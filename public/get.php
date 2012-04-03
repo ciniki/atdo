@@ -45,7 +45,7 @@ function ciniki_atdo_get($ciniki) {
 
 	$strsql = "SELECT ciniki_atdos.id, type, subject, location, content, user_id, "
 		. "IF((ciniki_atdos.perm_flags&0x01)=1, 'yes', 'no') AS private, "
-		. "status, ciniki_atdos.priority, "
+		. "status, ciniki_atdos.category, ciniki_atdos.priority, "
 		. "DATE_FORMAT(appointment_date, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS appointment_date, "
 		. "DATE_FORMAT(appointment_date, '%Y-%m-%d') AS appointment_date_date, "
 		. "DATE_FORMAT(appointment_date, '%H:%i') AS appointment_time, "

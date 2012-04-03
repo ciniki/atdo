@@ -23,6 +23,7 @@ function ciniki_atdo_update($ciniki) {
 		'type'=>array('required'=>'no', 'blank'=>'no', 'errmsg'=>'No type specified'),
 		'parent_id'=>array('required'=>'no', 'blank'=>'yes', 'errmsg'=>'No parent specified'),
         'subject'=>array('required'=>'no', 'blank'=>'no', 'errmsg'=>'No subject specified'), 
+        'category'=>array('required'=>'no', 'blank'=>'no', 'errmsg'=>'No category specified'), 
         'location'=>array('required'=>'no', 'blank'=>'no', 'errmsg'=>'No location specified'), 
         'content'=>array('required'=>'no', 'blank'=>'no', 'errmsg'=>'No content specified'), 
 		'assigned'=>array('required'=>'no', 'blank'=>'yes', 'type'=>'idlist', 'errmsg'=>'No assignments specified'),
@@ -108,6 +109,7 @@ function ciniki_atdo_update($ciniki) {
 
 	$changelog_fields = array(
 		'type',
+		'category',
 		'subject',
 		'location',
 		'content',
@@ -130,7 +132,6 @@ function ciniki_atdo_update($ciniki) {
 	}
 	$strsql .= "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
 		. "AND id = '" . ciniki_core_dbQuote($ciniki, $args['atdo_id']) . "' ";
-	error_log($strsql);
 	$rc = ciniki_core_dbUpdate($ciniki, $strsql, 'atdo');
 	if( $rc['stat'] != 'ok' ) { 
 		ciniki_core_dbTransactionRollback($ciniki, 'atdo');
