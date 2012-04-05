@@ -54,6 +54,7 @@ function ciniki_atdo__appointmentSearch($ciniki, $business_id, $args) {
 		. "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
 		// Search items with an appointment date or due date
 		. "AND (ciniki_atdos.appointment_date != 0 OR ciniki_atdos.due_date != 0) "
+		. "AND (type = 1 OR type = 2) "
 		. "";
 // Search for all tasks, even when closed
 	if( isset($args['full']) && $args['full'] == 'yes' ) {

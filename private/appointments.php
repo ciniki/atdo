@@ -60,6 +60,7 @@ function ciniki_atdo__appointments($ciniki, $business_id, $args) {
 		. "FROM ciniki_atdos "
 		. "LEFT JOIN ciniki_atdo_users AS u1 ON (ciniki_atdos.id = u1.atdo_id AND u1.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
 		. "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+		. "AND (type = 1 OR type = 2) "
 		. "";
 	if( isset($args['atdo_id']) && $args['atdo_id'] > 0 ) {
 		$strsql .= "AND ciniki_atdos.id = '" . ciniki_core_dbQuote($ciniki, $args['appointment_id']) . "' ";
@@ -79,6 +80,7 @@ function ciniki_atdo__appointments($ciniki, $business_id, $args) {
 			. "LEFT JOIN ciniki_atdo_users AS u1 ON (ciniki_atdos.id = u1.atdo_id AND u1.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
 			. "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
 			. "AND status = 1 "
+			. "AND (type = 1 OR type = 2) "
 		. "";
 
 
