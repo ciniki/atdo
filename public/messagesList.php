@@ -75,7 +75,7 @@ function ciniki_atdo_messagesList($ciniki) {
 			// created by the user requesting the list
 			. "OR ((perm_flags&0x01) = 1 AND ciniki_atdos.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
 			// Assigned to the user requesting the list
-			. "OR ((perm_flags&0x01) = 1 AND (u1.perms&0x04) = 0x04 AND (u1.perms&0x10) = 0x10 ) "
+			. "OR ((perm_flags&0x01) = 1 AND (u1.perms&0x04) = 0x04 AND (u1.perms&0x10) != 0x10 ) "
 			. ") "
 		. "ORDER BY assigned DESC, priority DESC, due_date DESC, ciniki_atdos.id, u3.display_name "
 		. "";
