@@ -14,7 +14,7 @@
 #					0x01 - following comments, notify via email
 #					0x02 - following notifications, notify via email
 #					0x04 - the atdo is assigned to the user
-#					0x08 - atdo has been updated, removed when user requests atdo through ciniki.atdo.get
+#					0x08 - atdo has been viewed, removed when user requests atdo through ciniki.atdo.get
 #						   This is used for messaging and keeping track of what updates the user has viewed.
 #					0x10 - The atdo has been marked deleted for this user.
 #						   Used for messages, and to remove from users view.

@@ -201,7 +201,7 @@ function ciniki_atdo_add($ciniki) {
 	// Add the user who created the atdo, as a follower 
 	//
 	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/threadAddUserPerms.php');
-	$rc = ciniki_core_threadAddUserPerms($ciniki, 'atdo', 'ciniki_atdo_users', 'atdo', $atdo_id, $ciniki['session']['user']['id'], 0x01|0x04);
+	$rc = ciniki_core_threadAddUserPerms($ciniki, 'atdo', 'ciniki_atdo_users', 'atdo', $atdo_id, $ciniki['session']['user']['id'], (0x01|0x04));
 	if( $rc['stat'] != 'ok' ) {
 		ciniki_core_dbTransactionRollback($ciniki, 'atdo');
 		return $rc;

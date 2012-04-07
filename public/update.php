@@ -208,7 +208,7 @@ function ciniki_atdo_update($ciniki) {
 	if( (isset($args['followup']) && $args['followup'] != '')
 		|| (isset($args['status']) && $args['status'] != '' ) ) {
 		$strsql = "UPDATE ciniki_atdo_users "
-			. "SET perms = (perms|0x18) "
+			. "SET perms = ((perms&~0x10)|0x08) "		// Removed delete flag if set, add unread flag
 			. "WHERE atdo_id = '" . ciniki_core_dbQuote($ciniki, $args['atdo_id']) . "' "
 			. "AND user_id <> '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "' "
 			. "AND (perms&0x04) = 0x04 "	// Only update assigned users
