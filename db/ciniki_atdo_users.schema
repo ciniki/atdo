@@ -14,8 +14,12 @@
 #					0x01 - following comments, notify via email
 #					0x02 - following notifications, notify via email
 #					0x04 - the atdo is assigned to the user
-#					0x08 - 
+#					0x08 - atdo has been updated, removed when user requests atdo through ciniki.atdo.get
+#						   This is used for messaging and keeping track of what updates the user has viewed.
+#					0x10 - The atdo has been marked deleted for this user.
+#						   Used for messages, and to remove from users view.
 #
+### last_viewed:		The UTC date and time the user last viewed the atdo.
 # date_added:		The UTC date and time the user subscribed to this thread.
 # last_updated:		The UTC date and time the status was last changed.
 #
@@ -23,6 +27,7 @@ create table ciniki_atdo_users (
 	atdo_id int not null,
 	user_id varchar(50) not null,
 	perms tinyint unsigned not null,
+#	last_viewed datetime not null,
 	date_added datetime not null,
 	last_updated datetime not null,
 	primary key (atdo_id, user_id)

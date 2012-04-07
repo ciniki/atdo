@@ -73,7 +73,7 @@ function ciniki_atdo_faqsSearchFull($ciniki) {
 //			// created by the user requesting the list
 //			. "OR ((perm_flags&0x01) = 1 AND ciniki_atdos.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
 //			// Assigned to the user requesting the list
-//			. "OR ((perm_flags&0x01) = 1 AND u1.perms = 0x04) "
+//			. "OR ((perm_flags&0x01) = 1 AND (u1.perms&0x04) = 0x04) "
 //			. ") "
 //		. "GROUP BY ciniki_atdos.id, u3.id "
 //		. "";	

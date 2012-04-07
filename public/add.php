@@ -74,7 +74,8 @@ function ciniki_atdo_add($ciniki) {
 	// Setup flags
 	//
 	$perm_flags = 0;
-	if( isset($args['private']) && $args['private'] == 'yes' ) {
+	// Make messages private, always
+	if( $args['type'] == 6 || (isset($args['private']) && $args['private'] == 'yes') ) {
 		$perm_flags += 1;
 	}
 	$appointment_flags = 0;
@@ -209,10 +210,11 @@ function ciniki_atdo_add($ciniki) {
 	//
 	// Add users who were assigned.  If the creator also is assigned the atdo, then they will be 
 	// both a follower (above code) and assigned (below code).
+	// Add the viewed flag to be set, so it's marked as unread for new assigned users.
 	//
 	if( isset($args['assigned']) && is_array($args['assigned']) ) {
 		foreach( $args['assigned'] as $user_id ) {
-			$rc = ciniki_core_threadAddUserPerms($ciniki, 'atdo', 'ciniki_atdo_users', 'atdo', $atdo_id, $user_id, 4);
+			$rc = ciniki_core_threadAddUserPerms($ciniki, 'atdo', 'ciniki_atdo_users', 'atdo', $atdo_id, $user_id, (4|8));
 			if( $rc['stat'] != 'ok' ) {
 				ciniki_core_dbTransactionRollback($ciniki, 'atdo');
 				return $rc;

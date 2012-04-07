@@ -121,7 +121,7 @@ function ciniki_atdo__appointments($ciniki, $business_id, $args) {
 			// created by the user requesting the list
 			. "OR ((ciniki_atdos.perm_flags&0x01) = 1 AND ciniki_atdos.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
 			// Assigned to the user requesting the list
-			. "OR ((ciniki_atdos.perm_flags&0x01) = 1 AND u1.perms = 0x04) "
+			. "OR ((ciniki_atdos.perm_flags&0x01) = 1 AND (u1.perms&0x04) = 0x04) "
 			. ") "
 		. "";
 	$strsql .= ""

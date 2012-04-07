@@ -95,18 +95,16 @@ function ciniki_atdo_update($ciniki) {
 			$strsql .= ', due_flags=(due_flags&~0x01)';
 		}
 	}
-	if( isset($args['private']) ) {
-		if( $args['private'] == 'yes' ) {
-			$strsql .= ', perm_flags=(perm_flags|0x01)';
-		} else {
-			$strsql .= ', perm_flags=(perm_flags&~0x01)';
-		}
+	// Make sure the message is private, or if other type is set as private
+	if( (isset($args['type']) && $args['type'] == 6) || (isset($args['private']) && $args['private'] == 'yes') ) {
+		$strsql .= ', perm_flags=(perm_flags|0x01)';
+	} elseif( isset($args['private']) ) {
+		$strsql .= ', perm_flags=(perm_flags&~0x01)';
 	}
 
 	//
 	// Add all the fields to the change log
 	//
-
 	$changelog_fields = array(
 		'type',
 		'category',
@@ -142,21 +140,6 @@ function ciniki_atdo_update($ciniki) {
 		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'556', 'msg'=>'Unable to update task'));
 	}
 
-	//
-	// Check if there is a followup
-	//
-	if( isset($args['followup']) && $args['followup'] != '' ) {
-		require_once($ciniki['config']['core']['modules_dir'] . '/core/private/threadAddFollowup.php');
-		$rc = ciniki_core_threadAddFollowup($ciniki, 'atdo', 'ciniki_atdo_followups', 'atdo', $args['atdo_id'], array(
-			'user_id'=>$ciniki['session']['user']['id'],
-			'atdo_id'=>$args['atdo_id'],
-			'content'=>$args['followup']
-			));
-		if( $rc['stat'] != 'ok' ) {
-			ciniki_core_dbTransactionRollback($ciniki, 'atdo');
-			return $rc;
-		}
-	}
 
 	//
 	// Check if the assigned users has changed
@@ -193,11 +176,47 @@ function ciniki_atdo_update($ciniki) {
 		$to_be_added = array_diff($args['assigned'], $task_users);
 		if( is_array($to_be_added) ) {
 			foreach($to_be_added as $user_id) {
-				$rc = ciniki_core_threadAddUserPerms($ciniki, 'atdo', 'ciniki_atdo_users', 'atdo', $args['atdo_id'], $user_id, 0x04);
+				$rc = ciniki_core_threadAddUserPerms($ciniki, 'atdo', 'ciniki_atdo_users', 'atdo', $args['atdo_id'], $user_id, (0x04|0x08));
 				if( $rc['stat'] != 'ok' ) {
 					return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'561', 'msg'=>'Unable to update task information', 'err'=>$rc['err']));
 				}
 			}
+		}
+	}
+
+	//
+	// Check if there is a followup, but after we have adjusted the assigned users
+	// so any new users get the unviewed flag set
+	//
+	if( isset($args['followup']) && $args['followup'] != '' ) {
+		require_once($ciniki['config']['core']['modules_dir'] . '/core/private/threadAddFollowup.php');
+		$rc = ciniki_core_threadAddFollowup($ciniki, 'atdo', 'ciniki_atdo_followups', 'atdo', $args['atdo_id'], array(
+			'user_id'=>$ciniki['session']['user']['id'],
+			'atdo_id'=>$args['atdo_id'],
+			'content'=>$args['followup']
+			));
+		if( $rc['stat'] != 'ok' ) {
+			ciniki_core_dbTransactionRollback($ciniki, 'atdo');
+			return $rc;
+		}
+	}
+
+	//
+	// Update the assigned users viewed flag, and remove any user delete flags so they see the message again
+	// if followup specified, or status has changed.
+	//
+	if( (isset($args['followup']) && $args['followup'] != '')
+		|| (isset($args['status']) && $args['status'] != '' ) ) {
+		$strsql = "UPDATE ciniki_atdo_users "
+			. "SET perms = (perms|0x18) "
+			. "WHERE atdo_id = '" . ciniki_core_dbQuote($ciniki, $args['atdo_id']) . "' "
+			. "AND user_id <> '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "' "
+			. "AND (perms&0x04) = 0x04 "	// Only update assigned users
+			. "";
+		$rc = ciniki_core_dbUpdate($ciniki, $strsql, 'atdo');
+		if( $rc['stat'] != 'ok' ) {
+			ciniki_core_dbTransactionRollback($ciniki, 'atdo');
+			return $rc;
 		}
 	}
 

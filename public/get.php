@@ -201,6 +201,15 @@ function ciniki_atdo_get($ciniki) {
 		$atdo['user_display_name'] = $users[$atdo['user_id']]['display_name'];
 	}
 
+	//
+	// Update the viewed flag to specify the user has requested this atdo.
+	//
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadRemoveUserPerms');
+	$rc = ciniki_core_threadRemoveUserPerms($ciniki, 'atdo', 'ciniki_atdo_users', 'atdo', $args['atdo_id'], $ciniki['session']['user']['id'], 0x08);
+	if( $rc['stat'] != 'ok' ) {
+		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'587', 'msg'=>'Unable to update task information', 'err'=>$rc['err']));
+	}
+
 	return array('stat'=>'ok', 'atdo'=>$atdo);
 }
 ?>
