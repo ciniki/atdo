@@ -42,6 +42,7 @@ function ciniki_atdo_update($ciniki) {
         'due_date'=>array('required'=>'no', 'blank'=>'yes', 'type'=>'datetime', 'errmsg'=>'No due date specified'), 
         'due_duration'=>array('required'=>'no', 'blank'=>'no', 'errmsg'=>'No duration specified'), 
         'due_allday'=>array('required'=>'no', 'blank'=>'no', 'errmsg'=>'No allday specified'), 
+		'userdelete'=>array('required'=>'no', 'blank'=>'yes', 'errmsg'=>'No user delete specified'),
         )); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
@@ -138,6 +139,19 @@ function ciniki_atdo_update($ciniki) {
 	if( !isset($rc['num_affected_rows']) || $rc['num_affected_rows'] != 1 ) {
 		ciniki_core_dbTransactionRollback($ciniki, 'atdo');
 		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'556', 'msg'=>'Unable to update task'));
+	}
+
+
+	//
+	// Check if the user has delete the message from their messages
+	// which results in it being marked deleted in ciniki_atdo_users.perms
+	//
+	if( isset($args['userdelete']) && $args['userdelete'] == 'yes' ) {
+		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddUserPerms');
+		$rc = ciniki_core_threadAddUserPerms($ciniki, 'atdo', 'ciniki_atdo_users', 'atdo', $args['atdo_id'], $ciniki['session']['user']['id'], 0x10);
+		if( $rc['stat'] != 'ok' ) {
+			return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'589', 'msg'=>'Unable to remove message', 'err'=>$rc['err']));
+		}
 	}
 
 

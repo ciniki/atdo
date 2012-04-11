@@ -44,21 +44,20 @@ function ciniki_atdo_messagesList($ciniki) {
 	$date_format = ciniki_users_dateFormat($ciniki);
 
 	$strsql = "SELECT ciniki_atdos.id, subject, "
-	//	. "IF((ciniki_atdos.appointment_flags&0x01)=1, 'yes', 'no') AS allday, "
 		. "IF((ciniki_atdos.perm_flags&0x01)=1, 'yes', 'no') AS private, "
 		. "IF(ciniki_atdos.status=1, 'open', 'closed') AS status, "
-	//	. "priority, "
 		. "IF((u1.perms&0x04)=4, 'yes', 'no') AS assigned, "
 		. "IF((u1.perms&0x08)=8, 'no', 'yes') AS viewed, "
-	//	. "DATE_FORMAT(start_date, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS start_date, "
 		. "u2.user_id AS assigned_user_ids, "
 		. "IFNULL(u3.display_name, '') AS assigned_users "
 		. "FROM ciniki_atdos "
 		. "LEFT JOIN ciniki_atdo_users AS u1 ON (ciniki_atdos.id = u1.atdo_id AND u1.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
+//			. "AND (u1.perms&0x10) = 0 ) " // Make sure not deleted from users view
 		. "LEFT JOIN ciniki_atdo_users AS u2 ON (ciniki_atdos.id = u2.atdo_id && (u2.perms&0x04) = 4) "
 		. "LEFT JOIN ciniki_users AS u3 ON (u2.user_id = u3.id) "
 		. "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
 		. "AND type = 6 "
+		. "AND (u1.perms&0x10) = 0 "
 		. "";
 	if( isset($args['status']) ) {
 		switch($args['status']) {
