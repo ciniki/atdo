@@ -54,7 +54,7 @@ function ciniki_atdo_update($ciniki) {
     // check permission to run this function for this business
     //  
     require_once($ciniki['config']['core']['modules_dir'] . '/atdo/private/checkAccess.php');
-    $rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.taskUpdate'); 
+    $rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.update'); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }   
