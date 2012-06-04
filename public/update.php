@@ -190,7 +190,7 @@ function ciniki_atdo_update($ciniki) {
 		$to_be_added = array_diff($args['assigned'], $task_users);
 		if( is_array($to_be_added) ) {
 			foreach($to_be_added as $user_id) {
-				$rc = ciniki_core_threadAddUserPerms($ciniki, 'atdo', 'ciniki_atdo_users', 'atdo', $args['atdo_id'], $user_id, (0x04|0x08));
+				$rc = ciniki_core_threadAddUserPerms($ciniki, 'atdo', 'ciniki_atdo_users', 'atdo', $args['atdo_id'], $user_id, (0x04));
 				if( $rc['stat'] != 'ok' ) {
 					return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'561', 'msg'=>'Unable to update task information', 'err'=>$rc['err']));
 				}
@@ -222,7 +222,7 @@ function ciniki_atdo_update($ciniki) {
 	if( (isset($args['followup']) && $args['followup'] != '')
 		|| (isset($args['status']) && $args['status'] != '' ) ) {
 		$strsql = "UPDATE ciniki_atdo_users "
-			. "SET perms = ((perms&~0x10)|0x08) "		// Removed delete flag if set, add unread flag
+			. "SET perms = ((perms&~0x18)) "		// Removed delete flag if set, add unread flag
 			. "WHERE atdo_id = '" . ciniki_core_dbQuote($ciniki, $args['atdo_id']) . "' "
 			. "AND user_id <> '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "' "
 			. "AND (perms&0x04) = 0x04 "	// Only update assigned users

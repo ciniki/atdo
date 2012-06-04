@@ -49,7 +49,7 @@ function ciniki_atdo_notesList($ciniki) {
 		. "IF(ciniki_atdos.status=1, 'open', 'closed') AS status, "
 	//	. "priority, "
 		. "IF((u1.perms&0x04)=4, 'yes', 'no') AS assigned, "
-		. "IF((u1.perms&0x08)=8, 'no', 'yes') AS viewed, "
+		. "IF((u1.perms&0x08)=8, 'yes', 'no') AS viewed, "
 	//	. "DATE_FORMAT(start_date, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS start_date, "
 	//	. "duration, "
 	//	. "IFNULL(DATE_FORMAT(ciniki_atdos.due_date, '" . ciniki_core_dbQuote($ciniki, $date_format) . "'), '') AS due_date, "

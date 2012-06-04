@@ -114,6 +114,8 @@ function ciniki_atdo_get($ciniki) {
 
 	$atdo['followers'] = array();
 	$atdo['assigned'] = '';
+	$atdo['viewed'] = '';
+	$atdo['deleted'] = '';
 
 	$user_ids = array($rc['atdo']['user_id']);
 
@@ -174,6 +176,20 @@ function ciniki_atdo_get($ciniki) {
 		if( ($user['user']['perms'] & 0x01) > 0 ) {
 			array_push($atdo['followers'], array('user'=>array('id'=>$user['user']['user_id'], 'display_name'=>$display_name)));
 		}
+		// User has viewed the atdo
+		if( ($user['user']['perms'] & 0x08) > 0 ) {
+			if( $atdo['viewed'] != '' ) {
+				$atdo['viewed'] .= ',';
+			}
+			$atdo['viewed'] .= $user['user']['user_id'];
+		}
+		// User has deleted the atdo
+		if( ($user['user']['perms'] & 0x10) > 0 ) {
+			if( $atdo['deleted'] != '' ) {
+				$atdo['deleted'] .= ',';
+			}
+			$atdo['deleted'] .= $user['user']['user_id'];
+		}
 		// Assigned to
 		if( ($user['user']['perms'] & 0x04) > 0 ) {
 			if( $atdo['assigned'] != '' ) {
@@ -204,8 +220,8 @@ function ciniki_atdo_get($ciniki) {
 	//
 	// Update the viewed flag to specify the user has requested this atdo.
 	//
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadRemoveUserPerms');
-	$rc = ciniki_core_threadRemoveUserPerms($ciniki, 'atdo', 'ciniki_atdo_users', 'atdo', $args['atdo_id'], $ciniki['session']['user']['id'], 0x08);
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddUserPerms');
+	$rc = ciniki_core_threadAddUserPerms($ciniki, 'atdo', 'ciniki_atdo_users', 'atdo', $args['atdo_id'], $ciniki['session']['user']['id'], 0x08);
 	if( $rc['stat'] != 'ok' ) {
 		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'587', 'msg'=>'Unable to update task information', 'err'=>$rc['err']));
 	}

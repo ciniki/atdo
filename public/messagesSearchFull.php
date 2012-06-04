@@ -49,7 +49,7 @@ function ciniki_atdo_messagesSearchFull($ciniki) {
 	//
 	$strsql = "SELECT ciniki_atdos.id, subject, ciniki_atdos.status, priority, "
 		. "IF((u1.perms&0x04)=4, 'yes', 'no') AS assigned, "
-		. "IF((u1.perms&0x08)=8, 'no', 'yes') AS viewed, "
+		. "IF((u1.perms&0x08)=8, 'yes', 'no') AS viewed, "
 		. "IFNULL(u3.display_name, '') AS assigned_users "
 		. "FROM ciniki_atdos "
 		. "LEFT JOIN ciniki_atdo_users AS u1 ON (ciniki_atdos.id = u1.atdo_id AND u1.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "

@@ -47,7 +47,7 @@ function ciniki_atdo_messagesList($ciniki) {
 		. "IF((ciniki_atdos.perm_flags&0x01)=1, 'yes', 'no') AS private, "
 		. "IF(ciniki_atdos.status=1, 'open', 'closed') AS status, "
 		. "IF((u1.perms&0x04)=4, 'yes', 'no') AS assigned, "
-		. "IF((u1.perms&0x08)=8, 'no', 'yes') AS viewed, "
+		. "IF((u1.perms&0x08)=8, 'yes', 'no') AS viewed, "
 		. "u2.user_id AS assigned_user_ids, "
 		. "IFNULL(u3.display_name, '') AS assigned_users "
 		. "FROM ciniki_atdos "
