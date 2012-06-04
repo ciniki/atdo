@@ -50,12 +50,15 @@ function ciniki_atdo_messagesSearchFull($ciniki) {
 	$strsql = "SELECT ciniki_atdos.id, subject, ciniki_atdos.status, priority, "
 		. "IF((u1.perms&0x04)=4, 'yes', 'no') AS assigned, "
 		. "IF((u1.perms&0x08)=8, 'yes', 'no') AS viewed, "
-		. "IFNULL(u3.display_name, '') AS assigned_users "
+		. "IFNULL(u3.display_name, '') AS assigned_users, "
+		. "CAST((UNIX_TIMESTAMP(UTC_TIMESTAMP())-UNIX_TIMESTAMP(ciniki_atdo_followups.date_added)) as DECIMAL(12,0)) AS age_followup, "
+		. "IFNULL(u4.display_name, '') AS followup_user "
 		. "FROM ciniki_atdos "
 		. "LEFT JOIN ciniki_atdo_users AS u1 ON (ciniki_atdos.id = u1.atdo_id AND u1.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
 		. "LEFT JOIN ciniki_atdo_users AS u2 ON (ciniki_atdos.id = u2.atdo_id && (u2.perms&0x04) = 4) "
 		. "LEFT JOIN ciniki_users AS u3 ON (u2.user_id = u3.id) "
-		. "LEFT JOIN ciniki_atdo_followups ON (ciniki_atdos.id = ciniki_atdo_followups.atdo_id ) "
+		. "LEFT JOIN ciniki_atdo_followups ON (ciniki_atdos.id = ciniki_atdo_followups.atdo_id) "
+		. "LEFT JOIN ciniki_users AS u4 ON (ciniki_atdo_followups.user_id = u4.id ) "
 		. "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
 		. "AND ciniki_atdos.type = 6 "		// Messages
 		. "";
@@ -79,10 +82,10 @@ function ciniki_atdo_messagesSearchFull($ciniki) {
 		. "GROUP BY ciniki_atdos.id, u3.id "
 		. "";	
 	if( isset($args['completed']) && $args['completed'] == 'yes' ) {
-		$strsql .= "ORDER BY ciniki_atdos.id DESC, assigned DESC, ciniki_atdos.id, u3.display_name "
+		$strsql .= "ORDER BY ciniki_atdos.id DESC, assigned DESC, ciniki_atdos.id, u3.display_name, ciniki_atdo_followups.date_added DESC "
 		. "";
 	} else {
-		$strsql .= "ORDER BY assigned DESC, ciniki_atdos.id, u3.display_name "
+		$strsql .= "ORDER BY assigned DESC, ciniki_atdos.id, u3.display_name, ciniki_atdo_followups.date_added DESC "
 		. "";
 	}
 	if( isset($args['limit']) && $args['limit'] != '' && $args['limit'] > 0 ) {
@@ -93,7 +96,7 @@ function ciniki_atdo_messagesSearchFull($ciniki) {
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
 	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'messages', array(
 		array('container'=>'messages', 'fname'=>'id', 'name'=>'message',
-			'fields'=>array('id', 'subject', 'viewed', 'assigned', 'assigned_users'), 
+			'fields'=>array('id', 'subject', 'viewed', 'assigned', 'assigned_users', 'last_followup_age'=>'age_followup', 'last_followup_user'=>'followup_user'), 
 			'lists'=>array('assigned_users'),
 			'maps'=>array('status'=>array(''=>'Unknown', '1'=>'Open', '60'=>'Completed')),
 			),
