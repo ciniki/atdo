@@ -82,7 +82,7 @@ function ciniki_atdo_messagesList($ciniki) {
 			. ") "
 		. "ORDER BY assigned DESC, priority DESC, due_date DESC, ciniki_atdos.id, u3.display_name, ciniki_atdo_followups.date_added DESC "
 		. "";
-	error_log($strsql);
+	// error_log($strsql);
 	if( isset($args['limit']) && $args['limit'] != '' && $args['limit'] > 0 ) {
 		$strsql .= "LIMIT " . ciniki_core_dbQuote($ciniki, $args['limit']) . " ";
 	}
