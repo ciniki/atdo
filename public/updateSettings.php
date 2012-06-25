@@ -47,7 +47,7 @@ function ciniki_atdo_updateSettings($ciniki) {
 	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbTransactionCommit.php');
 	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbQuote.php');
 	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbInsert.php');
-	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbAddChangeLog.php');
+	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbAddModuleHistory.php');
 	$rc = ciniki_core_dbTransactionStart($ciniki, 'atdo');
 	if( $rc['stat'] != 'ok' ) { 
 		return $rc;
@@ -84,7 +84,7 @@ function ciniki_atdo_updateSettings($ciniki) {
 				ciniki_core_dbTransactionRollback($ciniki, 'atdo');
 				return $rc;
 			}
-			ciniki_core_dbAddChangeLog($ciniki, 'atdo', $args['business_id'], 'ciniki_atdo_settings', $field, 'detail_value', $ciniki['request']['args'][$field]);
+			ciniki_core_dbAddModuleHistory($ciniki, 'atdo', 'ciniki_atdo_history', $args['business_id'], 'ciniki_atdo_settings', $field, 'detail_value', $ciniki['request']['args'][$field]);
 		}
 	}
 

@@ -67,7 +67,7 @@ function ciniki_atdo_update($ciniki) {
 	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbTransactionCommit.php');
 	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbQuote.php');
 	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbUpdate.php');
-	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbAddChangeLog.php');
+	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbAddModuleHistory.php');
 	$rc = ciniki_core_dbTransactionStart($ciniki, 'atdo');
 	if( $rc['stat'] != 'ok' ) { 
 		return $rc;
@@ -125,8 +125,8 @@ function ciniki_atdo_update($ciniki) {
 	foreach($changelog_fields as $field) {
 		if( isset($args[$field]) ) {
 			$strsql .= ", $field = '" . ciniki_core_dbQuote($ciniki, $args[$field]) . "' ";
-			$rc = ciniki_core_dbAddChangeLog($ciniki, 'atdo', $args['business_id'], 
-				'ciniki_atdos', $args['atdo_id'], $field, $args[$field]);
+			$rc = ciniki_core_dbAddModuleHistory($ciniki, 'atdo', 'ciniki_atdo_history', $args['business_id'], 
+				2, 'ciniki_atdos', $args['atdo_id'], $field, $args[$field]);
 		}
 	}
 	$strsql .= "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "

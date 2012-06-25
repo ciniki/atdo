@@ -41,15 +41,15 @@ function ciniki_atdo_getHistory($ciniki) {
 	}
 
 	if( $args['field'] == 'appointment_date' ) {
-		require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbGetChangeLogReformat.php');
-		return ciniki_core_dbGetChangeLogReformat($ciniki, $args['business_id'], 'ciniki_atdos', $args['atdo_id'], $args['field'], 'atdo', 'datetime');
+		require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbGetModuleHistoryReformat.php');
+		return ciniki_core_dbGetModuleHistoryReformat($ciniki, 'atdo', 'ciniki_atdo_history', $args['business_id'], 'ciniki_atdos', $args['atdo_id'], $args['field'], 'datetime');
 	}
 	if( $args['field'] == 'due_date' ) {
-		require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbGetChangeLogReformat.php');
-		return ciniki_core_dbGetChangeLogReformat($ciniki, $args['business_id'], 'ciniki_atdos', $args['atdo_id'], $args['field'], 'atdo', 'datetime');
+		require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbGetModuleHistoryReformat.php');
+		return ciniki_core_dbGetModuleHistoryReformat($ciniki, 'atdo', 'ciniki_atdo_history', $args['business_id'], 'ciniki_atdos', $args['atdo_id'], $args['field'], 'datetime');
 	}
 
-	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbGetChangeLog.php');
-	return ciniki_core_dbGetChangeLog($ciniki, $args['business_id'], 'ciniki_atdos', $args['atdo_id'], $args['field'], 'atdo');
+	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbGetModuleHistory.php');
+	return ciniki_core_dbGetModuleHistory($ciniki, 'atdo', 'ciniki_atdo_history', $args['business_id'], 'ciniki_atdos', $args['atdo_id'], $args['field']);
 }
 ?>
