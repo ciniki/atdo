@@ -22,7 +22,7 @@ function ciniki_atdo_add($ciniki) {
 		'type'=>array('required'=>'yes', 'blank'=>'no', 'errmsg'=>'No type specified'),
 		'parent_id'=>array('required'=>'no', 'blank'=>'yes', 'default'=>'0', 'errmsg'=>'No parent specified'),
         'subject'=>array('required'=>'yes', 'blank'=>'no', 'errmsg'=>'No subject specified'), 
-        'category'=>array('required'=>'no', 'blank'=>'yes', 'errmsg'=>'No category specified'), 
+        'category'=>array('required'=>'no', 'blank'=>'yes', 'default'=>'', 'errmsg'=>'No category specified'), 
         'location'=>array('required'=>'no', 'blank'=>'yes', 'default'=>'', 'errmsg'=>'No location specified'), 
         'content'=>array('required'=>'no', 'blank'=>'yes', 'default'=>'', 'errmsg'=>'No content specified'), 
 		'assigned'=>array('required'=>'no', 'blank'=>'yes', 'type'=>'idlist', 'errmsg'=>'No assignments specified'),
@@ -38,7 +38,7 @@ function ciniki_atdo_add($ciniki) {
         'appointment_repeat_type'=>array('required'=>'no', 'default'=>'0', 'blank'=>'yes', 'errmsg'=>'No repeat specified'), 
         'appointment_repeat_interval'=>array('required'=>'no', 'default'=>'0', 'blank'=>'yes', 'errmsg'=>'No repeat interval specified'), 
         'appointment_repeat_end'=>array('required'=>'no', 'type'=>'date', 'default'=>'', 'blank'=>'yes', 'errmsg'=>'No repeat end specified'), 
-        'due_date'=>array('required'=>'no', 'blank'=>'yes', 'type'=>'datetime', 'errmsg'=>'No date specified'), 
+        'due_date'=>array('required'=>'no', 'blank'=>'yes', 'type'=>'datetime', 'default'=>'', 'errmsg'=>'No date specified'), 
         'due_allday'=>array('required'=>'no', 'default'=>'no', 'blank'=>'no', 'errmsg'=>'No due allday specified'), 
         )); 
     if( $rc['stat'] != 'ok' ) { 
