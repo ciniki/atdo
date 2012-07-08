@@ -110,7 +110,7 @@ function ciniki_atdo_taskClose($ciniki) {
 	//
 	// FIXME: Notify the other users on this thread there was an update.
 	//
-	// ciniki_core_threadNotifyUsers($ciniki, 'atdo', 'ciniki_atdo_users', 'followup', 
+	// ciniki_core_threadNotifyUsers($ciniki, 'atdo', 'ciniki_atdo_users', 'followup');
 	//
 
 	//
