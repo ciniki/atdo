@@ -5,16 +5,13 @@
 // This method allow's a user to close a task.  They must have suffcient permissions to
 // close the task
 //
-// Info
-// ----
-// Status: beta
-//
 // Arguments
 // ---------
 // api_key:
 // auth_token:
 // business_id: 		The business the task is attached to.
-// task_id:				The ID of the task to be closed.
+// atdo_id:				The ID of the task to be closed.
+// content:				(optional) Any followup content to be added during close.
 // 
 // Returns
 // -------
