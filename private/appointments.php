@@ -2,21 +2,17 @@
 //
 // Description
 // -----------
-// This function will return any tasks that should be displayed in a calendar as an appointment.  This
-// will get all tasks, even if they are closed.
+// This function will return any appointments or tasks that should be displayed in the calendar.
+// This function is used by ciniki.calendars.appointments.
 //
 // Arguments
 // ---------
-// api_key:
-// auth_token:
-// business_id:			The ID of the business to get the details for.
-// date:				The date to get the schedule for.
+// ciniki:
+// business_id:			The ID of the business to get the appointments for.
+// args:				The arguments passed to the calling public method ciniki.calendars.appointments.
 //
 // Returns
 // -------
-//	<appointments>
-//		<appointment calendar="Appointments" customer_name="" invoice_number="" wine_name="" />
-//	</appointments>
 //
 function ciniki_atdo__appointments($ciniki, $business_id, $args) {
 

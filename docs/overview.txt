@@ -1,0 +1,11 @@
+This module stores Appointments, Tasks, FAQ's, Notes and Messages.
+
+Appointments are visible in the calendar.  Tasks are also visible
+in the calendar if a due date is set.
+
+FAQ's store questions and answers, where there can be multiple answers.  
+
+Notes are similar to FAQ's but can be used for internal documentation of business procedures.
+
+Messages are used for communication between employee's and owners.  It's
+similar to an email system.

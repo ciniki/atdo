@@ -34,7 +34,7 @@ function ciniki_atdo_faqsList($ciniki) {
     // check permission to run this function for this business
     //  
     require_once($ciniki['config']['core']['modules_dir'] . '/atdo/private/checkAccess.php');
-    $rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.notesList'); 
+    $rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.faqsList'); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }   

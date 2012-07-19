@@ -6,7 +6,9 @@
 //
 // Arguments
 // ---------
-// user_id: 		The user making the request
+// api_key:
+// auth_token:
+// business_id:		The ID of the business to add the atdo to.
 // 
 // Returns
 // -------

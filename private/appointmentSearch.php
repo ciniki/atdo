@@ -2,20 +2,17 @@
 //
 // Description
 // -----------
-// This function will search atdo and return them in the calendar/appointment format.
+// This function will search the atdo module for appointments or tasks and return 
+// them in the calendar/appointment format.
 //
 // Arguments
 // ---------
-// api_key:
-// auth_token:
-// business_id:			The ID of the business to get the details for.
-// date:				The date to get the schedule for.
+// ciniki:
+// business_id:			The ID of the business to search for appointments.
+// args:				The arguments passed to the calling public method ciniki.calendars.search.
 //
 // Returns
 // -------
-//	<appointments>
-//		<appointment calendar="Tasks" customer_name="" invoice_number="" wine_name="" />
-//	</appointments>
 //
 function ciniki_atdo__appointmentSearch($ciniki, $business_id, $args) {
 

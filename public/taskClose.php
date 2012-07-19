@@ -37,7 +37,7 @@ function ciniki_atdo_taskClose($ciniki) {
 	// check permission to run this function for this business
 	//
 	require_once($ciniki['config']['core']['modules_dir'] . '/atdo/private/checkAccess.php');
-	$rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.close', $args['atdo_id'], $ciniki['session']['user']['id']);
+	$rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.taskClose', $args['atdo_id'], $ciniki['session']['user']['id']);
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
 	}

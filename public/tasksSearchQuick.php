@@ -32,7 +32,7 @@ function ciniki_atdo_tasksSearchQuick($ciniki) {
     // check permission to run this function for this business
     //  
     require_once($ciniki['config']['core']['modules_dir'] . '/atdo/private/checkAccess.php');
-    $rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.searchQuick', 0); 
+    $rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.tasksSearchQuick', 0); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }   
