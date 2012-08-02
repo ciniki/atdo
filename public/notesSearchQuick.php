@@ -76,7 +76,7 @@ function ciniki_atdo_notesSearchQuick($ciniki) {
 		$strsql .= "LIMIT 25 ";
 	}
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
-	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'atdo', array(
+	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
 		array('container'=>'notes', 'fname'=>'id', 'name'=>'note',
 			'fields'=>array('id', 'subject', 'assigned', 'viewed', 'assigned_users'), 'lists'=>array('assigned_users')),
 		));
@@ -87,8 +87,5 @@ function ciniki_atdo_notesSearchQuick($ciniki) {
 		return array('stat'=>'ok', 'notes'=>array());
 	}
 	return array('stat'=>'ok', 'notes'=>$rc['notes']);
-
-//	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbRspQuery.php');
-//	return ciniki_core_dbRspQuery($ciniki, $strsql, 'notes', 'notes', 'note', array('stat'=>'ok', 'notes'=>array()));
 }
 ?>

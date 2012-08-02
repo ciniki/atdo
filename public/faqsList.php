@@ -88,7 +88,7 @@ function ciniki_atdo_faqsList($ciniki) {
 		$strsql .= "LIMIT " . ciniki_core_dbQuote($ciniki, $args['limit']) . " ";
 	}
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
-	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'atdo', array(
+	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
 		array('container'=>'categories', 'fname'=>'name', 'name'=>'category',
 			'fields'=>array('name')),
 		array('container'=>'faqs', 'fname'=>'id', 'name'=>'faq',

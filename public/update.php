@@ -68,7 +68,7 @@ function ciniki_atdo_update($ciniki) {
 	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbQuote.php');
 	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbUpdate.php');
 	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbAddModuleHistory.php');
-	$rc = ciniki_core_dbTransactionStart($ciniki, 'atdo');
+	$rc = ciniki_core_dbTransactionStart($ciniki, 'ciniki.atdo');
 	if( $rc['stat'] != 'ok' ) { 
 		return $rc;
 	}   
@@ -125,19 +125,19 @@ function ciniki_atdo_update($ciniki) {
 	foreach($changelog_fields as $field) {
 		if( isset($args[$field]) ) {
 			$strsql .= ", $field = '" . ciniki_core_dbQuote($ciniki, $args[$field]) . "' ";
-			$rc = ciniki_core_dbAddModuleHistory($ciniki, 'atdo', 'ciniki_atdo_history', $args['business_id'], 
+			$rc = ciniki_core_dbAddModuleHistory($ciniki, 'ciniki.atdo', 'ciniki_atdo_history', $args['business_id'], 
 				2, 'ciniki_atdos', $args['atdo_id'], $field, $args[$field]);
 		}
 	}
 	$strsql .= "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
 		. "AND id = '" . ciniki_core_dbQuote($ciniki, $args['atdo_id']) . "' ";
-	$rc = ciniki_core_dbUpdate($ciniki, $strsql, 'atdo');
+	$rc = ciniki_core_dbUpdate($ciniki, $strsql, 'ciniki.atdo');
 	if( $rc['stat'] != 'ok' ) { 
-		ciniki_core_dbTransactionRollback($ciniki, 'atdo');
+		ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
 		return $rc;
 	}
 	if( !isset($rc['num_affected_rows']) || $rc['num_affected_rows'] != 1 ) {
-		ciniki_core_dbTransactionRollback($ciniki, 'atdo');
+		ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
 		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'556', 'msg'=>'Unable to update task'));
 	}
 
@@ -148,7 +148,7 @@ function ciniki_atdo_update($ciniki) {
 	//
 	if( isset($args['userdelete']) && $args['userdelete'] == 'yes' ) {
 		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddUserPerms');
-		$rc = ciniki_core_threadAddUserPerms($ciniki, 'atdo', 'ciniki_atdo_users', 'atdo', $args['atdo_id'], $ciniki['session']['user']['id'], 0x10);
+		$rc = ciniki_core_threadAddUserPerms($ciniki, 'ciniki.atdo', 'ciniki_atdo_users', 'atdo', $args['atdo_id'], $ciniki['session']['user']['id'], 0x10);
 		if( $rc['stat'] != 'ok' ) {
 			return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'589', 'msg'=>'Unable to remove message', 'err'=>$rc['err']));
 		}
@@ -170,7 +170,7 @@ function ciniki_atdo_update($ciniki) {
 			. "WHERE atdo_id = '" . ciniki_core_dbQuote($ciniki, $args['atdo_id']) . "' "
 			. "AND (perms&0x04) = 4 "
 			. "";
-		$rc = ciniki_core_dbQueryList($ciniki, $strsql, 'atdo', 'users', 'user_id');
+		$rc = ciniki_core_dbQueryList($ciniki, $strsql, 'ciniki.atdo', 'users', 'user_id');
 		if( $rc['stat'] != 'ok' ) {
 			return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'562', 'msg'=>'Unable to load task information', 'err'=>$rc['err']));
 		}
@@ -181,7 +181,7 @@ function ciniki_atdo_update($ciniki) {
 		$to_be_removed = array_diff($task_users, $args['assigned']);
 		if( is_array($to_be_removed) ) {
 			foreach($to_be_removed as $user_id) {
-				$rc = ciniki_core_threadRemoveUserPerms($ciniki, 'atdo', 'ciniki_atdo_users', 'atdo', $args['atdo_id'], $user_id, 0x04);
+				$rc = ciniki_core_threadRemoveUserPerms($ciniki, 'ciniki.atdo', 'ciniki_atdo_users', 'atdo', $args['atdo_id'], $user_id, 0x04);
 				if( $rc['stat'] != 'ok' ) {
 					return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'560', 'msg'=>'Unable to update task information', 'err'=>$rc['err']));
 				}
@@ -190,7 +190,7 @@ function ciniki_atdo_update($ciniki) {
 		$to_be_added = array_diff($args['assigned'], $task_users);
 		if( is_array($to_be_added) ) {
 			foreach($to_be_added as $user_id) {
-				$rc = ciniki_core_threadAddUserPerms($ciniki, 'atdo', 'ciniki_atdo_users', 'atdo', $args['atdo_id'], $user_id, (0x04));
+				$rc = ciniki_core_threadAddUserPerms($ciniki, 'ciniki.atdo', 'ciniki_atdo_users', 'atdo', $args['atdo_id'], $user_id, (0x04));
 				if( $rc['stat'] != 'ok' ) {
 					return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'561', 'msg'=>'Unable to update task information', 'err'=>$rc['err']));
 				}
@@ -204,13 +204,13 @@ function ciniki_atdo_update($ciniki) {
 	//
 	if( isset($args['followup']) && $args['followup'] != '' ) {
 		require_once($ciniki['config']['core']['modules_dir'] . '/core/private/threadAddFollowup.php');
-		$rc = ciniki_core_threadAddFollowup($ciniki, 'atdo', 'ciniki_atdo_followups', 'atdo', $args['atdo_id'], array(
+		$rc = ciniki_core_threadAddFollowup($ciniki, 'ciniki.atdo', 'ciniki_atdo_followups', 'atdo', $args['atdo_id'], array(
 			'user_id'=>$ciniki['session']['user']['id'],
 			'atdo_id'=>$args['atdo_id'],
 			'content'=>$args['followup']
 			));
 		if( $rc['stat'] != 'ok' ) {
-			ciniki_core_dbTransactionRollback($ciniki, 'atdo');
+			ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
 			return $rc;
 		}
 	}
@@ -227,9 +227,9 @@ function ciniki_atdo_update($ciniki) {
 			. "AND user_id <> '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "' "
 			. "AND (perms&0x04) = 0x04 "	// Only update assigned users
 			. "";
-		$rc = ciniki_core_dbUpdate($ciniki, $strsql, 'atdo');
+		$rc = ciniki_core_dbUpdate($ciniki, $strsql, 'ciniki.atdo');
 		if( $rc['stat'] != 'ok' ) {
-			ciniki_core_dbTransactionRollback($ciniki, 'atdo');
+			ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
 			return $rc;
 		}
 	}
@@ -237,10 +237,17 @@ function ciniki_atdo_update($ciniki) {
 	//
 	// Commit the database changes
 	//
-    $rc = ciniki_core_dbTransactionCommit($ciniki, 'atdo');
+    $rc = ciniki_core_dbTransactionCommit($ciniki, 'ciniki.atdo');
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
 	}
+
+	//
+	// Update the last_change date in the business modules
+	// Ignore the result, as we don't want to stop user updates if this fails.
+	//
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'updateModuleChangeDate');
+	ciniki_businesses_updateModuleChangeDate($ciniki, $args['business_id'], 'ciniki', 'atdo');
 
 	return array('stat'=>'ok');
 }

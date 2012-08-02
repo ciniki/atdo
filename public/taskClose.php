@@ -56,7 +56,7 @@ function ciniki_atdo_taskClose($ciniki) {
 	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbTransactionCommit.php');
 	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbUpdate.php');
 	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbAddModuleHistory.php');
-	$rc = ciniki_core_dbTransactionStart($ciniki, 'atdo');
+	$rc = ciniki_core_dbTransactionStart($ciniki, 'ciniki.atdo');
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
 	}
@@ -66,9 +66,9 @@ function ciniki_atdo_taskClose($ciniki) {
 	//
 	if( isset($args['content']) && $args['content'] != '' ) {
 		require_once($ciniki['config']['core']['modules_dir'] . '/core/private/threadAddFollowup.php');
-		$rc = ciniki_core_threadAddFollowup($ciniki, 'atdo', 'ciniki_atdo_followups', 'atdo', $args['atdo_id'], $args);
+		$rc = ciniki_core_threadAddFollowup($ciniki, 'ciniki.atdo', 'ciniki_atdo_followups', 'atdo', $args['atdo_id'], $args);
 		if( $rc['stat'] != 'ok' ) {
-			ciniki_core_dbTransactionRollback($ciniki, 'atdo');
+			ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
 			return $rc;
 		}
 
@@ -77,9 +77,9 @@ function ciniki_atdo_taskClose($ciniki) {
 		// will make sure the flag is set.
 		// 
 		require_once($ciniki['config']['core']['modules_dir'] . '/core/private/threadAddFollower.php');
-		$rc = ciniki_core_threadAddFollower($ciniki, 'atdo', 'ciniki_atdo_users', 'atdo', $args['atdo_id'], $ciniki['session']['user']['id']);
+		$rc = ciniki_core_threadAddFollower($ciniki, 'ciniki.atdo', 'ciniki_atdo_users', 'atdo', $args['atdo_id'], $ciniki['session']['user']['id']);
 		if( $rc['stat'] != 'ok' ) {
-			ciniki_core_dbTransactionRollback($ciniki, 'atdo');
+			ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
 			return $rc;
 		}
 	}
@@ -91,32 +91,39 @@ function ciniki_atdo_taskClose($ciniki) {
 		. "WHERE id = '" . ciniki_core_dbQuote($ciniki, $args['atdo']) . "' "
 		. "AND business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
 		. "";
-	$rc = ciniki_core_dbUpdate($ciniki, $strsql, 'atdo');
+	$rc = ciniki_core_dbUpdate($ciniki, $strsql, 'ciniki.atdo');
 	if( $rc['stat'] != 'ok' ) {
-		ciniki_core_dbTransactionRollback($ciniki, 'atdo');
+		ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
 		return $rc;
 	}
 
-	$rc = ciniki_core_dbAddModuleHistory($ciniki, 'atdo', 'ciniki_atdo_history', $args['business_id'],
+	$rc = ciniki_core_dbAddModuleHistory($ciniki, 'ciniki.atdo', 'ciniki_atdo_history', $args['business_id'],
 		2, 'ciniki_atdos', $args['atdo_id'], 'status', 60);
 	if( $rc['stat'] != 'ok' ) {
-		ciniki_core_dbTransactionRollback($ciniki, 'atdo');
+		ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
 		return $rc;
 	}
 
 	//
 	// FIXME: Notify the other users on this thread there was an update.
 	//
-	// ciniki_core_threadNotifyUsers($ciniki, 'atdo', 'ciniki_atdo_users', 'followup');
+	// ciniki_core_threadNotifyUsers($ciniki, 'ciniki.atdo', 'ciniki_atdo_users', 'followup');
 	//
 
 	//
 	// Commit the changes
 	//
-	$rc = ciniki_core_dbTransactionCommit($ciniki, 'atdo');
+	$rc = ciniki_core_dbTransactionCommit($ciniki, 'ciniki.atdo');
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
 	}
+
+	//
+	// Update the last_change date in the business modules
+	// Ignore the result, as we don't want to stop user updates if this fails.
+	//
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'updateModuleChangeDate');
+	ciniki_businesses_updateModuleChangeDate($ciniki, $args['business_id'], 'ciniki', 'atdo');
 
 	return array('stat'=>'ok');
 	

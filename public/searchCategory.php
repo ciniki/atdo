@@ -57,7 +57,7 @@ function ciniki_atdo_searchCategory($ciniki) {
 		$strsql .= "LIMIT 25 ";
 	}
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
-	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'atdo', array(
+	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
 		array('container'=>'categories', 'fname'=>'name', 'name'=>'category', 'fields'=>array('name')),
 		));
 	if( $rc['stat'] != 'ok' ) {

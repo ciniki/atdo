@@ -48,7 +48,7 @@ function ciniki_atdo_updateSettings($ciniki) {
 	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbQuote.php');
 	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbInsert.php');
 	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbAddModuleHistory.php');
-	$rc = ciniki_core_dbTransactionStart($ciniki, 'atdo');
+	$rc = ciniki_core_dbTransactionStart($ciniki, 'ciniki.atdo');
 	if( $rc['stat'] != 'ok' ) { 
 		return $rc;
 	}   
@@ -79,22 +79,29 @@ function ciniki_atdo_updateSettings($ciniki) {
 				. "ON DUPLICATE KEY UPDATE detail_value = '" . ciniki_core_dbQuote($ciniki, $ciniki['request']['args'][$field]) . "' "
 				. ", last_updated = UTC_TIMESTAMP() "
 				. "";
-			$rc = ciniki_core_dbInsert($ciniki, $strsql, 'atdo');
+			$rc = ciniki_core_dbInsert($ciniki, $strsql, 'ciniki.atdo');
 			if( $rc['stat'] != 'ok' ) {
-				ciniki_core_dbTransactionRollback($ciniki, 'atdo');
+				ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
 				return $rc;
 			}
-			ciniki_core_dbAddModuleHistory($ciniki, 'atdo', 'ciniki_atdo_history', $args['business_id'], 'ciniki_atdo_settings', $field, 'detail_value', $ciniki['request']['args'][$field]);
+			ciniki_core_dbAddModuleHistory($ciniki, 'ciniki.atdo', 'ciniki_atdo_history', $args['business_id'], 'ciniki_atdo_settings', $field, 'detail_value', $ciniki['request']['args'][$field]);
 		}
 	}
 
 	//
 	// Commit the database changes
 	//
-    $rc = ciniki_core_dbTransactionCommit($ciniki, 'atdo');
+    $rc = ciniki_core_dbTransactionCommit($ciniki, 'ciniki.atdo');
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
 	}
+
+	//
+	// Update the last_change date in the business modules
+	// Ignore the result, as we don't want to stop user updates if this fails.
+	//
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'updateModuleChangeDate');
+	ciniki_businesses_updateModuleChangeDate($ciniki, $args['business_id'], 'ciniki', 'atdo');
 
 	return array('stat'=>'ok');
 }

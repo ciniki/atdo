@@ -48,7 +48,7 @@ function ciniki_atdo_getSettings($ciniki) {
     require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbQuote.php');
     require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbHashQuery.php');
 	$strsql = "SELECT DATE_FORMAT(FROM_UNIXTIME('" . time() . "'), '" . ciniki_core_dbQuote($ciniki, $date_format) . "') as formatted_date ";
-	$rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'core', 'date');
+	$rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.core', 'date');
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
 	}
@@ -61,7 +61,7 @@ function ciniki_atdo_getSettings($ciniki) {
 	// Grab the settings for the business from the database
 	//
     require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbDetailsQuery.php');
-	$rc = ciniki_core_dbDetailsQuery($ciniki, 'ciniki_atdo_settings', 'business_id', $args['business_id'], 'atdo', 'settings', '');
+	$rc = ciniki_core_dbDetailsQuery($ciniki, 'ciniki_atdo_settings', 'business_id', $args['business_id'], 'ciniki.atdo', 'settings', '');
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
 	}

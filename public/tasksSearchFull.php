@@ -93,7 +93,7 @@ function ciniki_atdo_tasksSearchFull($ciniki) {
 		$strsql .= "LIMIT 25 ";
 	}
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
-	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'tasks', array(
+	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
 		array('container'=>'tasks', 'fname'=>'id', 'name'=>'task',
 			'fields'=>array('id', 'subject', 'priority', 'assigned', 'assigned_users', 'due_date', 'due_time', 'status'), 
 			'lists'=>array('assigned_users'),
@@ -108,8 +108,5 @@ function ciniki_atdo_tasksSearchFull($ciniki) {
 		return array('stat'=>'ok', 'tasks'=>array());
 	}
 	return array('stat'=>'ok', 'tasks'=>$rc['tasks']);
-
-//	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbRspQuery.php');
-//	return ciniki_core_dbRspQuery($ciniki, $strsql, 'tasks', 'tasks', 'task', array('stat'=>'ok', 'tasks'=>array()));
 }
 ?>

@@ -67,7 +67,7 @@ function ciniki_atdo_add($ciniki) {
 	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbQuote.php');
 	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbInsert.php');
 	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbAddModuleHistory.php');
-	$rc = ciniki_core_dbTransactionStart($ciniki, 'atdo');
+	$rc = ciniki_core_dbTransactionStart($ciniki, 'ciniki.atdo');
 	if( $rc['stat'] != 'ok' ) { 
 		return $rc;
 	}   
@@ -120,13 +120,13 @@ function ciniki_atdo_add($ciniki) {
 		. "'" . ciniki_core_dbQuote($ciniki, $due_flags) . "', "
 		. "UTC_TIMESTAMP(), UTC_TIMESTAMP())"
 		. "";
-	$rc = ciniki_core_dbInsert($ciniki, $strsql, 'atdo');
+	$rc = ciniki_core_dbInsert($ciniki, $strsql, 'ciniki.atdo');
 	if( $rc['stat'] != 'ok' ) { 
-		ciniki_core_dbTransactionRollback($ciniki, 'atdo');
+		ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
 		return $rc;
 	}
 	if( !isset($rc['insert_id']) || $rc['insert_id'] < 1 ) {
-		ciniki_core_dbTransactionRollback($ciniki, 'atdo');
+		ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
 		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'555', 'msg'=>'Unable to add item'));
 	}
 	$atdo_id = $rc['insert_id'];
@@ -153,7 +153,7 @@ function ciniki_atdo_add($ciniki) {
 	foreach($changelog_fields as $field) {
 		$insert_name = $field;
 		if( isset($ciniki['request']['args'][$field]) && $ciniki['request']['args'][$field] != '' ) {
-			$rc = ciniki_core_dbAddModuleHistory($ciniki, 'atdo', 'ciniki_atdo_history', $args['business_id'], 
+			$rc = ciniki_core_dbAddModuleHistory($ciniki, 'ciniki.atdo', 'ciniki_atdo_history', $args['business_id'], 
 				1, 'ciniki_atdos', $atdo_id, $insert_name, $ciniki['request']['args'][$field]);
 		}
 	}
@@ -163,13 +163,13 @@ function ciniki_atdo_add($ciniki) {
 	//
 	if( isset($args['followup']) && $args['followup'] != '' ) {
 		require_once($ciniki['config']['core']['modules_dir'] . '/core/private/threadAddFollowup.php');
-		$rc = ciniki_core_threadAddFollowup($ciniki, 'atdo', 'ciniki_atdo_followups', 'atdo', $atdo_id, array(
+		$rc = ciniki_core_threadAddFollowup($ciniki, 'ciniki.atdo', 'ciniki_atdo_followups', 'atdo', $atdo_id, array(
 			'user_id'=>$ciniki['session']['user']['id'],
 			'atdo_id'=>$atdo_id,
 			'content'=>$args['followup']
 			));
 		if( $rc['stat'] != 'ok' ) {
-			ciniki_core_dbTransactionRollback($ciniki, 'atdo');
+			ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
 			return $rc;
 		}
 	}
@@ -180,20 +180,20 @@ function ciniki_atdo_add($ciniki) {
 	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/threadAddAttachment.php');
 	if( isset($args['customer_ids']) && is_array($args['customer_ids']) ) {
 		foreach($args['customer_ids'] as $customer_id) {
-			$rc = ciniki_core_threadAddAttachment($ciniki, 'atdo', 'ciniki_atdo_attachments', 'atdo', $atdo_id,
+			$rc = ciniki_core_threadAddAttachment($ciniki, 'ciniki.atdo', 'ciniki_atdo_attachments', 'atdo', $atdo_id,
 				'ciniki', 'customers', 'customer', $customer_id);
 			if( $rc['stat'] != 'ok' ) {
-				ciniki_core_dbTransactionRollback($ciniki, 'atdo');
+				ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
 				return $rc;
 			}
 		}
 	}
 	if( isset($args['product_ids']) && is_array($args['product_ids']) ) {
 		foreach($args['product_ids'] as $product_id) {
-			$rc = ciniki_core_threadAddAttachment($ciniki, 'atdo', 'ciniki_atdo_attachments', 'atdo', $atdo_id,
+			$rc = ciniki_core_threadAddAttachment($ciniki, 'ciniki.atdo', 'ciniki_atdo_attachments', 'atdo', $atdo_id,
 				'ciniki', 'products', 'product', $product_id);
 			if( $rc['stat'] != 'ok' ) {
-				ciniki_core_dbTransactionRollback($ciniki, 'atdo');
+				ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
 				return $rc;
 			}
 		}
@@ -203,9 +203,9 @@ function ciniki_atdo_add($ciniki) {
 	// Add the user who created the atdo, as a follower 
 	//
 	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/threadAddUserPerms.php');
-	$rc = ciniki_core_threadAddUserPerms($ciniki, 'atdo', 'ciniki_atdo_users', 'atdo', $atdo_id, $ciniki['session']['user']['id'], (0x01|0x04));
+	$rc = ciniki_core_threadAddUserPerms($ciniki, 'ciniki.atdo', 'ciniki_atdo_users', 'atdo', $atdo_id, $ciniki['session']['user']['id'], (0x01|0x04));
 	if( $rc['stat'] != 'ok' ) {
-		ciniki_core_dbTransactionRollback($ciniki, 'atdo');
+		ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
 		return $rc;
 	}
 
@@ -216,9 +216,9 @@ function ciniki_atdo_add($ciniki) {
 	//
 	if( isset($args['assigned']) && is_array($args['assigned']) ) {
 		foreach( $args['assigned'] as $user_id ) {
-			$rc = ciniki_core_threadAddUserPerms($ciniki, 'atdo', 'ciniki_atdo_users', 'atdo', $atdo_id, $user_id, (0x04));
+			$rc = ciniki_core_threadAddUserPerms($ciniki, 'ciniki.atdo', 'ciniki_atdo_users', 'atdo', $atdo_id, $user_id, (0x04));
 			if( $rc['stat'] != 'ok' ) {
-				ciniki_core_dbTransactionRollback($ciniki, 'atdo');
+				ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
 				return $rc;
 			}
 		}
@@ -227,10 +227,17 @@ function ciniki_atdo_add($ciniki) {
 	//
 	// Commit the database changes
 	//
-    $rc = ciniki_core_dbTransactionCommit($ciniki, 'atdo');
+    $rc = ciniki_core_dbTransactionCommit($ciniki, 'ciniki.atdo');
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
 	}
+
+	//
+	// Update the last_change date in the business modules
+	// Ignore the result, as we don't want to stop user updates if this fails.
+	//
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'updateModuleChangeDate');
+	ciniki_businesses_updateModuleChangeDate($ciniki, $args['business_id'], 'ciniki', 'atdo');
 
 	//
 	// FIXME: Notify users

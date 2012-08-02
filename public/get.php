@@ -47,7 +47,7 @@ function ciniki_atdo_get($ciniki) {
 	// Update the viewed flag to specify the user has requested this atdo.
 	//
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddUserPerms');
-	$rc = ciniki_core_threadAddUserPerms($ciniki, 'atdo', 'ciniki_atdo_users', 'atdo', $args['atdo_id'], $ciniki['session']['user']['id'], 0x08);
+	$rc = ciniki_core_threadAddUserPerms($ciniki, 'ciniki.atdo', 'ciniki_atdo_users', 'atdo', $args['atdo_id'], $ciniki['session']['user']['id'], 0x08);
 	if( $rc['stat'] != 'ok' ) {
 		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'587', 'msg'=>'Unable to update task information', 'err'=>$rc['err']));
 	}
@@ -84,7 +84,7 @@ function ciniki_atdo_get($ciniki) {
 		. "";
 	
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQuery');
-	$rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'atdo', 'atdo');
+	$rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.atdo', 'atdo');
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
 	}
@@ -143,7 +143,7 @@ function ciniki_atdo_get($ciniki) {
 		. "ORDER BY ciniki_atdo_followups.date_added ASC "
         . ""; 
 	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbRspQueryPlusUserIDs.php');
-	$rc = ciniki_core_dbRspQueryPlusUserIDs($ciniki, $strsql, 'atdo', 'followups', 'followup', array('stat'=>'ok', 'followups'=>array(), 'user_ids'=>array()));
+	$rc = ciniki_core_dbRspQueryPlusUserIDs($ciniki, $strsql, 'ciniki.atdo', 'followups', 'followup', array('stat'=>'ok', 'followups'=>array(), 'user_ids'=>array()));
 	if( $rc['stat'] != 'ok' ) {
 		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'558', 'msg'=>'Unable to load item information', 'err'=>$rc['err']));
 	}
@@ -156,7 +156,7 @@ function ciniki_atdo_get($ciniki) {
 	$strsql = "SELECT atdo_id, user_id, perms "
 		. "FROM ciniki_atdo_users "
 		. "WHERE atdo_id = '" . ciniki_core_dbQuote($ciniki, $args['atdo_id']) . "' ";
-	$rc = ciniki_core_dbRspQueryPlusUserIDs($ciniki, $strsql, 'atdo', 'users', 'user', array('stat'=>'ok', 'users'=>array(), 'user_ids'=>array()));
+	$rc = ciniki_core_dbRspQueryPlusUserIDs($ciniki, $strsql, 'ciniki.atdo', 'users', 'user', array('stat'=>'ok', 'users'=>array(), 'user_ids'=>array()));
 	if( $rc['stat'] != 'ok' ) {
 		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'566', 'msg'=>'Unable to load item information', 'err'=>$rc['err']));
 	}

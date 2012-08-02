@@ -87,7 +87,7 @@ function ciniki_atdo_messagesList($ciniki) {
 		$strsql .= "LIMIT " . ciniki_core_dbQuote($ciniki, $args['limit']) . " ";
 	}
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
-	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'atdo', array(
+	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
 		array('container'=>'messages', 'fname'=>'id', 'name'=>'message',
 			'fields'=>array('id', 'subject', 'viewed', 'status', 'assigned_user_ids', 'assigned_users', 'last_followup_age'=>'age_followup', 'last_followup_user'=>'followup_user'), 
 			'idlists'=>array('assigned_user_ids'), 'lists'=>array('assigned_users')),
