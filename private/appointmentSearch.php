@@ -42,6 +42,7 @@ function ciniki_atdo__appointmentSearch($ciniki, $business_id, $args) {
 		. "DATE_FORMAT(appointment_date, '%Y-%m-%d') AS date, "
 		. "DATE_FORMAT(appointment_date, '%H:%i') AS time, "
 		. "DATE_FORMAT(appointment_date, '%l:%i') AS 12hour, "
+		. "ciniki_atdos.status, "
 		. "appointment_duration as duration, '#ffdddd' AS colour, 'ciniki.atdo' AS 'module' "
 		. "FROM ciniki_atdos "
 		. "LEFT JOIN ciniki_atdo_users AS u1 ON (ciniki_atdos.id = u1.atdo_id AND u1.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
@@ -55,9 +56,9 @@ function ciniki_atdo__appointmentSearch($ciniki, $business_id, $args) {
 		. "";
 // Search for all tasks, even when closed
 	if( isset($args['full']) && $args['full'] == 'yes' ) {
-		$strsql .= "AND status <= 60 ";
+		$strsql .= "AND ciniki_atdos.status <= 60 ";
 	} else {
-		$strsql .= "AND status = 1 ";
+		$strsql .= "AND ciniki_atdos.status = 1 ";
 	}
 	$strsql .= "AND (subject LIKE '" . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "
 			. " OR DATE_FORMAT(appointment_date, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') LIKE '%" . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "
@@ -83,7 +84,7 @@ function ciniki_atdo__appointmentSearch($ciniki, $business_id, $args) {
 	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
 		array('container'=>'appointments', 'fname'=>'id', 'name'=>'appointment', 
 			'fields'=>array('id', 'module', 'start_ts', 'start_date', 'date', 'time', '12hour', 'duration', 'colour', 'type', 
-				'subject', 'priority')),
+				'subject', 'priority', 'status')),
 		));
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
@@ -105,7 +106,6 @@ function ciniki_atdo__appointmentSearch($ciniki, $business_id, $args) {
 				}
 				
 			}
-
 		}
 	}
 	return $rc;
