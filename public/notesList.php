@@ -43,7 +43,9 @@ function ciniki_atdo_notesList($ciniki) {
 	require_once($ciniki['config']['core']['modules_dir'] . '/users/private/dateFormat.php');
 	$date_format = ciniki_users_dateFormat($ciniki);
 
-	$strsql = "SELECT ciniki_atdos.id, subject, "
+	$strsql = "SELECT ciniki_atdos.id, "
+		. "IF(category='', 'Uncategorized', category) AS category, "
+		. "subject, "
 	//	. "IF((ciniki_atdos.appointment_flags&0x01)=1, 'yes', 'no') AS allday, "
 		. "IF((ciniki_atdos.perm_flags&0x01)=1, 'yes', 'no') AS private, "
 		. "IF(ciniki_atdos.status=1, 'open', 'closed') AS status, "
@@ -80,13 +82,15 @@ function ciniki_atdo_notesList($ciniki) {
 			// Assigned to the user requesting the list
 			. "OR ((perm_flags&0x01) = 1 AND (u1.perms&0x04) = 0x04) "
 			. ") "
-		. "ORDER BY assigned DESC, priority DESC , due_date DESC, ciniki_atdos.id, u3.display_name "
+		. "ORDER BY category, assigned DESC, priority DESC, due_date DESC, ciniki_atdos.id, u3.display_name "
 		. "";
 	if( isset($args['limit']) && $args['limit'] != '' && $args['limit'] > 0 ) {
 		$strsql .= "LIMIT " . ciniki_core_dbQuote($ciniki, $args['limit']) . " ";
 	}
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
 	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
+		array('container'=>'categories', 'fname'=>'category', 'name'=>'category',
+			'fields'=>array('name'=>'category')),
 		array('container'=>'notes', 'fname'=>'id', 'name'=>'note',
 			'fields'=>array('id', 'subject', 'status', 'private', 'assigned', 'viewed', 'assigned_user_ids', 'assigned_users'), 'idlists'=>array('assigned_user_ids'), 'lists'=>array('assigned_users')),
 		));
@@ -94,9 +98,10 @@ function ciniki_atdo_notesList($ciniki) {
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
 	}
-	if( !isset($rc['notes']) ) {
-		return array('stat'=>'ok', 'notes'=>array());
-	}
-	return array('stat'=>'ok', 'notes'=>$rc['notes']);
+	return $rc;
+//	if( !isset($rc['notes']) ) {
+//		return array('stat'=>'ok', 'notes'=>array());
+//	}
+//	return array('stat'=>'ok', 'notes'=>$rc['notes']);
 }
 ?>
