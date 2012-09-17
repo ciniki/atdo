@@ -18,7 +18,7 @@ function ciniki_atdo_add($ciniki) {
     //  
     // Find all the required and optional arguments
     //  
-    require_once($ciniki['config']['core']['modules_dir'] . '/core/private/prepareArgs.php');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
         'business_id'=>array('required'=>'yes', 'blank'=>'no', 'errmsg'=>'No business specified'), 
 		'type'=>array('required'=>'yes', 'blank'=>'no', 'errmsg'=>'No type specified'),
@@ -34,7 +34,7 @@ function ciniki_atdo_add($ciniki) {
 		'customer_ids'=>array('required'=>'no', 'blank'=>'yes', 'type'=>'idlist', 'errmsg'=>'No customer specified'),
 		'product_ids'=>array('required'=>'no', 'blank'=>'yes', 'type'=>'idlist', 'errmsg'=>'No product specified'),
         'followup'=>array('required'=>'no', 'default'=>'', 'blank'=>'yes', 'errmsg'=>'No secondary_text specified'), 
-        'appointment_date'=>array('required'=>'no', 'blank'=>'yes', 'type'=>'datetime', 'errmsg'=>'No date specified'), 
+        'appointment_date'=>array('required'=>'no', 'blank'=>'yes', 'default'=>'', 'type'=>'datetime', 'errmsg'=>'No date specified'), 
         'appointment_duration'=>array('required'=>'no', 'default'=>'60', 'blank'=>'no', 'errmsg'=>'No duration specified'), 
         'appointment_allday'=>array('required'=>'no', 'default'=>'no', 'blank'=>'no', 'errmsg'=>'No allday specified'), 
         'appointment_repeat_type'=>array('required'=>'no', 'default'=>'0', 'blank'=>'yes', 'errmsg'=>'No repeat specified'), 
@@ -52,7 +52,7 @@ function ciniki_atdo_add($ciniki) {
     // Make sure this module is activated, and
     // check permission to run this function for this business
     //  
-    require_once($ciniki['config']['core']['modules_dir'] . '/atdo/private/checkAccess.php');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'atdo', 'private', 'checkAccess');
     $rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.add'); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
@@ -61,12 +61,12 @@ function ciniki_atdo_add($ciniki) {
 	//  
 	// Turn off autocommit
 	//  
-	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbTransactionStart.php');
-	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbTransactionRollback.php');
-	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbTransactionCommit.php');
-	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbQuote.php');
-	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbInsert.php');
-	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbAddModuleHistory.php');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbTransactionStart');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbTransactionRollback');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbTransactionCommit');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbQuote');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbInsert');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbAddModuleHistory');
 	$rc = ciniki_core_dbTransactionStart($ciniki, 'ciniki.atdo');
 	if( $rc['stat'] != 'ok' ) { 
 		return $rc;
@@ -162,7 +162,7 @@ function ciniki_atdo_add($ciniki) {
 	// Add followup
 	//
 	if( isset($args['followup']) && $args['followup'] != '' ) {
-		require_once($ciniki['config']['core']['modules_dir'] . '/core/private/threadAddFollowup.php');
+		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddFollowup');
 		$rc = ciniki_core_threadAddFollowup($ciniki, 'ciniki.atdo', 'ciniki_atdo_followups', 'atdo', $atdo_id, array(
 			'user_id'=>$ciniki['session']['user']['id'],
 			'atdo_id'=>$atdo_id,
@@ -177,7 +177,7 @@ function ciniki_atdo_add($ciniki) {
 	//
 	// Add attachments to customers and products
 	//
-	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/threadAddAttachment.php');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddAttachment');
 	if( isset($args['customer_ids']) && is_array($args['customer_ids']) ) {
 		foreach($args['customer_ids'] as $customer_id) {
 			$rc = ciniki_core_threadAddAttachment($ciniki, 'ciniki.atdo', 'ciniki_atdo_attachments', 'atdo', $atdo_id,
@@ -202,7 +202,7 @@ function ciniki_atdo_add($ciniki) {
 	//
 	// Add the user who created the atdo, as a follower 
 	//
-	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/threadAddUserPerms.php');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddUserPerms');
 	$rc = ciniki_core_threadAddUserPerms($ciniki, 'ciniki.atdo', 'ciniki_atdo_users', 'atdo', $atdo_id, $ciniki['session']['user']['id'], (0x01|0x04));
 	if( $rc['stat'] != 'ok' ) {
 		ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');

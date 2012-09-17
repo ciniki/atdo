@@ -2,19 +2,22 @@
 //
 // Description
 // ===========
-// This function will return a list of messages assigned to the user and/or the business.
+// This method will return a list of projects, organized by category.
 //
 // Arguments
 // ---------
-// user_id: 		The user making the request
+// api_key:
+// auth_token:
+// business_id:		The ID of the business to get the projects for.
+// 
 // 
 // Returns
 // -------
-// <messages>
-// 		<message id="1" subject="Task subject" assigned="yes" private="yes" due_date=""/>
-// </messages>
+// <notes>
+// 		<note id="1" subject="Task subject" assigned="yes" private="yes" due_date=""/>
+// </notes>
 //
-function ciniki_atdo_messagesList($ciniki) {
+function ciniki_atdo_projectsList($ciniki) {
     //  
     // Find all the required and optional arguments
     //  
@@ -34,7 +37,7 @@ function ciniki_atdo_messagesList($ciniki) {
     // check permission to run this function for this business
     //  
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'atdo', 'private', 'checkAccess');
-    $rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.messagesList'); 
+    $rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.projectsList'); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }   
@@ -43,27 +46,27 @@ function ciniki_atdo_messagesList($ciniki) {
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'dateFormat');
 	$date_format = ciniki_users_dateFormat($ciniki);
 
-	$strsql = "SELECT ciniki_atdos.id, ciniki_atdos.subject, a1.subject AS parent_subject, "
+	$strsql = "SELECT ciniki_atdos.id, "
+		. "IF(category='', 'Uncategorized', category) AS category, "
+		. "subject, "
+	//	. "IF((ciniki_atdos.appointment_flags&0x01)=1, 'yes', 'no') AS allday, "
 		. "IF((ciniki_atdos.perm_flags&0x01)=1, 'yes', 'no') AS private, "
 		. "IF(ciniki_atdos.status=1, 'open', 'closed') AS status, "
+	//	. "priority, "
 		. "IF((u1.perms&0x04)=4, 'yes', 'no') AS assigned, "
 		. "IF((u1.perms&0x08)=8, 'yes', 'no') AS viewed, "
+	//	. "DATE_FORMAT(start_date, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS start_date, "
+	//	. "duration, "
+	//	. "IFNULL(DATE_FORMAT(ciniki_atdos.due_date, '" . ciniki_core_dbQuote($ciniki, $date_format) . "'), '') AS due_date, "
+	//	. "IF((ciniki_atdos.due_flags&0x01)=1, '', IF(ciniki_atdos.due_date=0, '', DATE_FORMAT(ciniki_atdos.due_date, '%l:%i %p'))) AS due_time, "
 		. "u2.user_id AS assigned_user_ids, "
-		. "IFNULL(u3.display_name, '') AS assigned_users, "
-		. "CAST((UNIX_TIMESTAMP(UTC_TIMESTAMP())-UNIX_TIMESTAMP(ciniki_atdo_followups.date_added)) as DECIMAL(12,0)) AS age_followup, "
-		. "IFNULL(u4.display_name, u5.display_name) AS followup_user "
+		. "IFNULL(u3.display_name, '') AS assigned_users "
 		. "FROM ciniki_atdos "
 		. "LEFT JOIN ciniki_atdo_users AS u1 ON (ciniki_atdos.id = u1.atdo_id AND u1.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
-//			. "AND (u1.perms&0x10) = 0 ) " // Make sure not deleted from users view
 		. "LEFT JOIN ciniki_atdo_users AS u2 ON (ciniki_atdos.id = u2.atdo_id && (u2.perms&0x04) = 4) "
 		. "LEFT JOIN ciniki_users AS u3 ON (u2.user_id = u3.id) "
-		. "LEFT JOIN ciniki_atdo_followups ON (ciniki_atdos.id = ciniki_atdo_followups.atdo_id) "
-		. "LEFT JOIN ciniki_users AS u4 ON (ciniki_atdo_followups.user_id = u4.id ) "
-		. "LEFT JOIN ciniki_users AS u5 ON (ciniki_atdos.user_id = u5.id ) "
-		. "LEFT JOIN ciniki_atdos AS a1 ON (ciniki_atdos.parent_id = a1.id AND a1.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "') "
-		. "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
-		. "AND ciniki_atdos.type = 6 "
-		. "AND (u1.perms&0x10) = 0 "
+		. "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+		. "AND type = 7 "
 		. "";
 	if( isset($args['status']) ) {
 		switch($args['status']) {
@@ -75,31 +78,29 @@ function ciniki_atdo_messagesList($ciniki) {
 				break;
 		}
 	}
-	// Check for public/private messages, and if private make sure user created or is assigned
-	$strsql .= "AND ((ciniki_atdos.perm_flags&0x01) = 0 "  // Public to business
+	// Check for public/private notes, and if private make sure user created or is assigned
+	$strsql .= "AND ((perm_flags&0x01) = 0 "  // Public to business
 			// created by the user requesting the list
-			. "OR ((ciniki_atdos.perm_flags&0x01) = 1 AND ciniki_atdos.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
+			. "OR ((perm_flags&0x01) = 1 AND ciniki_atdos.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
 			// Assigned to the user requesting the list
-			. "OR ((ciniki_atdos.perm_flags&0x01) = 1 AND (u1.perms&0x04) = 0x04 AND (u1.perms&0x10) <> 0x10 ) "
+			. "OR ((perm_flags&0x01) = 1 AND (u1.perms&0x04) = 0x04) "
 			. ") "
-		. "ORDER BY assigned DESC, ciniki_atdos.priority DESC, ciniki_atdos.due_date DESC, ciniki_atdos.id, u3.display_name, ciniki_atdo_followups.date_added DESC "
+		. "ORDER BY category, assigned DESC, priority DESC, due_date DESC, ciniki_atdos.id, u3.display_name "
 		. "";
-	// error_log($strsql);
 	if( isset($args['limit']) && $args['limit'] != '' && $args['limit'] > 0 ) {
 		$strsql .= "LIMIT " . ciniki_core_dbQuote($ciniki, $args['limit']) . " ";
 	}
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
 	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
-		array('container'=>'messages', 'fname'=>'id', 'name'=>'message',
-			'fields'=>array('id', 'subject', 'parent_subject', 'viewed', 'status', 'assigned_user_ids', 'assigned_users', 'last_followup_age'=>'age_followup', 'last_followup_user'=>'followup_user'), 
-			'idlists'=>array('assigned_user_ids'), 'lists'=>array('assigned_users')),
+		array('container'=>'categories', 'fname'=>'category', 'name'=>'category',
+			'fields'=>array('name'=>'category')),
+		array('container'=>'projects', 'fname'=>'id', 'name'=>'project',
+			'fields'=>array('id', 'subject', 'status', 'private', 'assigned', 'viewed', 'assigned_user_ids', 'assigned_users'), 'idlists'=>array('assigned_user_ids'), 'lists'=>array('assigned_users')),
 		));
+	// error_log($strsql);
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
 	}
-	if( !isset($rc['messages']) ) {
-		return array('stat'=>'ok', 'messages'=>array());
-	}
-	return array('stat'=>'ok', 'messages'=>$rc['messages']);
+	return $rc;
 }
 ?>

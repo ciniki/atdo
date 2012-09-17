@@ -107,6 +107,7 @@ function ciniki_atdo_update($ciniki) {
 	// Add all the fields to the change log
 	//
 	$changelog_fields = array(
+		'parent_id',
 		'type',
 		'category',
 		'subject',

@@ -7,6 +7,8 @@
 # -------
 # id:				The id of the atdo.
 # parent_id:		The parent_id of the atdo, allows for nested appointments and tasks.
+#					Currently only Projects are allowed to have sub-items, which may not be another Project.
+#					
 # uuid:				The Universal Unique ID.
 #
 # business_id:		The business the atdo is attached to.
@@ -17,9 +19,10 @@
 #					1 - Appointment
 #					2 - Task
 #					3 - Document (future)
-#					4 - FAQ (future)
-#					5 - Notes (future)
-#					6 - Message (future)
+#					4 - FAQ
+#					5 - Note
+#					6 - Message
+#					7 - Project
 #
 # category:			The category for the atdo.
 # 

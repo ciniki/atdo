@@ -2,24 +2,29 @@
 //
 // Description
 // ===========
-// This function will return all the details for a atdo.
+// This method will return all the details for an ATDO, and
+// the children if a project.
 //
 // Arguments
 // ---------
-// user_id: 		The user making the request
+// api_key:
+// auth_token:
+// business_id:		The ID of the business to get the ATDO for.
+// atdo_id:			The ID of the ATDO to get.
+// children:		(optional) The children flag to specify returning all child ATDO's if specified as yes.
 // 
 // Returns
 // -------
-// <atdo id="1" subject="Task subject" assigned="yes" private="yes" due_date=""/>
 //
 function ciniki_atdo_get($ciniki) {
     //  
     // Find all the required and optional arguments
     //  
-    require_once($ciniki['config']['core']['modules_dir'] . '/core/private/prepareArgs.php');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
         'business_id'=>array('required'=>'yes', 'blank'=>'no', 'errmsg'=>'No business specified'), 
         'atdo_id'=>array('required'=>'yes', 'blank'=>'no', 'errmsg'=>'No atdo specified'), 
+		'children'=>array('required'=>'no', 'blank'=>'yes', 'default'=>'no', 'errmsg'=>'No children flag specified'),
         )); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
@@ -30,18 +35,20 @@ function ciniki_atdo_get($ciniki) {
     // Make sure this module is activated, and
     // check permission to run this function for this business
     //  
-    require_once($ciniki['config']['core']['modules_dir'] . '/atdo/private/checkAccess.php');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'atdo', 'private', 'checkAccess');
     $rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.get'); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }   
 
-	require_once($ciniki['config']['core']['modules_dir'] . '/users/private/timezoneOffset.php');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'timezoneOffset');
 	$utc_offset = ciniki_users_timezoneOffset($ciniki);
 
-	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbQuote.php');
-	require_once($ciniki['config']['core']['modules_dir'] . '/users/private/datetimeFormat.php');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbQuote');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'datetimeFormat');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'dateFormat');
 	$datetime_format = ciniki_users_datetimeFormat($ciniki);
+	$date_format = ciniki_users_dateFormat($ciniki);
 
 	//
 	// Update the viewed flag to specify the user has requested this atdo.
@@ -55,31 +62,33 @@ function ciniki_atdo_get($ciniki) {
 	//
 	// Get the atdo information
 	//
-	$strsql = "SELECT ciniki_atdos.id, type, subject, location, content, user_id, "
+	$strsql = "SELECT ciniki_atdos.id, ciniki_atdos.parent_id, a1.subject AS parent_subject, "
+		. "ciniki_atdos.type, ciniki_atdos.subject, ciniki_atdos.location, ciniki_atdos.content, ciniki_atdos.user_id, "
 		. "IF((ciniki_atdos.perm_flags&0x01)=1, 'yes', 'no') AS private, "
-		. "status, ciniki_atdos.category, ciniki_atdos.priority, "
-		. "DATE_FORMAT(appointment_date, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS appointment_date, "
-		. "DATE_FORMAT(appointment_date, '%Y-%m-%d') AS appointment_date_date, "
-		. "DATE_FORMAT(appointment_date, '%H:%i') AS appointment_time, "
-		. "DATE_FORMAT(appointment_date, '%l:%i') AS appointment_12hour, "
-		. "appointment_duration, "
+		. "ciniki_atdos.status, ciniki_atdos.category, ciniki_atdos.priority, "
+		. "DATE_FORMAT(ciniki_atdos.appointment_date, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS appointment_date, "
+		. "DATE_FORMAT(ciniki_atdos.appointment_date, '%Y-%m-%d') AS appointment_date_date, "
+		. "DATE_FORMAT(ciniki_atdos.appointment_date, '%H:%i') AS appointment_time, "
+		. "DATE_FORMAT(ciniki_atdos.appointment_date, '%l:%i') AS appointment_12hour, "
+		. "ciniki_atdos.appointment_duration, "
 		. "IF((ciniki_atdos.appointment_flags&0x01)=1, 'yes', 'no') AS appointment_duration_allday, "
-		. "DATE_FORMAT(due_date, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS due_date, "
-		. "DATE_FORMAT(due_date, '%Y-%m-%d') AS due_date_date, "
-		. "DATE_FORMAT(due_date, '%H:%i') AS due_time, "
-		. "DATE_FORMAT(due_date, '%l:%i') AS due_12hour, "
-		. "due_duration, "
+		. "DATE_FORMAT(ciniki_atdos.due_date, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS due_date, "
+		. "DATE_FORMAT(ciniki_atdos.due_date, '%Y-%m-%d') AS due_date_date, "
+		. "DATE_FORMAT(ciniki_atdos.due_date, '%H:%i') AS due_time, "
+		. "DATE_FORMAT(ciniki_atdos.due_date, '%l:%i') AS due_12hour, "
+		. "ciniki_atdos.due_duration, "
 		. "IF((ciniki_atdos.due_flags&0x01)=1, 'yes', 'no') AS due_duration_allday, "
-		. "appointment_repeat_type, appointment_repeat_interval, "
-		. "DATE_FORMAT(appointment_date, '%D') AS appointment_repeat_dayofmonth, "
-		. "DAY(appointment_date) AS appointment_repeat_day, "
-		. "DATE_FORMAT(appointment_date, '%W') AS appointment_repeat_weekday, "
-		. "DATE_FORMAT(appointment_repeat_end, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS appointment_repeat_end, "
-		. "DATE_FORMAT(CONVERT_TZ(date_added, '+00:00', '" . ciniki_core_dbQuote($ciniki, $utc_offset) . "'), '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS date_added, "
-		. "DATE_FORMAT(CONVERT_TZ(last_updated, '+00:00', '" . ciniki_core_dbQuote($ciniki, $utc_offset) . "'), '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS last_updated "
+		. "ciniki_atdos.appointment_repeat_type, ciniki_atdos.appointment_repeat_interval, "
+		. "DATE_FORMAT(ciniki_atdos.appointment_date, '%D') AS appointment_repeat_dayofmonth, "
+		. "DAY(ciniki_atdos.appointment_date) AS appointment_repeat_day, "
+		. "DATE_FORMAT(ciniki_atdos.appointment_date, '%W') AS appointment_repeat_weekday, "
+		. "DATE_FORMAT(ciniki_atdos.appointment_repeat_end, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS appointment_repeat_end, "
+		. "DATE_FORMAT(CONVERT_TZ(ciniki_atdos.date_added, '+00:00', '" . ciniki_core_dbQuote($ciniki, $utc_offset) . "'), '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS date_added, "
+		. "DATE_FORMAT(CONVERT_TZ(ciniki_atdos.last_updated, '+00:00', '" . ciniki_core_dbQuote($ciniki, $utc_offset) . "'), '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS last_updated "
 		. "FROM ciniki_atdos "
+		. "LEFT JOIN ciniki_atdos a1 ON (ciniki_atdos.parent_id = a1.id AND a1.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "') "
 		
-		. "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+		. "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
 		. "AND ciniki_atdos.id = '" . ciniki_core_dbQuote($ciniki, $args['atdo_id']) . "' "
 		. "";
 	
@@ -142,7 +151,7 @@ function ciniki_atdo_get($ciniki) {
         . "WHERE ciniki_atdo_followups.atdo_id = '" . ciniki_core_dbQuote($ciniki, $args['atdo_id']) . "' "
 		. "ORDER BY ciniki_atdo_followups.date_added ASC "
         . ""; 
-	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbRspQueryPlusUserIDs.php');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbRspQueryPlusUserIDs');
 	$rc = ciniki_core_dbRspQueryPlusUserIDs($ciniki, $strsql, 'ciniki.atdo', 'followups', 'followup', array('stat'=>'ok', 'followups'=>array(), 'user_ids'=>array()));
 	if( $rc['stat'] != 'ok' ) {
 		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'558', 'msg'=>'Unable to load item information', 'err'=>$rc['err']));
@@ -166,7 +175,7 @@ function ciniki_atdo_get($ciniki) {
 	//
 	// Get the users which are linked to these accounts
 	//
-	require_once($ciniki['config']['core']['modules_dir'] . '/users/private/userListByID.php');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'userListByID');
 	$rc = ciniki_users_userListByID($ciniki, 'users', $user_ids, 'display_name');
 	if( $rc['stat'] != 'ok' ) {
 		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'563', 'msg'=>'Unable to load item information', 'err'=>$rc['err']));
@@ -229,6 +238,94 @@ function ciniki_atdo_get($ciniki) {
 		$atdo['user_display_name'] = $users[$atdo['user_id']]['display_name'];
 	}
 
+	//
+	// Check if the children should be loaded for a project
+	//
+	if( isset($args['children']) && $args['children'] == 'yes' ) {
+		$atdo['appointments'] = array();
+		$atdo['tasks'] = array();
+		$atdo['documents'] = array();
+		$atdo['notes'] = array();
+		$atdo['messages'] = array();
+		$strsql = "SELECT ciniki_atdos.id, ciniki_atdos.type, ciniki_atdos.subject, "
+			. "IF((ciniki_atdos.appointment_flags&0x01)=1, 'yes', 'no') AS allday, "
+			. "IF((ciniki_atdos.perm_flags&0x01)=1, 'yes', 'no') AS private, "
+			. "IF(ciniki_atdos.status=1, 'open', 'closed') AS status, "
+			. "priority, "
+			. "IF((u1.perms&0x04)=4, 'yes', 'no') AS assigned, "
+		//	. "DATE_FORMAT(start_date, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS start_date, "
+		//	. "duration, "
+			. "UNIX_TIMESTAMP(ciniki_atdos.appointment_date) AS start_ts, "
+			. "DATE_FORMAT(ciniki_atdos.appointment_date, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS start_date, "
+			. "IFNULL(DATE_FORMAT(ciniki_atdos.due_date, '" . ciniki_core_dbQuote($ciniki, $date_format) . "'), '') AS due_date, "
+			. "IF((ciniki_atdos.due_flags&0x01)=1, '', IF(ciniki_atdos.due_date=0, '', DATE_FORMAT(ciniki_atdos.due_date, '%l:%i %p'))) AS due_time, "
+			. "u2.user_id AS assigned_user_ids, "
+			. "IFNULL(u3.display_name, '') AS assigned_users, "
+			. "CAST((UNIX_TIMESTAMP(UTC_TIMESTAMP())-UNIX_TIMESTAMP(ciniki_atdo_followups.date_added)) as DECIMAL(12,0)) AS age_followup, "
+			. "IFNULL(u4.display_name, '') AS followup_user "
+			. "FROM ciniki_atdos "
+			. "LEFT JOIN ciniki_atdo_users AS u1 ON (ciniki_atdos.id = u1.atdo_id AND u1.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
+			. "LEFT JOIN ciniki_atdo_users AS u2 ON (ciniki_atdos.id = u2.atdo_id && (u2.perms&0x04) = 4) "
+			. "LEFT JOIN ciniki_users AS u3 ON (u2.user_id = u3.id) "
+			. "LEFT JOIN ciniki_atdo_followups ON (ciniki_atdos.id = ciniki_atdo_followups.atdo_id) "
+			. "LEFT JOIN ciniki_users AS u4 ON (ciniki_atdo_followups.user_id = u4.id ) "
+			. "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+			. "AND ciniki_atdos.parent_id = '" . ciniki_core_dbQuote($ciniki, $atdo['id']) . "' "
+			. "AND (ciniki_atdos.type = 1 OR ciniki_atdos.type = 2 OR ciniki_atdos.type = 3 OR ciniki_atdos.type = 5 OR (ciniki_atdos.type = 6 AND (u1.perms&0x10) = 0)) "
+			. "";
+		if( isset($args['status']) ) {
+			switch($args['status']) {
+				case 'Open':
+				case 'open': $strsql .= "AND ciniki_atdos.status = 1 ";
+					break;
+				case 'Closed':
+				case 'closed': $strsql .= "AND ciniki_atdos.status = 60 ";
+					break;
+			}
+		}
+		// Check for public/private tasks, and if private make sure user created or is assigned
+		$strsql .= "AND ((perm_flags&0x01) = 0 "  // Public to business
+				// created by the user requesting the list
+				. "OR ((perm_flags&0x01) = 1 AND ciniki_atdos.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
+				// Assigned to the user requesting the list
+				. "OR ((perm_flags&0x01) = 1 AND (u1.perms&0x04) = 0x04) "
+				. ") "
+			. "ORDER BY ciniki_atdos.appointment_date, ciniki_atdos.priority DESC, ciniki_atdos.id, u3.display_name "
+			. "";
+//		if( isset($args['limit']) && $args['limit'] != '' && $args['limit'] > 0 ) {
+//			$strsql .= "LIMIT " . ciniki_core_dbQuote($ciniki, $args['limit']) . " ";
+//		}
+		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
+		$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
+			array('container'=>'childtypes', 'fname'=>'type', 'name'=>'tchild',
+				'fields'=>array('type')),
+			array('container'=>'children', 'fname'=>'id', 'name'=>'child',
+				'fields'=>array('id', 'subject', 'allday', 'status', 'priority', 'private', 'assigned', 'assigned_user_ids', 'assigned_users', 'due_date', 'due_time',
+					'start_ts', 'start_date', 
+					'last_followup_age'=>'age_followup', 'last_followup_user'=>'followup_user'), 
+				'idlists'=>array('assigned_user_ids'), 'lists'=>array('assigned_users')),
+			));
+		if( $rc['stat'] != 'ok' ) {
+			return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'575', 'msg'=>'Unable to get child items', 'err'=>$rc['err']));
+		}
+		if( isset($rc['childtypes']) ) {
+			foreach($rc['childtypes'] as $tcid => $tchild) {
+				foreach($tchild['tchild']['children'] as $cid => $child) {
+					if( $tchild['tchild']['type'] == 1 ) {
+						array_push($atdo['appointments'], array('appointment'=>$child['child']));
+					} elseif( $tchild['tchild']['type'] == 2 ) {
+						array_push($atdo['tasks'], array('task'=>$child['child']));
+					} elseif( $tchild['tchild']['type'] == 3 ) {
+						array_push($atdo['documents'], array('document'=>$child['child']));
+					} elseif( $tchild['tchild']['type'] == 5 ) {
+						array_push($atdo['notes'], array('note'=>$child['child']));
+					} elseif( $tchild['tchild']['type'] == 6 ) {
+						array_push($atdo['messages'], array('message'=>$child['child']));
+					}
+				}
+			}
+		}
+	}
 
 	return array('stat'=>'ok', 'atdo'=>$atdo);
 }
