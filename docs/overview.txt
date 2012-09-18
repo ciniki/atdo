@@ -1,4 +1,4 @@
-This module stores Appointments, Tasks, FAQ's, Notes and Messages.
+This module stores Appointments, Tasks, FAQ's, Notes, Messages and Projects.
 
 Appointments are visible in the calendar.  Tasks are also visible
 in the calendar if a due date is set.
