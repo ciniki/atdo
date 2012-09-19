@@ -43,7 +43,7 @@ function ciniki_atdo_messagesList($ciniki) {
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'dateFormat');
 	$date_format = ciniki_users_dateFormat($ciniki);
 
-	$strsql = "SELECT ciniki_atdos.id, ciniki_atdos.subject, a1.subject AS parent_subject, "
+	$strsql = "SELECT ciniki_atdos.id, ciniki_atdos.subject, ciniki_projects.name AS project_name, "
 		. "IF((ciniki_atdos.perm_flags&0x01)=1, 'yes', 'no') AS private, "
 		. "IF(ciniki_atdos.status=1, 'open', 'closed') AS status, "
 		. "IF((u1.perms&0x04)=4, 'yes', 'no') AS assigned, "
@@ -60,7 +60,7 @@ function ciniki_atdo_messagesList($ciniki) {
 		. "LEFT JOIN ciniki_atdo_followups ON (ciniki_atdos.id = ciniki_atdo_followups.atdo_id) "
 		. "LEFT JOIN ciniki_users AS u4 ON (ciniki_atdo_followups.user_id = u4.id ) "
 		. "LEFT JOIN ciniki_users AS u5 ON (ciniki_atdos.user_id = u5.id ) "
-		. "LEFT JOIN ciniki_atdos AS a1 ON (ciniki_atdos.parent_id = a1.id AND a1.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "') "
+		. "LEFT JOIN ciniki_projects ON (ciniki_atdos.project_id = ciniki_projects.id AND ciniki_projects.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "') "
 		. "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
 		. "AND ciniki_atdos.type = 6 "
 		. "AND (u1.perms&0x10) = 0 "
@@ -91,7 +91,7 @@ function ciniki_atdo_messagesList($ciniki) {
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
 	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
 		array('container'=>'messages', 'fname'=>'id', 'name'=>'message',
-			'fields'=>array('id', 'subject', 'parent_subject', 'viewed', 'status', 'assigned_user_ids', 'assigned_users', 'last_followup_age'=>'age_followup', 'last_followup_user'=>'followup_user'), 
+			'fields'=>array('id', 'subject', 'project_name', 'viewed', 'status', 'assigned_user_ids', 'assigned_users', 'last_followup_age'=>'age_followup', 'last_followup_user'=>'followup_user'), 
 			'idlists'=>array('assigned_user_ids'), 'lists'=>array('assigned_users')),
 		));
 	if( $rc['stat'] != 'ok' ) {

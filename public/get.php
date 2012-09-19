@@ -62,7 +62,7 @@ function ciniki_atdo_get($ciniki) {
 	//
 	// Get the atdo information
 	//
-	$strsql = "SELECT ciniki_atdos.id, ciniki_atdos.parent_id, a1.subject AS parent_subject, "
+	$strsql = "SELECT ciniki_atdos.id, ciniki_atdos.parent_id, ciniki_atdos.project_id, ciniki_projects.name AS project_name, "
 		. "ciniki_atdos.type, ciniki_atdos.subject, ciniki_atdos.location, ciniki_atdos.content, ciniki_atdos.user_id, "
 		. "IF((ciniki_atdos.perm_flags&0x01)=1, 'yes', 'no') AS private, "
 		. "ciniki_atdos.status, ciniki_atdos.category, ciniki_atdos.priority, "
@@ -86,7 +86,7 @@ function ciniki_atdo_get($ciniki) {
 		. "DATE_FORMAT(CONVERT_TZ(ciniki_atdos.date_added, '+00:00', '" . ciniki_core_dbQuote($ciniki, $utc_offset) . "'), '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS date_added, "
 		. "DATE_FORMAT(CONVERT_TZ(ciniki_atdos.last_updated, '+00:00', '" . ciniki_core_dbQuote($ciniki, $utc_offset) . "'), '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS last_updated "
 		. "FROM ciniki_atdos "
-		. "LEFT JOIN ciniki_atdos a1 ON (ciniki_atdos.parent_id = a1.id AND a1.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "') "
+		. "LEFT JOIN ciniki_projects ON (ciniki_atdos.project_id = ciniki_projects.id AND ciniki_projects.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "') "
 		
 		. "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
 		. "AND ciniki_atdos.id = '" . ciniki_core_dbQuote($ciniki, $args['atdo_id']) . "' "

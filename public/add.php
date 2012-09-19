@@ -23,6 +23,7 @@ function ciniki_atdo_add($ciniki) {
         'business_id'=>array('required'=>'yes', 'blank'=>'no', 'errmsg'=>'No business specified'), 
 		'type'=>array('required'=>'yes', 'blank'=>'no', 'errmsg'=>'No type specified'),
 		'parent_id'=>array('required'=>'no', 'blank'=>'yes', 'default'=>'0', 'errmsg'=>'No parent specified'),
+		'project_id'=>array('required'=>'no', 'blank'=>'yes', 'default'=>'0', 'errmsg'=>'No project specified'),
         'subject'=>array('required'=>'yes', 'blank'=>'no', 'errmsg'=>'No subject specified'), 
         'category'=>array('required'=>'no', 'blank'=>'yes', 'default'=>'', 'errmsg'=>'No category specified'), 
         'location'=>array('required'=>'no', 'blank'=>'yes', 'default'=>'', 'errmsg'=>'No location specified'), 
@@ -92,13 +93,14 @@ function ciniki_atdo_add($ciniki) {
 	//
 	// Add the atdo to the database
 	//
-	$strsql = "INSERT INTO ciniki_atdos (parent_id, uuid, business_id, type, category, status, priority, perm_flags, user_id, "
+	$strsql = "INSERT INTO ciniki_atdos (parent_id, project_id, uuid, business_id, type, category, status, priority, perm_flags, user_id, "
 		. "subject, location, content, "
 		. "appointment_date, appointment_duration, appointment_flags, "
 		. "appointment_repeat_type, appointment_repeat_interval, appointment_repeat_end, "
 		. "due_date, due_flags, "
 		. "date_added, last_updated) VALUES ("
 		. "'" . ciniki_core_dbQuote($ciniki, $args['parent_id']) . "', "
+		. "'" . ciniki_core_dbQuote($ciniki, $args['project_id']) . "', "
 		. "UUID(), "
 		. "'" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "', "
 		. "'" . ciniki_core_dbQuote($ciniki, $args['type']) . "', "

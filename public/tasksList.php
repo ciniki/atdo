@@ -15,7 +15,7 @@
 // Returns
 // -------
 // <tasks>
-// 		<task id="1" subject="Task subject" parent_subject="" assigned="yes" private="yes" due_date=""/>
+// 		<task id="1" subject="Task subject" project_name="" assigned="yes" private="yes" due_date=""/>
 // </tasks>
 //
 function ciniki_atdo_tasksList($ciniki) {
@@ -47,7 +47,7 @@ function ciniki_atdo_tasksList($ciniki) {
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'dateFormat');
 	$date_format = ciniki_users_dateFormat($ciniki);
 
-	$strsql = "SELECT ciniki_atdos.id, ciniki_atdos.subject, a1.subject AS parent_subject, "
+	$strsql = "SELECT ciniki_atdos.id, ciniki_atdos.subject, ciniki_projects.name AS project_name, "
 		. "IF((ciniki_atdos.appointment_flags&0x01)=1, 'yes', 'no') AS allday, "
 		. "IF((ciniki_atdos.perm_flags&0x01)=1, 'yes', 'no') AS private, "
 		. "IF(ciniki_atdos.status=1, 'open', 'closed') AS status, "
@@ -63,7 +63,7 @@ function ciniki_atdo_tasksList($ciniki) {
 		. "LEFT JOIN ciniki_atdo_users AS u1 ON (ciniki_atdos.id = u1.atdo_id AND u1.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
 		. "LEFT JOIN ciniki_atdo_users AS u2 ON (ciniki_atdos.id = u2.atdo_id && (u2.perms&0x04) = 4) "
 		. "LEFT JOIN ciniki_users AS u3 ON (u2.user_id = u3.id) "
-		. "LEFT JOIN ciniki_atdos AS a1 ON (ciniki_atdos.parent_id = a1.id AND a1.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "') "
+		. "LEFT JOIN ciniki_projects ON (ciniki_atdos.project_id = ciniki_projects.id AND ciniki_projects.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "') "
 		. "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
 		. "AND ciniki_atdos.type = 2 "
 		. "";
@@ -92,7 +92,7 @@ function ciniki_atdo_tasksList($ciniki) {
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
 	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
 		array('container'=>'tasks', 'fname'=>'id', 'name'=>'task',
-			'fields'=>array('id', 'subject', 'parent_subject', 'allday', 'status', 'priority', 'private', 'assigned', 'assigned_user_ids', 'assigned_users', 'due_date', 'due_time'), 'idlists'=>array('assigned_user_ids'), 'lists'=>array('assigned_users')),
+			'fields'=>array('id', 'subject', 'project_name', 'allday', 'status', 'priority', 'private', 'assigned', 'assigned_user_ids', 'assigned_users', 'due_date', 'due_time'), 'idlists'=>array('assigned_user_ids'), 'lists'=>array('assigned_users')),
 		));
 	// error_log($strsql);
 	if( $rc['stat'] != 'ok' ) {

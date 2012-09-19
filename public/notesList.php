@@ -64,7 +64,7 @@ function ciniki_atdo_notesList($ciniki) {
 		. "LEFT JOIN ciniki_users AS u3 ON (u2.user_id = u3.id) "
 		. "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
 		. "AND type = 5 "
-		. "AND parent_id = 0 "
+		. "AND project_id = 0 "
 		. "";
 	if( isset($args['status']) ) {
 		switch($args['status']) {

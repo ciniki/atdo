@@ -41,7 +41,7 @@ function ciniki_atdo_tasksSearchQuick($ciniki) {
 	// Get the number of tasks in each status for the business, 
 	// if no rows found, then return empty array
 	//
-	$strsql = "SELECT ciniki_atdos.id, ciniki_atdos.subject, a1.subject as parent_subject, ciniki_atdos.priority, "
+	$strsql = "SELECT ciniki_atdos.id, ciniki_atdos.subject, ciniki_projects.name as project_name, ciniki_atdos.priority, "
 //		. "IF((ciniki_atdos.flags&0x02)=2, 'yes', 'no') AS private, "
 		. "IF((u1.perms&0x04)=4, 'yes', 'no') AS assigned, "
 		. "IFNULL(DATE_FORMAT(ciniki_atdos.due_date, '%b %e, %Y'), '') AS due_date, "
@@ -52,7 +52,7 @@ function ciniki_atdo_tasksSearchQuick($ciniki) {
 		. "LEFT JOIN ciniki_atdo_users AS u2 ON (ciniki_atdos.id = u2.atdo_id && (u2.perms&0x04) = 4) "
 		. "LEFT JOIN ciniki_users AS u3 ON (u2.user_id = u3.id) "
 		. "LEFT JOIN ciniki_atdo_followups ON (ciniki_atdos.id = ciniki_atdo_followups.atdo_id ) "
-		. "LEFT JOIN ciniki_atdos AS a1 ON (ciniki_atdos.parent_id = a1.id AND a1.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "') "
+		. "LEFT JOIN ciniki_projects ON (ciniki_atdos.project_id = ciniki_projects.id AND ciniki_projects.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "') "
 		. "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
 		. "AND ciniki_atdos.type = 2 "		// Tasks
 		. "AND ciniki_atdos.status = 1 "
@@ -80,7 +80,7 @@ function ciniki_atdo_tasksSearchQuick($ciniki) {
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
 	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
 		array('container'=>'tasks', 'fname'=>'id', 'name'=>'task',
-			'fields'=>array('id', 'subject', 'parent_subject', 'priority', 'assigned', 'assigned_users', 'due_date', 'due_time'), 'lists'=>array('assigned_users')),
+			'fields'=>array('id', 'subject', 'project_name', 'priority', 'assigned', 'assigned_users', 'due_date', 'due_time'), 'lists'=>array('assigned_users')),
 		));
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
