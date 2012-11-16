@@ -21,7 +21,7 @@ function ciniki_atdo_taskClose($ciniki) {
 	//
 	// Find all the required and optional arguments
 	//
-	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/prepareArgs.php');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
 	$rc = ciniki_core_prepareArgs($ciniki, 'no', array(
 		'business_id'=>array('required'=>'yes', 'blank'=>'no', 'errmsg'=>'No business specified'), 
 		'atdo_id'=>array('required'=>'yes', 'blank'=>'no', 'errmsg'=>'No atdo specified'),
@@ -36,7 +36,7 @@ function ciniki_atdo_taskClose($ciniki) {
 	// Make sure this module is activated, and
 	// check permission to run this function for this business
 	//
-	require_once($ciniki['config']['core']['modules_dir'] . '/atdo/private/checkAccess.php');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'atdo', 'private', 'checkAccess');
 	$rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.taskClose', $args['atdo_id'], $ciniki['session']['user']['id']);
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
@@ -51,11 +51,12 @@ function ciniki_atdo_taskClose($ciniki) {
 	// 
 	// Turn of auto commit in the database
 	//
-	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbTransactionStart.php');
-	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbTransactionRollback.php');
-	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbTransactionCommit.php');
-	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbUpdate.php');
-	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbAddModuleHistory.php');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbTransactionStart');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbTransactionRollback');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbTransactionCommit');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbQuote');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbUpdate');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbAddModuleHistory');
 	$rc = ciniki_core_dbTransactionStart($ciniki, 'ciniki.atdo');
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
@@ -65,7 +66,7 @@ function ciniki_atdo_taskClose($ciniki) {
 	// Check if there is a followup
 	//
 	if( isset($args['content']) && $args['content'] != '' ) {
-		require_once($ciniki['config']['core']['modules_dir'] . '/core/private/threadAddFollowup.php');
+		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddFollowup');
 		$rc = ciniki_core_threadAddFollowup($ciniki, 'ciniki.atdo', 'ciniki_atdo_followups', 'atdo', $args['atdo_id'], $args);
 		if( $rc['stat'] != 'ok' ) {
 			ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
@@ -76,7 +77,7 @@ function ciniki_atdo_taskClose($ciniki) {
 		// Make sure the user is attached as a follower.  They may already be attached, but it
 		// will make sure the flag is set.
 		// 
-		require_once($ciniki['config']['core']['modules_dir'] . '/core/private/threadAddFollower.php');
+		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddFollower');
 		$rc = ciniki_core_threadAddFollower($ciniki, 'ciniki.atdo', 'ciniki_atdo_users', 'atdo', $args['atdo_id'], $ciniki['session']['user']['id']);
 		if( $rc['stat'] != 'ok' ) {
 			ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');

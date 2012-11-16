@@ -16,7 +16,7 @@ function ciniki_atdo_notesSearchFull($ciniki) {
     //  
     // Find all the required and optional arguments
     //  
-    require_once($ciniki['config']['core']['modules_dir'] . '/core/private/prepareArgs.php');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
         'business_id'=>array('required'=>'yes', 'blank'=>'no', 'errmsg'=>'No business specified'), 
         'start_needle'=>array('required'=>'no', 'blank'=>'yes', 'errmsg'=>'No search specified'), 
@@ -37,7 +37,7 @@ function ciniki_atdo_notesSearchFull($ciniki) {
     // Make sure this module is activated, and
     // check permission to run this function for this business
     //  
-    require_once($ciniki['config']['core']['modules_dir'] . '/atdo/private/checkAccess.php');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'atdo', 'private', 'checkAccess');
     $rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.notesSearchFull', 0); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;

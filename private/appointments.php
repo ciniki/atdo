@@ -27,7 +27,7 @@ function ciniki_atdo__appointments($ciniki, $business_id, $args) {
 	//
 	// Get the module settings
 	//
-	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbDetailsQuery.php');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbDetailsQuery');
 	$rc =  ciniki_core_dbDetailsQuery($ciniki, 'ciniki_atdo_settings', 'business_id', $args['business_id'], 'ciniki.atdo', 'settings', '');
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
@@ -37,9 +37,9 @@ function ciniki_atdo__appointments($ciniki, $business_id, $args) {
 	//
 	// Load date formats
 	//
-    require_once($ciniki['config']['core']['modules_dir'] . '/users/private/datetimeFormat.php');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'datetimeFormat');
 	$datetime_format = ciniki_users_datetimeFormat($ciniki);
-    require_once($ciniki['config']['core']['modules_dir'] . '/users/private/dateFormat.php');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'dateFormat');
 	$date_format = ciniki_users_dateFormat($ciniki);
 
 	$strsql = "SELECT ciniki_atdos.id, type, subject, location, priority, "
@@ -123,7 +123,7 @@ function ciniki_atdo__appointments($ciniki, $business_id, $args) {
 	$strsql .= ""
 		. "ORDER BY start_ts, subject "
 		. "";
-	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbHashQueryTree.php');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
 	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
 		array('container'=>'appointments', 'fname'=>'id', 'name'=>'appointment', 
 			'fields'=>array('id', 'module', 'start_ts', 'start_date', 'date', 'time', '12hour', 'allday', 'duration', 'repeat_type', 'repeat_interval', 'repeat_end', 'colour', 'type', 'subject', 'location', 'secondary_text', 'priority')),

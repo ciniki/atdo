@@ -23,7 +23,7 @@ function ciniki_atdo__appointmentSearch($ciniki, $business_id, $args) {
 	//
 	// Get the module settings
 	//
-	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbDetailsQuery.php');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbDetailsQuery');
 	$rc =  ciniki_core_dbDetailsQuery($ciniki, 'ciniki_atdo_settings', 'business_id', $args['business_id'], 'ciniki.atdo', 'settings', '');
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
@@ -33,9 +33,10 @@ function ciniki_atdo__appointmentSearch($ciniki, $business_id, $args) {
 	//
 	// Load datetime formats
 	//
-    require_once($ciniki['config']['core']['modules_dir'] . '/users/private/datetimeFormat.php');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'datetimeFormat');
 	$datetime_format = ciniki_users_datetimeFormat($ciniki);
 
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbQuote');
 	$strsql = "SELECT ciniki_atdos.id, type, subject, location, priority,  "
 		. "UNIX_TIMESTAMP(appointment_date) AS start_ts, "
 		. "DATE_FORMAT(appointment_date, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS start_date, "
@@ -80,7 +81,7 @@ function ciniki_atdo__appointmentSearch($ciniki, $business_id, $args) {
 	if( isset($args['limit']) && is_numeric($args['limit']) && $args['limit'] > 0 ) {
 		$strsql .= "LIMIT " . ciniki_core_dbQuote($ciniki, $args['limit']) . " ";	// is_numeric verified
 	}
-	require_once($ciniki['config']['core']['modules_dir'] . '/core/private/dbHashQueryTree.php');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
 	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
 		array('container'=>'appointments', 'fname'=>'id', 'name'=>'appointment', 
 			'fields'=>array('id', 'module', 'start_ts', 'start_date', 'date', 'time', '12hour', 'duration', 'colour', 'type', 
