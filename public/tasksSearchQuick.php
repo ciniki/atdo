@@ -35,14 +35,20 @@ function ciniki_atdo_tasksSearchQuick($ciniki) {
     $rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.tasksSearchQuick', 0); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
-    }   
+    }
+	$modules = $rc['modules'];
 
 	//
 	// Get the number of tasks in each status for the business, 
 	// if no rows found, then return empty array
 	//
-	$strsql = "SELECT ciniki_atdos.id, ciniki_atdos.subject, ciniki_projects.name as project_name, ciniki_atdos.priority, "
-//		. "IF((ciniki_atdos.flags&0x02)=2, 'yes', 'no') AS private, "
+	$strsql = "SELECT ciniki_atdos.id, ciniki_atdos.subject, ";
+	if( isset($modules['ciniki.projects']) ) {
+		$strsql .= "ciniki_projects.name as project_name, ";
+	} else {
+		$strsql .= "'' AS project_name, ";
+	}
+	$strsql .= "ciniki_atdos.priority, "
 		. "IF((u1.perms&0x04)=4, 'yes', 'no') AS assigned, "
 		. "IFNULL(DATE_FORMAT(ciniki_atdos.due_date, '%b %e, %Y'), '') AS due_date, "
 		. "IF((ciniki_atdos.due_flags&0x01)=1, '', IF(ciniki_atdos.due_date=0, '', DATE_FORMAT(ciniki_atdos.due_date, '%l:%i %p'))) AS due_time, "
@@ -51,9 +57,11 @@ function ciniki_atdo_tasksSearchQuick($ciniki) {
 		. "LEFT JOIN ciniki_atdo_users AS u1 ON (ciniki_atdos.id = u1.atdo_id AND u1.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
 		. "LEFT JOIN ciniki_atdo_users AS u2 ON (ciniki_atdos.id = u2.atdo_id && (u2.perms&0x04) = 4) "
 		. "LEFT JOIN ciniki_users AS u3 ON (u2.user_id = u3.id) "
-		. "LEFT JOIN ciniki_atdo_followups ON (ciniki_atdos.id = ciniki_atdo_followups.atdo_id ) "
-		. "LEFT JOIN ciniki_projects ON (ciniki_atdos.project_id = ciniki_projects.id AND ciniki_projects.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "') "
-		. "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+		. "LEFT JOIN ciniki_atdo_followups ON (ciniki_atdos.id = ciniki_atdo_followups.atdo_id ) ";
+	if( isset($modules['ciniki.projects']) ) {
+		$strsql .= "LEFT JOIN ciniki_projects ON (ciniki_atdos.project_id = ciniki_projects.id AND ciniki_projects.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "') ";
+	}
+	$strsql .= "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
 		. "AND ciniki_atdos.type = 2 "		// Tasks
 		. "AND ciniki_atdos.status = 1 "
 		. "AND (ciniki_atdos.subject LIKE '" . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "

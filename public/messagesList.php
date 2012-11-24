@@ -37,14 +37,20 @@ function ciniki_atdo_messagesList($ciniki) {
     $rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.messagesList'); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
-    }   
+    }
+	$modules = $rc['modules'];
 
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbQuote');
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'dateFormat');
 	$date_format = ciniki_users_dateFormat($ciniki);
 
-	$strsql = "SELECT ciniki_atdos.id, ciniki_atdos.subject, ciniki_projects.name AS project_name, "
-		. "IF((ciniki_atdos.perm_flags&0x01)=1, 'yes', 'no') AS private, "
+	$strsql = "SELECT ciniki_atdos.id, ciniki_atdos.subject, ";
+	if( isset($modules['ciniki.projects']) ) {
+		$strsql .= "ciniki_projects.name AS project_name, ";
+	} else {
+		$strsql .= "'' AS project_name, ";
+	}
+	$strsql .= "IF((ciniki_atdos.perm_flags&0x01)=1, 'yes', 'no') AS private, "
 		. "IF(ciniki_atdos.status=1, 'open', 'closed') AS status, "
 		. "IF((u1.perms&0x04)=4, 'yes', 'no') AS assigned, "
 		. "IF((u1.perms&0x08)=8, 'yes', 'no') AS viewed, "
@@ -59,9 +65,11 @@ function ciniki_atdo_messagesList($ciniki) {
 		. "LEFT JOIN ciniki_users AS u3 ON (u2.user_id = u3.id) "
 		. "LEFT JOIN ciniki_atdo_followups ON (ciniki_atdos.id = ciniki_atdo_followups.atdo_id) "
 		. "LEFT JOIN ciniki_users AS u4 ON (ciniki_atdo_followups.user_id = u4.id ) "
-		. "LEFT JOIN ciniki_users AS u5 ON (ciniki_atdos.user_id = u5.id ) "
-		. "LEFT JOIN ciniki_projects ON (ciniki_atdos.project_id = ciniki_projects.id AND ciniki_projects.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "') "
-		. "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+		. "LEFT JOIN ciniki_users AS u5 ON (ciniki_atdos.user_id = u5.id ) ";
+		if( isset($modules['ciniki.projects']) ) {
+			$strsql .= "LEFT JOIN ciniki_projects ON (ciniki_atdos.project_id = ciniki_projects.id AND ciniki_projects.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "') ";
+		}
+		$strsql .= "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
 		. "AND ciniki_atdos.type = 6 "
 		. "AND (u1.perms&0x10) = 0 "
 		. "";

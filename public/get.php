@@ -2,8 +2,7 @@
 //
 // Description
 // ===========
-// This method will return all the details for an ATDO, and
-// the children if a project.
+// This method will return all the details for an ATDO.
 //
 // Arguments
 // ---------
@@ -39,7 +38,8 @@ function ciniki_atdo_get($ciniki) {
     $rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.get'); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
-    }   
+    }
+	$modules = $rc['modules'];
 
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'timezoneOffset');
 	$utc_offset = ciniki_users_timezoneOffset($ciniki);
@@ -62,8 +62,11 @@ function ciniki_atdo_get($ciniki) {
 	//
 	// Get the atdo information
 	//
-	$strsql = "SELECT ciniki_atdos.id, ciniki_atdos.parent_id, ciniki_atdos.project_id, ciniki_projects.name AS project_name, "
-		. "ciniki_atdos.type, ciniki_atdos.subject, ciniki_atdos.location, ciniki_atdos.content, ciniki_atdos.user_id, "
+	$strsql = "SELECT ciniki_atdos.id, ciniki_atdos.parent_id, ";
+	if( isset($modules['ciniki.projects']) ) {
+		$strsql .= "ciniki_atdos.project_id, ciniki_projects.name AS project_name, ";
+	}
+	$strsql .= "ciniki_atdos.type, ciniki_atdos.subject, ciniki_atdos.location, ciniki_atdos.content, ciniki_atdos.user_id, "
 		. "IF((ciniki_atdos.perm_flags&0x01)=1, 'yes', 'no') AS private, "
 		. "ciniki_atdos.status, ciniki_atdos.category, ciniki_atdos.priority, "
 		. "DATE_FORMAT(ciniki_atdos.appointment_date, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS appointment_date, "
@@ -85,10 +88,11 @@ function ciniki_atdo_get($ciniki) {
 		. "DATE_FORMAT(ciniki_atdos.appointment_repeat_end, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS appointment_repeat_end, "
 		. "DATE_FORMAT(CONVERT_TZ(ciniki_atdos.date_added, '+00:00', '" . ciniki_core_dbQuote($ciniki, $utc_offset) . "'), '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS date_added, "
 		. "DATE_FORMAT(CONVERT_TZ(ciniki_atdos.last_updated, '+00:00', '" . ciniki_core_dbQuote($ciniki, $utc_offset) . "'), '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS last_updated "
-		. "FROM ciniki_atdos "
-		. "LEFT JOIN ciniki_projects ON (ciniki_atdos.project_id = ciniki_projects.id AND ciniki_projects.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "') "
-		
-		. "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+		. "FROM ciniki_atdos ";
+	if( isset($modules['ciniki.projects']) ) {
+		$strsql .= "LEFT JOIN ciniki_projects ON (ciniki_atdos.project_id = ciniki_projects.id AND ciniki_projects.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "') ";
+	}
+	$strsql .= "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
 		. "AND ciniki_atdos.id = '" . ciniki_core_dbQuote($ciniki, $args['atdo_id']) . "' "
 		. "";
 	
@@ -253,8 +257,6 @@ function ciniki_atdo_get($ciniki) {
 			. "IF(ciniki_atdos.status=1, 'open', 'closed') AS status, "
 			. "priority, "
 			. "IF((u1.perms&0x04)=4, 'yes', 'no') AS assigned, "
-		//	. "DATE_FORMAT(start_date, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS start_date, "
-		//	. "duration, "
 			. "UNIX_TIMESTAMP(ciniki_atdos.appointment_date) AS start_ts, "
 			. "DATE_FORMAT(ciniki_atdos.appointment_date, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS start_date, "
 			. "IFNULL(DATE_FORMAT(ciniki_atdos.due_date, '" . ciniki_core_dbQuote($ciniki, $date_format) . "'), '') AS due_date, "
