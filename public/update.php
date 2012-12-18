@@ -24,7 +24,7 @@ function ciniki_atdo_update($ciniki) {
 		'parent_id'=>array('required'=>'no', 'blank'=>'yes', 'errmsg'=>'No parent specified'),
 		'project_id'=>array('required'=>'no', 'blank'=>'yes', 'errmsg'=>'No project specified'),
         'subject'=>array('required'=>'no', 'blank'=>'no', 'errmsg'=>'No subject specified'), 
-        'category'=>array('required'=>'no', 'blank'=>'no', 'errmsg'=>'No category specified'), 
+        'category'=>array('required'=>'no', 'blank'=>'yes', 'errmsg'=>'No category specified'), 
         'location'=>array('required'=>'no', 'blank'=>'no', 'errmsg'=>'No location specified'), 
         'content'=>array('required'=>'no', 'blank'=>'yes', 'errmsg'=>'No content specified'), 
 		'assigned'=>array('required'=>'no', 'blank'=>'yes', 'type'=>'idlist', 'errmsg'=>'No assignments specified'),

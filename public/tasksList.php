@@ -10,6 +10,7 @@
 // auth_token:
 // business_id:		The ID of the business to get the task list for.
 // status:			(optional) Only lists tasks that are open or closed.
+// category:		(optional) Only return tasks that are assigned to the specified category.
 // limit:			(optional) The maximum number of records to return.
 // 
 // Returns
@@ -24,9 +25,10 @@ function ciniki_atdo_tasksList($ciniki) {
     //  
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'errmsg'=>'No business specified'), 
-        'status'=>array('required'=>'no', 'blank'=>'no', 'errmsg'=>'No status specified'), 
-        'limit'=>array('required'=>'no', 'blank'=>'no', 'errmsg'=>'No limit specified'), 
+        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'status'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Status'), 
+        'category'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Category'), 
+        'limit'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Limit'), 
         )); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
@@ -48,7 +50,9 @@ function ciniki_atdo_tasksList($ciniki) {
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'dateFormat');
 	$date_format = ciniki_users_dateFormat($ciniki);
 
-	$strsql = "SELECT ciniki_atdos.id, ciniki_atdos.subject, ";
+	$strsql = "SELECT ciniki_atdos.id, "
+		. "IF(ciniki_atdos.category='', 'Uncategorized', ciniki_atdos.category) AS category, "
+		. "ciniki_atdos.subject, ";
 	if( isset($modules['ciniki.projects']) ) {
 		$strsql .= "ciniki_projects.name AS project_name, ";
 	} else {
@@ -92,23 +96,28 @@ function ciniki_atdo_tasksList($ciniki) {
 			// Assigned to the user requesting the list
 			. "OR ((ciniki_atdos.perm_flags&0x01) = 1 AND (u1.perms&0x04) = 0x04) "
 			. ") "
-		. "ORDER BY assigned DESC, ciniki_atdos.priority DESC, ciniki_atdos.due_date DESC, ciniki_atdos.id, u3.display_name "
+		. "ORDER BY category, assigned DESC, ciniki_atdos.priority DESC, ciniki_atdos.due_date DESC, ciniki_atdos.id, u3.display_name "
 		. "";
 	if( isset($args['limit']) && $args['limit'] != '' && $args['limit'] > 0 ) {
 		$strsql .= "LIMIT " . ciniki_core_dbQuote($ciniki, $args['limit']) . " ";
 	}
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
 	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
+		array('container'=>'categories', 'fname'=>'category', 'name'=>'category',
+			'fields'=>array('name'=>'category')),
 		array('container'=>'tasks', 'fname'=>'id', 'name'=>'task',
-			'fields'=>array('id', 'subject', 'project_name', 'allday', 'status', 'priority', 'private', 'assigned', 'assigned_user_ids', 'assigned_users', 'due_date', 'due_time'), 'idlists'=>array('assigned_user_ids'), 'lists'=>array('assigned_users')),
+			'fields'=>array('id', 'subject', 'project_name', 'allday', 'status', 'priority', 'private', 
+				'assigned', 'assigned_user_ids', 'assigned_users', 'due_date', 'due_time'), 
+			'idlists'=>array('assigned_user_ids'), 
+			'lists'=>array('assigned_users')),
 		));
 	// error_log($strsql);
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
 	}
-	if( !isset($rc['tasks']) ) {
-		return array('stat'=>'ok', 'tasks'=>array());
+	if( !isset($rc['categories']) ) {
+		return array('stat'=>'ok', 'categories'=>array());
 	}
-	return array('stat'=>'ok', 'tasks'=>$rc['tasks']);
+	return array('stat'=>'ok', 'categories'=>$rc['categories']);
 }
 ?>
