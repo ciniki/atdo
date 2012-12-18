@@ -11,6 +11,7 @@
 // business_id:		The ID of the business to get the task list for.
 // status:			(optional) Only lists tasks that are open or closed.
 // category:		(optional) Only return tasks that are assigned to the specified category.
+// assigned:		(optional) Only return tasks assigned to the session user.
 // limit:			(optional) The maximum number of records to return.
 // 
 // Returns
@@ -28,6 +29,7 @@ function ciniki_atdo_tasksList($ciniki) {
         'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
         'status'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Status'), 
         'category'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Category'), 
+        'assigned'=>array('required'=>'no', 'blank'=>'no', 'validlist'=>array('no', 'yes'), 'name'=>'Category'), 
         'limit'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Limit'), 
         )); 
     if( $rc['stat'] != 'ok' ) { 
@@ -79,6 +81,12 @@ function ciniki_atdo_tasksList($ciniki) {
 	$strsql .= "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
 		. "AND ciniki_atdos.type = 2 "
 		. "";
+	if( isset($args['category']) ) {
+		$strsql .= "AND ciniki_atdos.category = '" . ciniki_core_dbQuote($ciniki, $args['category']) . "' ";
+	}
+	if( isset($args['assigned']) && $args['assigned'] == 'yes' ) {
+		$strsql .= "AND u1.perms&0x04 = 4 ";
+	}
 	if( isset($args['status']) ) {
 		switch($args['status']) {
 			case 'Open':

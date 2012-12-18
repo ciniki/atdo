@@ -64,6 +64,7 @@ function ciniki_atdo_updateSettings($ciniki) {
 		'tasks.priority.30',
 		'tasks.priority.40',
 		'tasks.priority.50',
+		'tasks.ui.mainmenu.category.' . $ciniki['session']['user']['id'],		// Only allow updates to current user
 		);
 	//
 	// Check each valid setting and see if a new value was passed in the arguments for it.
