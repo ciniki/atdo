@@ -9,6 +9,7 @@
 // ciniki:
 // business_id:		The ID of the business to get the ATDO's for.
 // project_id:		The ID of the project to get the ATDO's for.
+// status:			Get the project children of a certain status.
 // 
 // Returns
 // -------
