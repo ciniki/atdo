@@ -16,7 +16,7 @@
 // -------
 // <rsp stat='ok' id='34' />
 //
-function ciniki_atdo_updateSettings($ciniki) {
+function ciniki_atdo_updateSettings(&$ciniki) {
     //  
     // Find all the required and optional arguments
     //  
@@ -104,6 +104,8 @@ function ciniki_atdo_updateSettings($ciniki) {
 	//
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'updateModuleChangeDate');
 	ciniki_businesses_updateModuleChangeDate($ciniki, $args['business_id'], 'ciniki', 'atdo');
+
+	$ciniki['syncqueue'][] = array('method'=>'ciniki.atdo.setting.push', 'args'=>array());
 
 	return array('stat'=>'ok');
 }
