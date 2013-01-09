@@ -16,7 +16,7 @@ function ciniki_atdo_setting_get($ciniki, $sync, $business_id, $args) {
 	//
 	if( (!isset($args['uuid']) || $args['uuid'] == '' )
 		&& (!isset($args['setting']) || $args['setting'] == '') ) {
-		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'153', 'msg'=>'No setting specified'));
+		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1043', 'msg'=>'No setting specified'));
 	}
 
 	if( !isset($args['setting']) && isset($args['uuid']) ) {
@@ -62,10 +62,10 @@ function ciniki_atdo_setting_get($ciniki, $sync, $business_id, $args) {
 				'action', 'table_field', 'new_value', 'log_date')),
 		));
 	if( $rc['stat'] != 'ok' ) {
-		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'975', 'msg'=>'Unable to get atdo setting', 'err'=>$rc['err']));
+		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1044', 'msg'=>'Unable to get atdo setting', 'err'=>$rc['err']));
 	}
 	if( !isset($rc['settings'][$args['setting']]) ) {
-		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'152', 'msg'=>'Setting does not exist'));
+		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1045', 'msg'=>'Setting does not exist'));
 	}
 	$setting = $rc['settings'][$args['setting']];
 

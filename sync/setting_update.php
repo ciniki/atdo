@@ -16,7 +16,7 @@ function ciniki_atdo_setting_update(&$ciniki, $sync, $business_id, $args) {
 	//
 	if( (!isset($args['uuid']) || $args['uuid'] == '' ) 
 		&& (!isset($args['setting']) || $args['setting'] == '') ) {
-		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'131', 'msg'=>'No setting specified'));
+		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'259', 'msg'=>'No setting specified'));
 	}
 	if( isset($args['uuid']) && $args['uuid'] != '' ) {
 		//
@@ -25,10 +25,10 @@ function ciniki_atdo_setting_update(&$ciniki, $sync, $business_id, $args) {
 		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'syncRequest');
 		$rc = ciniki_core_syncRequest($ciniki, $sync, array('method'=>"ciniki.atdo.setting.get", 'uuid'=>$args['uuid']));
 		if( $rc['stat'] != 'ok' ) {
-			return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'980', 'msg'=>"Unable to get the remote setting", 'err'=>$rc['err']));
+			return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1029', 'msg'=>"Unable to get the remote setting", 'err'=>$rc['err']));
 		}
 		if( !isset($rc['setting']) ) {
-			return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'285', 'msg'=>"setting not found on remote server"));
+			return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1030', 'msg'=>"setting not found on remote server"));
 		}
 		$remote_setting = $rc['setting'];
 	} else {
@@ -58,7 +58,7 @@ function ciniki_atdo_setting_update(&$ciniki, $sync, $business_id, $args) {
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'atdo', 'sync', 'setting_get');
 	$rc = ciniki_atdo_setting_get($ciniki, $sync, $business_id, array('setting'=>$remote_setting['detail_key']));
 	if( $rc['stat'] != 'ok' && $rc['err']['code'] != 152 ) {
-		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'979', 'msg'=>'Unable to get atdo setting', 'err'=>$rc['err']));
+		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1031', 'msg'=>'Unable to get atdo setting', 'err'=>$rc['err']));
 	}
 	if( !isset($rc['setting']) ) {
 		$local_setting = array();
@@ -75,7 +75,7 @@ function ciniki_atdo_setting_update(&$ciniki, $sync, $business_id, $args) {
 		$rc = ciniki_core_dbInsert($ciniki, $strsql, 'ciniki.atdo');
 		if( $rc['stat'] != 'ok' ) {
 			ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
-			return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'976', 'msg'=>'Unable to get atdo setting', 'err'=>$rc['err']));
+			return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1032', 'msg'=>'Unable to get atdo setting', 'err'=>$rc['err']));
 		}
 	} else {
 		$local_setting = $rc['setting'];
@@ -88,7 +88,7 @@ function ciniki_atdo_setting_update(&$ciniki, $sync, $business_id, $args) {
 			'last_updated'=>array('type'=>'uts'),
 			));
 		if( $rc['stat'] != 'ok' ) {
-			return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'977', 'msg'=>'Unable to update atdo setting', 'err'=>$rc['err']));
+			return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1033', 'msg'=>'Unable to update atdo setting', 'err'=>$rc['err']));
 		}
 		if( isset($rc['strsql']) && $rc['strsql'] != '' ) {
 			$strsql = "UPDATE ciniki_atdo_settings SET " . $rc['strsql'] . " "
@@ -97,7 +97,7 @@ function ciniki_atdo_setting_update(&$ciniki, $sync, $business_id, $args) {
 				. "";
 			$rc = ciniki_core_dbUpdate($ciniki, $strsql, 'ciniki.atdo');
 			if( $rc['stat'] != 'ok' ) {
-				return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'978', 'msg'=>'Unable to update atdo setting', 'err'=>$rc['err']));
+				return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1034', 'msg'=>'Unable to update atdo setting', 'err'=>$rc['err']));
 			}
 			$db_updated = 1;
 		}
@@ -115,7 +115,7 @@ function ciniki_atdo_setting_update(&$ciniki, $sync, $business_id, $args) {
 				'ciniki_atdo_history', $remote_setting['detail_key'], 'ciniki_atdo_settings', $remote_setting['history'], array(), array());
 		}
 		if( $rc['stat'] != 'ok' ) {
-			return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'130', 'msg'=>'Unable to save history', 'err'=>$rc['err']));
+			return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1028', 'msg'=>'Unable to save history', 'err'=>$rc['err']));
 		}
 	}
 

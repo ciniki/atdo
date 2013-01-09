@@ -16,11 +16,11 @@ function ciniki_atdo_setting_list($ciniki, $sync, $business_id, $args) {
 	//
 	if( !isset($args['type']) ||
 		($args['type'] != 'partial' && $args['type'] != 'full' && $args['type'] != 'incremental') ) {
-		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'137', 'msg'=>'No type specified'));
+		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1040', 'msg'=>'No type specified'));
 	}
 	if( $args['type'] == 'incremental' 
 		&& (!isset($args['since_uts']) || $args['since_uts'] == '') ) {
-		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'136', 'msg'=>'No timestamp specified'));
+		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1041', 'msg'=>'No timestamp specified'));
 	}
 
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbQuote');
@@ -39,7 +39,7 @@ function ciniki_atdo_setting_list($ciniki, $sync, $business_id, $args) {
 		. "";
 	$rc = ciniki_core_dbHashIDQuery($ciniki, $strsql, 'ciniki.atdo', 'settings', 'detail_key');
 	if( $rc['stat'] != 'ok' ) {
-		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'132', 'msg'=>'Unable to get list', 'err'=>$rc['err']));
+		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1042', 'msg'=>'Unable to get list', 'err'=>$rc['err']));
 	}
 
 	if( !isset($rc['settings']) ) {
