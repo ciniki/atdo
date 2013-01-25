@@ -54,7 +54,7 @@ function ciniki_atdo_projectChildren($ciniki, $business_id, $project_id, $status
 		. "LEFT JOIN ciniki_atdo_followups ON (ciniki_atdos.id = ciniki_atdo_followups.atdo_id) "
 		. "LEFT JOIN ciniki_users AS u4 ON (ciniki_atdo_followups.user_id = u4.id ) "
 		. "LEFT JOIN ciniki_users AS u5 ON (ciniki_atdos.user_id = u5.id ) "
-		. "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+		. "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
 		. "AND ciniki_atdos.project_id = '" . ciniki_core_dbQuote($ciniki, $project_id) . "' "
 		. "AND (ciniki_atdos.type = 1 OR ciniki_atdos.type = 2 OR ciniki_atdos.type = 3 OR ciniki_atdos.type = 5 OR (ciniki_atdos.type = 6 AND (u1.perms&0x10) = 0)) "
 		. "";
