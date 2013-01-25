@@ -60,7 +60,7 @@
 #			                   20 - weekly
 #          			           30 - monthly, day of month
 #                 			   31 - monthly, day of week (first sunday)
-#			                   40 - yearly
+#			                   50 - yearly
 #
 # appointment_repeat_interval:  The interval to repeat the appointment, (default 1)
 # appointment_repeat_end:       The date and time to stop the repeatable appointment on#
@@ -104,5 +104,6 @@ create table ciniki_atdos (
     primary key (id),
 	index (type),
 	index (category),
-    index (parent_id, business_id, status, priority, date_added)
-) ENGINE='InnoDB', COMMENT='v1.03';
+    index (parent_id, business_id, status, priority, date_added),
+	index (business_id, uuid, last_updated)
+) ENGINE='InnoDB', COMMENT='v1.04';

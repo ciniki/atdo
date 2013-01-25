@@ -67,7 +67,7 @@ function ciniki_atdo_taskClose($ciniki) {
 	//
 	if( isset($args['content']) && $args['content'] != '' ) {
 		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddFollowup');
-		$rc = ciniki_core_threadAddFollowup($ciniki, 'ciniki.atdo', 'ciniki_atdo_followups', 'atdo', $args['atdo_id'], $args);
+		$rc = ciniki_core_threadAddFollowup($ciniki, 'ciniki.atdo', $args['business_id'], 'ciniki_atdo_followups', 'atdo', $args['atdo_id'], $args);
 		if( $rc['stat'] != 'ok' ) {
 			ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
 			return $rc;
@@ -78,7 +78,7 @@ function ciniki_atdo_taskClose($ciniki) {
 		// will make sure the flag is set.
 		// 
 		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddFollower');
-		$rc = ciniki_core_threadAddFollower($ciniki, 'ciniki.atdo', 'ciniki_atdo_users', 'atdo', $args['atdo_id'], $ciniki['session']['user']['id']);
+		$rc = ciniki_core_threadAddFollower($ciniki, 'ciniki.atdo', $args['business_id'], 'ciniki_atdo_users', 'atdo', $args['atdo_id'], $ciniki['session']['user']['id']);
 		if( $rc['stat'] != 'ok' ) {
 			ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
 			return $rc;

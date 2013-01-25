@@ -5,6 +5,9 @@
 #
 # Fields
 # ------
+# id:					The unique ID assigned to the attachment.
+# uuid:					The Universal Unique ID assigned to the attachment.
+# business_id:			The ID of the business the attachment is for.
 # atdo_id:				The ID of the atdo for the attachment.
 # flags:				Options to set for a atdok:  (not yet implemented)
 #
@@ -28,6 +31,9 @@
 # last_updated:			The date and time the thread was last updated.
 #
 create table ciniki_atdo_attachments (
+	id int not null auto_increment,
+	uuid char(36) not null,
+	business_id int not null,
 	atdo_id int not null,
 	flags tinyint unsigned not null,
 	package varchar(100) not null,
@@ -36,5 +42,7 @@ create table ciniki_atdo_attachments (
 	element_id varchar(255) not null,
 	date_added datetime not null,
 	last_updated datetime not null,
-	primary key (atdo_id, package, module, element, element_id)
-) ENGINE='InnoDB', COMMENT='v1.01';
+	primary key (id),
+	unique index (atdo_id, package, module, element, element_id),
+	index (business_id, uuid, last_updated)
+) ENGINE='InnoDB', COMMENT='v1.02';

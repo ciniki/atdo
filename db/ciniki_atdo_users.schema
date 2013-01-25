@@ -24,11 +24,16 @@
 # last_updated:		The UTC date and time the status was last changed.
 #
 create table ciniki_atdo_users (
+	id int not null auto_increment,
+	uuid char(36) not null,
+	business_id int not null,
 	atdo_id int not null,
 	user_id varchar(50) not null,
 	perms tinyint unsigned not null,
 #	last_viewed datetime not null,
 	date_added datetime not null,
 	last_updated datetime not null,
-	primary key (atdo_id, user_id)
-) ENGINE='InnoDB', COMMENT='v1.01';
+	primary key (id),
+	unique index (atdo_id, user_id),
+	index (business_id, uuid, last_updated)
+) ENGINE='InnoDB', COMMENT='v1.02';

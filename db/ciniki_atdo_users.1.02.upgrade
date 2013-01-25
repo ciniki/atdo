@@ -1,0 +1,11 @@
+#
+#
+ALTER TABLE ciniki_atdo_users DROP PRIMARY KEY;
+ALTER TABLE ciniki_atdo_users ADD COLUMN id int not null PRIMARY KEY auto_increment FIRST;
+ALTER TABLE ciniki_atdo_users ADD COLUMN uuid char(36) not null AFTER id;
+UPDATE ciniki_atdo_users SET uuid = uuid();
+ALTER TABLE ciniki_atdo_users ADD COLUMN business_id int not null AFTER uuid;
+UPDATE ciniki_atdo_users SET business_id = (SELECT business_id FROM ciniki_atdos WHERE ciniki_atdos.id = ciniki_atdo_users.atdo_id);
+CREATE UNIQUE INDEX atdo_id ON ciniki_atdo_users (atdo_id, user_id);
+CREATE INDEX uuid ON ciniki_atdo_users (business_id, uuid, last_updated);
+ALTER TABLE ciniki_atdo_users COMMENT='v1.02';
