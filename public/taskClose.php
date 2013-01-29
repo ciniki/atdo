@@ -67,7 +67,8 @@ function ciniki_atdo_taskClose($ciniki) {
 	//
 	if( isset($args['content']) && $args['content'] != '' ) {
 		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddFollowup');
-		$rc = ciniki_core_threadAddFollowup($ciniki, 'ciniki.atdo', $args['business_id'], 'ciniki_atdo_followups', 'atdo', $args['atdo_id'], $args);
+		$rc = ciniki_core_threadAddFollowup($ciniki, 'ciniki.atdo', 'followup', $args['business_id'], 
+			'ciniki_atdo_followups', 'ciniki_atdo_history', 'atdo', $args['atdo_id'], $args);
 		if( $rc['stat'] != 'ok' ) {
 			ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
 			return $rc;
@@ -77,8 +78,14 @@ function ciniki_atdo_taskClose($ciniki) {
 		// Make sure the user is attached as a follower.  They may already be attached, but it
 		// will make sure the flag is set.
 		// 
-		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddFollower');
-		$rc = ciniki_core_threadAddFollower($ciniki, 'ciniki.atdo', $args['business_id'], 'ciniki_atdo_users', 'atdo', $args['atdo_id'], $ciniki['session']['user']['id']);
+		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddUserPerms');
+		$rc = ciniki_core_threadAddUserPerms($ciniki, 'ciniki.atdo', 'user', $args['business_id'], 
+			'ciniki_atdo_users', 'ciniki_atdo_history', 
+			'atdo', $args['atdo_id'], $ciniki['session']['user']['id'], (0x01));
+//		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddFollower');
+//		$rc = ciniki_core_threadAddFollower($ciniki, 'ciniki.atdo', 'user', $args['business_id'], 
+//			'ciniki_atdo_users', 'ciniki_atdo_history', 
+//			'atdo', $args['atdo_id'], $ciniki['session']['user']['id']);
 		if( $rc['stat'] != 'ok' ) {
 			ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
 			return $rc;

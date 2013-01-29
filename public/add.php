@@ -165,7 +165,8 @@ function ciniki_atdo_add($ciniki) {
 	//
 	if( isset($args['followup']) && $args['followup'] != '' ) {
 		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddFollowup');
-		$rc = ciniki_core_threadAddFollowup($ciniki, 'ciniki.atdo', $args['business_id'], 'ciniki_atdo_followups', 'atdo', $atdo_id, array(
+		$rc = ciniki_core_threadAddFollowup($ciniki, 'ciniki.atdo', 'followup', $args['business_id'], 
+			'ciniki_atdo_followups', 'ciniki_atdo_history', 'atdo', $atdo_id, array(
 			'user_id'=>$ciniki['session']['user']['id'],
 			'atdo_id'=>$atdo_id,
 			'content'=>$args['followup']
@@ -182,8 +183,9 @@ function ciniki_atdo_add($ciniki) {
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddAttachment');
 	if( isset($args['customer_ids']) && is_array($args['customer_ids']) ) {
 		foreach($args['customer_ids'] as $customer_id) {
-			$rc = ciniki_core_threadAddAttachment($ciniki, 'ciniki.atdo', $args['business_id'], 'ciniki_atdo_attachments', 'atdo', $atdo_id,
-				'ciniki', 'customers', 'customer', $customer_id);
+			$rc = ciniki_core_threadAddAttachment($ciniki, 'ciniki.atdo', 'attachment',
+				$args['business_id'], 'ciniki_atdo_attachments', 'ciniki_atdo_history',
+				'atdo', $atdo_id, 'ciniki', 'customers', 'customer', $customer_id);
 			if( $rc['stat'] != 'ok' ) {
 				ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
 				return $rc;
@@ -192,8 +194,9 @@ function ciniki_atdo_add($ciniki) {
 	}
 	if( isset($args['product_ids']) && is_array($args['product_ids']) ) {
 		foreach($args['product_ids'] as $product_id) {
-			$rc = ciniki_core_threadAddAttachment($ciniki, 'ciniki.atdo', $args['business_id'], 'ciniki_atdo_attachments', 'atdo', $atdo_id,
-				'ciniki', 'products', 'product', $product_id);
+			$rc = ciniki_core_threadAddAttachment($ciniki, 'ciniki.atdo', 'attachment',
+				$args['business_id'], 'ciniki_atdo_attachments', 'ciniki_atdo_history',
+				'atdo', $atdo_id, 'ciniki', 'products', 'product', $product_id);
 			if( $rc['stat'] != 'ok' ) {
 				ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
 				return $rc;
@@ -205,7 +208,9 @@ function ciniki_atdo_add($ciniki) {
 	// Add the user who created the atdo, as a follower 
 	//
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddUserPerms');
-	$rc = ciniki_core_threadAddUserPerms($ciniki, 'ciniki.atdo', $args['business_id'], 'ciniki_atdo_users', 'atdo', $atdo_id, $ciniki['session']['user']['id'], (0x01|0x04));
+	$rc = ciniki_core_threadAddUserPerms($ciniki, 'ciniki.atdo', 'user', $args['business_id'], 
+		'ciniki_atdo_users', 'ciniki_atdo_history', 'atdo', $atdo_id, 
+		$ciniki['session']['user']['id'], (0x01|0x04));
 	if( $rc['stat'] != 'ok' ) {
 		ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
 		return $rc;
@@ -218,7 +223,8 @@ function ciniki_atdo_add($ciniki) {
 	//
 	if( isset($args['assigned']) && is_array($args['assigned']) ) {
 		foreach( $args['assigned'] as $user_id ) {
-			$rc = ciniki_core_threadAddUserPerms($ciniki, 'ciniki.atdo', $args['business_id'], 'ciniki_atdo_users', 'atdo', $atdo_id, $user_id, (0x04));
+			$rc = ciniki_core_threadAddUserPerms($ciniki, 'ciniki.atdo', 'user', $args['business_id'], 
+				'ciniki_atdo_users', 'ciniki_atdo_history', 'atdo', $atdo_id, $user_id, (0x04));
 			if( $rc['stat'] != 'ok' ) {
 				ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
 				return $rc;

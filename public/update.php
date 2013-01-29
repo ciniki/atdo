@@ -33,13 +33,13 @@ function ciniki_atdo_update($ciniki) {
 		'priority'=>array('required'=>'no', 'blank'=>'yes', 'errmsg'=>'No status specified'),
 		'customer_ids'=>array('required'=>'no', 'blank'=>'yes', 'type'=>'idlist', 'errmsg'=>'No customer specified'),
 		'product_ids'=>array('required'=>'no', 'blank'=>'yes', 'type'=>'idlist', 'errmsg'=>'No product specified'),
-        'followup'=>array('required'=>'no', 'default'=>'', 'blank'=>'yes', 'errmsg'=>'No followup specified'), 
+        'followup'=>array('required'=>'no', 'blank'=>'yes', 'errmsg'=>'No followup specified'), 
         'appointment_date'=>array('required'=>'no', 'blank'=>'yes', 'type'=>'datetime', 'errmsg'=>'No start date specified'), 
         'appointment_duration'=>array('required'=>'no', 'blank'=>'no', 'errmsg'=>'No duration specified'), 
         'appointment_allday'=>array('required'=>'no', 'blank'=>'no', 'errmsg'=>'No allday specified'), 
         'appointment_repeat_type'=>array('required'=>'no', 'blank'=>'yes', 'errmsg'=>'No repeat specified'), 
         'appointment_repeat_interval'=>array('required'=>'no', 'blank'=>'yes', 'errmsg'=>'No repeat interval specified'), 
-        'appointment_repeat_end'=>array('required'=>'no', 'type'=>'date', 'default'=>'', 'blank'=>'yes', 'errmsg'=>'No repeat end specified'), 
+        'appointment_repeat_end'=>array('required'=>'no', 'type'=>'date', 'blank'=>'yes', 'errmsg'=>'No repeat end specified'), 
         'due_date'=>array('required'=>'no', 'blank'=>'yes', 'type'=>'datetime', 'errmsg'=>'No due date specified'), 
         'due_duration'=>array('required'=>'no', 'blank'=>'no', 'errmsg'=>'No duration specified'), 
         'due_allday'=>array('required'=>'no', 'blank'=>'no', 'errmsg'=>'No allday specified'), 
@@ -151,7 +151,9 @@ function ciniki_atdo_update($ciniki) {
 	//
 	if( isset($args['userdelete']) && $args['userdelete'] == 'yes' ) {
 		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddUserPerms');
-		$rc = ciniki_core_threadAddUserPerms($ciniki, 'ciniki.atdo', $args['business_id'], 'ciniki_atdo_users', 'atdo', $args['atdo_id'], $ciniki['session']['user']['id'], 0x10);
+		$rc = ciniki_core_threadAddUserPerms($ciniki, 'ciniki.atdo', 'user', $args['business_id'], 
+			'ciniki_atdo_users', 'ciniki_atdo_history', 'atdo', $args['atdo_id'], 
+			$ciniki['session']['user']['id'], 0x10);
 		if( $rc['stat'] != 'ok' ) {
 			return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'589', 'msg'=>'Unable to remove message', 'err'=>$rc['err']));
 		}
@@ -184,7 +186,9 @@ function ciniki_atdo_update($ciniki) {
 		$to_be_removed = array_diff($task_users, $args['assigned']);
 		if( is_array($to_be_removed) ) {
 			foreach($to_be_removed as $user_id) {
-				$rc = ciniki_core_threadRemoveUserPerms($ciniki, 'ciniki.atdo', 'ciniki_atdo_users', 'atdo', $args['atdo_id'], $user_id, 0x04);
+				$rc = ciniki_core_threadRemoveUserPerms($ciniki, 'ciniki.atdo', 'user', 
+				$args['business_id'], 'ciniki_atdo_users', 'ciniki_atdo_history', 
+				'atdo', $args['atdo_id'], $user_id, 0x04);
 				if( $rc['stat'] != 'ok' ) {
 					return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'560', 'msg'=>'Unable to update task information', 'err'=>$rc['err']));
 				}
@@ -193,7 +197,9 @@ function ciniki_atdo_update($ciniki) {
 		$to_be_added = array_diff($args['assigned'], $task_users);
 		if( is_array($to_be_added) ) {
 			foreach($to_be_added as $user_id) {
-				$rc = ciniki_core_threadAddUserPerms($ciniki, 'ciniki.atdo', $args['business_id'], 'ciniki_atdo_users', 'atdo', $args['atdo_id'], $user_id, (0x04));
+				$rc = ciniki_core_threadAddUserPerms($ciniki, 'ciniki.atdo', 'user', 
+					$args['business_id'], 'ciniki_atdo_users', 'ciniki_atdo_history', 
+					'atdo', $args['atdo_id'], $user_id, (0x04));
 				if( $rc['stat'] != 'ok' ) {
 					return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'561', 'msg'=>'Unable to update task information', 'err'=>$rc['err']));
 				}
@@ -207,7 +213,8 @@ function ciniki_atdo_update($ciniki) {
 	//
 	if( isset($args['followup']) && $args['followup'] != '' ) {
 		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddFollowup');
-		$rc = ciniki_core_threadAddFollowup($ciniki, 'ciniki.atdo', $args['business_id'], 'ciniki_atdo_followups', 'atdo', $args['atdo_id'], array(
+		$rc = ciniki_core_threadAddFollowup($ciniki, 'ciniki.atdo', 'followup', $args['business_id'], 
+			'ciniki_atdo_followups', 'ciniki_atdo_history', 'atdo', $args['atdo_id'], array(
 			'user_id'=>$ciniki['session']['user']['id'],
 			'atdo_id'=>$args['atdo_id'],
 			'content'=>$args['followup']
