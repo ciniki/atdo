@@ -14,7 +14,7 @@
 // -------
 // <rsp stat='ok' id='34' />
 //
-function ciniki_atdo_add($ciniki) {
+function ciniki_atdo_add(&$ciniki) {
     //  
     // Find all the required and optional arguments
     //  

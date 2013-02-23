@@ -6,14 +6,13 @@
 # Fields
 # -------
 # id:				The id of the atdo.
+# uuid:				The Universal Unique ID.
+# business_id:		The business the atdo is attached to.
+#
 # parent_id:		The parent_id of the atdo, allows for nested appointments and tasks.
 #					Currently only Projects are allowed to have sub-items, which may not be another Project.
 #
 # project_id:		The ID of the project the atdo is attached to in the ciniki.projects module.
-#					
-# uuid:				The Universal Unique ID.
-#
-# business_id:		The business the atdo is attached to.
 #
 # type:				The type of atdo:
 #
@@ -77,10 +76,10 @@
 #
 create table ciniki_atdos (
     id int not null auto_increment,
-	parent_id int not null,
-	project_id int not null,
 	uuid char(36) not null,
     business_id int not null,
+	parent_id int not null,
+	project_id int not null,
 	type tinyint unsigned not null,
 	category varchar(140) not null,
     status tinyint unsigned not null,
