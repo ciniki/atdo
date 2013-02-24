@@ -15,7 +15,7 @@
 // Returns
 // -------
 //
-function ciniki_atdo_get($ciniki) {
+function ciniki_atdo_get(&$ciniki) {
     //  
     // Find all the required and optional arguments
     //  

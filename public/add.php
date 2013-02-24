@@ -160,7 +160,7 @@ function ciniki_atdo_add(&$ciniki) {
 		}
 	}
 
-	$ciniki['syncqueue'][] = array('push'=>'ciniki.atdos.atdo', 
+	$ciniki['syncqueue'][] = array('push'=>'ciniki.atdo.atdo', 
 		'args'=>array('id'=>$atdo_id));
 
 	//

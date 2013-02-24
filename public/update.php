@@ -147,7 +147,7 @@ function ciniki_atdo_update(&$ciniki) {
 	//
 	// Push the change to the other servers
 	//
-	$ciniki['syncqueue'][] = array('push'=>'ciniki.atdos.atdo', 
+	$ciniki['syncqueue'][] = array('push'=>'ciniki.atdo.atdo', 
 		'args'=>array('id'=>$args['atdo_id']));
 
 	//
@@ -236,22 +236,33 @@ function ciniki_atdo_update(&$ciniki) {
 	//
 	if( (isset($args['followup']) && $args['followup'] != '')
 		|| (isset($args['status']) && $args['status'] != '' ) ) {
-		$strsql = "UPDATE ciniki_atdo_users "
-			. "SET perms = ((perms&~0x18)) "		// Removed delete flag if set, add unread flag
+		//
+		// Get the list of currently assigned users
+		//
+		$strsql = "SELECT user_id "
+			. "FROM ciniki_atdo_users "
 			. "WHERE atdo_id = '" . ciniki_core_dbQuote($ciniki, $args['atdo_id']) . "' "
 			. "AND user_id <> '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "' "
-			. "AND (perms&0x04) = 0x04 "	// Only update assigned users
+			. "AND (perms&0x04) = 0x04 "
 			. "";
-		$rc = ciniki_core_dbUpdate($ciniki, $strsql, 'ciniki.atdo');
+		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbQueryList');
+		$rc = ciniki_core_dbQueryList($ciniki, $strsql, 'ciniki.atdo', 'users', 'user_id');
 		if( $rc['stat'] != 'ok' ) {
-			ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
-			return $rc;
+			return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'132', 'msg'=>'Unable to load task information', 'err'=>$rc['err']));
 		}
+		$task_users = $rc['users'];
+		// 
+		// Remove the delete flag if set, add unread flag
 		//
-		// FIXME: Push the change to the other servers
-		//
-//		$ciniki['syncqueue'][] = array('push'=>'ciniki.atdos.user', 
-//			'args'=>array('id'=>$args['atdo_id']));
+		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadRemoveUserPerms');
+		foreach($task_users as $user_id) {
+			$rc = ciniki_core_threadRemoveUserPerms($ciniki, 'ciniki.atdo', 'user', 
+			$args['business_id'], 'ciniki_atdo_users', 'ciniki_atdo_history', 
+			'atdo', $args['atdo_id'], $user_id, 0x18);
+			if( $rc['stat'] != 'ok' ) {
+				return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'136', 'msg'=>'Unable to update task information', 'err'=>$rc['err']));
+			}
+		}
 	}
 
 	//

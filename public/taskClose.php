@@ -115,7 +115,7 @@ function ciniki_atdo_taskClose(&$ciniki) {
 	//
 	// Push the change to the other servers
 	//
-	$ciniki['syncqueue'][] = array('push'=>'ciniki.atdos.atdo', 
+	$ciniki['syncqueue'][] = array('push'=>'ciniki.atdo.atdo', 
 		'args'=>array('id'=>$args['atdo_id']));
 
 	//

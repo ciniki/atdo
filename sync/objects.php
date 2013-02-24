@@ -20,7 +20,8 @@ function ciniki_atdo_sync_objects($ciniki, &$sync, $business_id, $args) {
 		'table'=>'ciniki_atdos',
 		'fields'=>array(
 			'parent_id'=>array(),
-			'project_id'=>array('ref'=>'ciniki.projects.project'),
+			'project_id'=>array(),
+//			'project_id'=>array('ref'=>'ciniki.projects.project'),
 			'type'=>array(),
 			'category'=>array(),
 			'status'=>array(),
@@ -47,7 +48,7 @@ function ciniki_atdo_sync_objects($ciniki, &$sync, $business_id, $args) {
 //		'name'=>'Atdo Attachment',
 //		'table'=>'ciniki_atdo_attachments',
 //		'fields'=>array(
-//			'atdo_id'=>array('ref'=>'ciniki.atdos.atdo'),
+//			'atdo_id'=>array('ref'=>'ciniki.atdo.atdo'),
 //			'flags'=>array(),
 //			'package'=>array(),
 //			'module'=>array(),
@@ -61,7 +62,7 @@ function ciniki_atdo_sync_objects($ciniki, &$sync, $business_id, $args) {
 		'table'=>'ciniki_atdo_followups',
 		'fields'=>array(
 			'parent_id'=>array(),
-			'atdo_id'=>array('ref'=>'ciniki.atdos.atdo'),
+			'atdo_id'=>array('ref'=>'ciniki.atdo.atdo'),
 			'user_id'=>array('ref'=>'ciniki.users.user'),
 			'content'=>array(),
 			),
@@ -71,7 +72,7 @@ function ciniki_atdo_sync_objects($ciniki, &$sync, $business_id, $args) {
 		'name'=>'Atdo User',
 		'table'=>'ciniki_atdo_users',
 		'fields'=>array(
-			'atdo_id'=>array('ref'=>'ciniki.atdos.atdo'),
+			'atdo_id'=>array('ref'=>'ciniki.atdo.atdo'),
 			'user_id'=>array('ref'=>'ciniki.users.user'),
 			'perms'=>array(),
 			),
