@@ -77,7 +77,7 @@ function ciniki_atdo_sync_objects($ciniki, &$sync, $business_id, $args) {
 			),
 		'history_table'=>'ciniki_atdo_history',
 		);
-	$objects['settings'] = array(
+	$objects['setting'] = array(
 		'type'=>'settings',
 		'name'=>'Atdo Settings',
 		'table'=>'ciniki_atdo_settings',

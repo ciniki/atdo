@@ -17,7 +17,7 @@
 // -------
 // <rsp stat='ok'/>
 //
-function ciniki_atdo_taskClose($ciniki) {
+function ciniki_atdo_taskClose(&$ciniki) {
 	//
 	// Find all the required and optional arguments
 	//
@@ -96,7 +96,7 @@ function ciniki_atdo_taskClose($ciniki) {
 	// Close the task
 	//
 	$strsql = "UPDATE ciniki_atdos SET status = 60, last_updated = UTC_TIMESTAMP() "
-		. "WHERE id = '" . ciniki_core_dbQuote($ciniki, $args['atdo']) . "' "
+		. "WHERE id = '" . ciniki_core_dbQuote($ciniki, $args['atdo_id']) . "' "
 		. "AND business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
 		. "";
 	$rc = ciniki_core_dbUpdate($ciniki, $strsql, 'ciniki.atdo');
@@ -111,6 +111,12 @@ function ciniki_atdo_taskClose($ciniki) {
 		ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
 		return $rc;
 	}
+
+	//
+	// Push the change to the other servers
+	//
+	$ciniki['syncqueue'][] = array('push'=>'ciniki.atdos.atdo', 
+		'args'=>array('id'=>$args['atdo_id']));
 
 	//
 	// FIXME: Notify the other users on this thread there was an update.

@@ -87,6 +87,8 @@ function ciniki_atdo_updateSettings(&$ciniki) {
 			}
 			$rc = ciniki_core_dbAddModuleHistory($ciniki, 'ciniki.atdo', 'ciniki_atdo_history', $args['business_id'], 
 				2, 'ciniki_atdo_settings', $field, 'detail_value', $ciniki['request']['args'][$field]);
+			$ciniki['syncqueue'][] = array('push'=>'ciniki.atdo.setting', 
+				'args'=>array('id'=>$field));
 		}
 	}
 
@@ -104,8 +106,6 @@ function ciniki_atdo_updateSettings(&$ciniki) {
 	//
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'updateModuleChangeDate');
 	ciniki_businesses_updateModuleChangeDate($ciniki, $args['business_id'], 'ciniki', 'atdo');
-
-	$ciniki['syncqueue'][] = array('method'=>'ciniki.atdo.setting.push', 'args'=>array());
 
 	return array('stat'=>'ok');
 }

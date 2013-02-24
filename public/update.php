@@ -144,6 +144,11 @@ function ciniki_atdo_update(&$ciniki) {
 		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'556', 'msg'=>'Unable to update task'));
 	}
 
+	//
+	// Push the change to the other servers
+	//
+	$ciniki['syncqueue'][] = array('push'=>'ciniki.atdos.atdo', 
+		'args'=>array('id'=>$args['atdo_id']));
 
 	//
 	// Check if the user has delete the message from their messages
@@ -242,6 +247,11 @@ function ciniki_atdo_update(&$ciniki) {
 			ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
 			return $rc;
 		}
+		//
+		// FIXME: Push the change to the other servers
+		//
+//		$ciniki['syncqueue'][] = array('push'=>'ciniki.atdos.user', 
+//			'args'=>array('id'=>$args['atdo_id']));
 	}
 
 	//

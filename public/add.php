@@ -160,6 +160,9 @@ function ciniki_atdo_add(&$ciniki) {
 		}
 	}
 
+	$ciniki['syncqueue'][] = array('push'=>'ciniki.atdos.atdo', 
+		'args'=>array('id'=>$atdo_id));
+
 	//
 	// Add followup
 	//
@@ -179,6 +182,8 @@ function ciniki_atdo_add(&$ciniki) {
 
 	//
 	// Add attachments to customers and products
+	// FIXME: Add sync for attachments.  Need to know what it's sync, 
+	//        and how to do lookups
 	//
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddAttachment');
 	if( isset($args['customer_ids']) && is_array($args['customer_ids']) ) {
