@@ -38,10 +38,10 @@ function ciniki_atdo_historyFix($ciniki) {
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbFixTableHistory');
 
 	//
-	// Update the history for ciniki_atdo
+	// Update the history for ciniki_atdos
 	//
 	$rc = ciniki_core_dbFixTableHistory($ciniki, 'ciniki.atdo', $args['business_id'],
-		'ciniki_atdo', 'ciniki_atdo_history', 
+		'ciniki_atdos', 'ciniki_atdo_history', 
 		array('uuid', 'parent_id', 'project_id', 'type', 'category', 'status',
 			'priority', 'perm_flags', 'user_id', 'subject', 'location',
 			'content', 'appointment_date', 'appointment_duration', 'appointment_flags',
@@ -55,7 +55,7 @@ function ciniki_atdo_historyFix($ciniki) {
 	// Update the history for ciniki_atdo_followups
 	//
 	$rc = ciniki_core_dbFixTableHistory($ciniki, 'ciniki.atdo', $args['business_id'],
-		'ciniki_atdo', 'ciniki_atdo_history', 
+		'ciniki_atdo_followups', 'ciniki_atdo_history', 
 		array('uuid', 'parent_id', 'atdo_id', 'user_id', 'content'));
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
@@ -65,7 +65,7 @@ function ciniki_atdo_historyFix($ciniki) {
 	// Update the history for ciniki_atdo_users
 	//
 	$rc = ciniki_core_dbFixTableHistory($ciniki, 'ciniki.atdo', $args['business_id'],
-		'ciniki_atdo', 'ciniki_atdo_history', 
+		'ciniki_atdo_users', 'ciniki_atdo_history', 
 		array('uuid', 'atdo_id', 'user_id', 'perms'));
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
