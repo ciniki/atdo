@@ -20,8 +20,8 @@ function ciniki_atdo_sync_objects($ciniki, &$sync, $business_id, $args) {
 		'table'=>'ciniki_atdos',
 		'fields'=>array(
 			'parent_id'=>array(),
-			'project_id'=>array(),
-//			'project_id'=>array('ref'=>'ciniki.projects.project'),
+//			'project_id'=>array(),
+			'project_id'=>array('ref'=>'ciniki.projects.project'),
 			'type'=>array(),
 			'category'=>array(),
 			'status'=>array(),
