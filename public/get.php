@@ -21,9 +21,9 @@ function ciniki_atdo_get(&$ciniki) {
     //  
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'errmsg'=>'No business specified'), 
-        'atdo_id'=>array('required'=>'yes', 'blank'=>'no', 'errmsg'=>'No atdo specified'), 
-		'children'=>array('required'=>'no', 'blank'=>'yes', 'default'=>'no', 'errmsg'=>'No children flag specified'),
+        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'atdo_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Atdo'), 
+		'children'=>array('required'=>'no', 'blank'=>'yes', 'default'=>'no', 'name'=>'Children'),
         )); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;

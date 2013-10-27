@@ -23,9 +23,9 @@ function ciniki_atdo_taskClose(&$ciniki) {
 	//
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
 	$rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-		'business_id'=>array('required'=>'yes', 'blank'=>'no', 'errmsg'=>'No business specified'), 
-		'atdo_id'=>array('required'=>'yes', 'blank'=>'no', 'errmsg'=>'No atdo specified'),
-		'content'=>array('required'=>'no', 'blank'=>'yes', 'errmsg'=>'No followup specified'),
+		'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+		'atdo_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Atdo'),
+		'content'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Followup'),
 		));
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;

@@ -24,14 +24,14 @@
 //		...
 //	</users>
 //
-function ciniki_atdo_getSettingHistory($ciniki) {
+function ciniki_atdo_settingsHistory($ciniki) {
 	//
 	// Find all the required and optional arguments
 	//
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
 	$rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-		'business_id'=>array('required'=>'yes', 'blank'=>'no', 'errmsg'=>'No business specified'), 
-		'field'=>array('required'=>'yes', 'blank'=>'no', 'errmsg'=>'No user specified'), 
+		'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+		'field'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'User'), 
 		));
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
@@ -42,7 +42,7 @@ function ciniki_atdo_getSettingHistory($ciniki) {
 	// Check access to business_id as owner, or sys admin
 	//
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'atdo', 'private', 'checkAccess');
-	$ac = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.getSettingHistory');
+	$ac = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.settingsHistory');
 	if( $ac['stat'] != 'ok' ) {
 		return $ac;
 	}

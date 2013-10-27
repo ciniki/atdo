@@ -18,10 +18,10 @@ function ciniki_atdo_messagesSearchFull($ciniki) {
     //  
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'errmsg'=>'No business specified'), 
-        'start_needle'=>array('required'=>'no', 'blank'=>'yes', 'errmsg'=>'No search specified'), 
-        'limit'=>array('required'=>'yes', 'blank'=>'no', 'errmsg'=>'No limit specified'), 
-		'completed'=>array('required'=>'no', 'errmsg'=>'No completed specified'),
+        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'start_needle'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Search'), 
+        'limit'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Limit'), 
+		'completed'=>array('required'=>'no', 'name'=>'Completed'),
         )); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
