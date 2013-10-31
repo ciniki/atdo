@@ -42,7 +42,7 @@ function ciniki_atdo__appointments($ciniki, $business_id, $args) {
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'dateFormat');
 	$date_format = ciniki_users_dateFormat($ciniki);
 
-	$strsql = "SELECT ciniki_atdos.id, type, subject, location, priority, "
+	$strsql = "SELECT ciniki_atdos.id, type, ciniki_atdos.status, subject, location, priority, "
 		. "UNIX_TIMESTAMP(appointment_date) AS start_ts, "
 		. "DATE_FORMAT(appointment_date, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS start_date, "
 		. "DATE_FORMAT(appointment_date, '%Y-%m-%d') AS date, "
@@ -62,7 +62,7 @@ function ciniki_atdo__appointments($ciniki, $business_id, $args) {
 		$strsql .= "AND ciniki_atdos.id = '" . ciniki_core_dbQuote($ciniki, $args['appointment_id']) . "' ";
 	} elseif( isset($args['date']) && $args['date'] != '' ) {
 		$quoted_date = ciniki_core_dbQuote($ciniki, $args['date']);
-		$strsql = "SELECT ciniki_atdos.id, type, subject, location, priority, "
+		$strsql = "SELECT ciniki_atdos.id, type, ciniki_atdos.status, subject, location, priority, "
 			. "UNIX_TIMESTAMP(appointment_date)+(UNIX_TIMESTAMP(DATE('$quoted_date'))-UNIX_TIMESTAMP(DATE(appointment_date))) AS start_ts, "
 			. "DATE_FORMAT(UNIX_TIMESTAMP(appointment_date)+(UNIX_TIMESTAMP(DATE('$quoted_date'))-UNIX_TIMESTAMP(DATE(appointment_date))), '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS start_date, "
 			. "DATE_FORMAT(UNIX_TIMESTAMP(appointment_date)+(UNIX_TIMESTAMP(DATE('$quoted_date'))-UNIX_TIMESTAMP(DATE(appointment_date))), '%Y-%m-%d') AS date, "
@@ -126,7 +126,9 @@ function ciniki_atdo__appointments($ciniki, $business_id, $args) {
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
 	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
 		array('container'=>'appointments', 'fname'=>'id', 'name'=>'appointment', 
-			'fields'=>array('id', 'module', 'start_ts', 'start_date', 'date', 'time', '12hour', 'allday', 'duration', 'repeat_type', 'repeat_interval', 'repeat_end', 'colour', 'type', 'subject', 'location', 'secondary_text', 'priority')),
+			'fields'=>array('id', 'module', 'start_ts', 'start_date', 'date', 'time', '12hour', 'allday', 'duration', 
+			'repeat_type', 'repeat_interval', 'repeat_end', 'colour', 'type', 'status', 
+			'subject', 'location', 'secondary_text', 'priority')),
 		));
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
@@ -141,7 +143,7 @@ function ciniki_atdo__appointments($ciniki, $business_id, $args) {
 				$rc['appointments'][$appointment_num]['appointment']['colour'] = $settings['appointments.status.1'];
 			}
 			elseif( $appointment['appointment']['type'] == 2 ) {
-				if( $appointment['appointment']['status'] == 60 ) {
+				if( isset($appointment['appointment']['status']) && $appointment['appointment']['status'] == 60 ) {
 					$rc['appointments'][$appointment_num]['appointment']['colour'] = $settings['tasks.status.60'];
 				} else {
 					$rc['appointments'][$appointment_num]['appointment']['colour'] = $settings['tasks.priority.' . $appointment['appointment']['priority']];
