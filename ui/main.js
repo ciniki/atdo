@@ -463,7 +463,7 @@ function ciniki_atdo_main() {
 			};
 		this.add.forms.task = {
 			'info':{'label':'', 'type':'simpleform', 'fields':{
-				'subject':{'label':'Subject', 'type':'text'},
+				'subject':{'label':'Task', 'type':'text'},
 				'category':{'label':'Category', 'type':'text', 'livesearch':'yes', 'livesearchempty':'yes'},
 				'assigned':{'label':'Assigned', 'type':'multiselect', 'none':'yes', 'options':M.curBusiness.employees},
 				'private':{'label':'Options', 'type':'multitoggle', 'none':'yes', 'toggles':{'no':'Public', 'yes':'Private'}},
@@ -504,10 +504,10 @@ function ciniki_atdo_main() {
 			};
 		this.add.forms.faq = {
 			'info':{'label':'', 'type':'simpleform', 'fields':{
-				'subject':{'label':'Subject', 'type':'text'},
+				'subject':{'label':'Question', 'type':'text'},
 				'category':{'label':'Category', 'type':'text', 'livesearch':'yes', 'livesearchempty':'yes'},
 			}},
-			'_notes':{'label':'Details', 'type':'simpleform', 'fields':{
+			'_notes':{'label':'Answer', 'type':'simpleform', 'fields':{
 				'followup':{'label':'', 'hidelabel':'yes', 'type':'textarea', 'size':'small'},
 				}},
 			'_save':{'label':'', 'buttons':{
@@ -516,7 +516,7 @@ function ciniki_atdo_main() {
 			};
 		this.add.forms.note = {
 			'info':{'label':'', 'type':'simpleform', 'fields':{
-				'subject':{'label':'Subject', 'type':'text'},
+				'subject':{'label':'Title', 'type':'text'},
 				'category':{'label':'Category', 'type':'text', 'livesearch':'yes', 'livesearchempty':'yes'},
 				'assigned':{'label':'Assigned', 'type':'multiselect', 'none':'yes', 'options':M.curBusiness.employees},
 				'private':{'label':'Options', 'type':'multitoggle', 'none':'yes', 'toggles':{'no':'Public', 'yes':'Private'}},
@@ -706,7 +706,7 @@ function ciniki_atdo_main() {
 				'add':{'label':'Save', 'fn':'M.ciniki_atdo_main.saveAtdo();'},
 				}},
 			'info':{'label':'', 'type':'simpleform', 'fields':{
-				'subject':{'label':'Subject', 'type':'text'},
+				'subject':{'label':'Title', 'type':'text'},
 				'category':{'label':'Category', 'type':'text', 'livesearch':'yes', 'livesearchempty':'yes'},
 				'assigned':{'label':'Assigned', 'type':'multiselect', 'none':'yes', 'options':M.curBusiness.employees, 'history':'no', 'viewed':'viewed', 'deleted':'deleted'},
 				'private':{'label':'Options', 'type':'multitoggle', 'none':'yes', 'toggles':{'no':'Public', 'yes':'Private'}, 'history':'no'},
@@ -759,7 +759,7 @@ function ciniki_atdo_main() {
 				'add':{'label':'Save', 'fn':'M.ciniki_atdo_main.saveAtdo();'},
 				}},
 			'info':{'label':'', 'type':'simpleform', 'fields':{
-				'subject':{'label':'Subject', 'type':'text'},
+				'subject':{'label':'Question', 'type':'text'},
 				'category':{'label':'Category', 'type':'text', 'livesearch':'yes', 'livesearchempty':'yes'},
 				'project_id':{'label':'Project', 'active':'no', 'type':'fkid', 'livesearch':'yes', 'livesearchempty':'yes'},
 			}},
@@ -773,7 +773,7 @@ function ciniki_atdo_main() {
 				'followup':{'label':'Details', 'hidelabel':'yes', 'type':'textarea', 'history':'no'},
 				}},
 			'info':{'label':'', 'type':'simpleform', 'fields':{
-				'subject':{'label':'Subject', 'type':'text'},
+				'subject':{'label':'Title', 'type':'text'},
 				'category':{'label':'Category', 'type':'text', 'livesearch':'yes', 'livesearchempty':'yes'},
 				'assigned':{'label':'Assigned', 'type':'multiselect', 'none':'yes', 'options':M.curBusiness.employees, 'history':'no', 'viewed':'viewed', 'deleted':'deleted'},
 				'private':{'label':'Options', 'type':'multitoggle', 'none':'yes', 'toggles':{'no':'Public', 'yes':'Private'}, 'history':'no'},
