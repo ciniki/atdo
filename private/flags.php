@@ -10,7 +10,7 @@
 // Returns
 // -------
 //
-function ciniki_atdo_flags($ciniki) {
+function ciniki_atdo_flags($ciniki, $modules) {
 	$flags = array(
 		array('flag'=>array('bit'=>'1', 'name'=>'Appointments')),
 		array('flag'=>array('bit'=>'2', 'name'=>'Tasks')),
