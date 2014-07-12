@@ -435,7 +435,7 @@ function ciniki_atdo_main() {
 				'message':{'label':'Message', 'field_id':6},
 			}};
 		this.add.forms.appointment = {
-			'info':{'label':'', 'type':'simpleform', 'fields':{
+			'info':{'label':'', 'aside':'yes', 'type':'simpleform', 'fields':{
 				'appointment_date':{'label':'Start', 'type':'appointment', 'caloffset':0,
 					'start':'8:00',
 					'end':'20:00',
@@ -448,7 +448,7 @@ function ciniki_atdo_main() {
 				'location':{'label':'Location', 'type':'text'},
 				'project_id':{'label':'Project', 'active':'no', 'type':'fkid', 'livesearch':'yes', 'livesearchempty':'yes'},
 			}},
-			'_repeat':{'label':'Repeat', 'type':'simpleform', 'fields':{
+			'_repeat':{'label':'Repeat', 'aside':'yes', 'type':'simpleform', 'fields':{
 				'appointment_repeat_type':{'label':'Type', 'type':'multitoggle', 'none':'yes', 'toggles':this.repeatOptions, 
 					'fn':'M.ciniki_atdo_main.add.updateInterval'},
 				'appointment_repeat_interval':{'label':'Every', 'type':'multitoggle', 'toggles':this.repeatIntervals, 'hint':' '},
@@ -462,7 +462,7 @@ function ciniki_atdo_main() {
 				}},
 			};
 		this.add.forms.task = {
-			'info':{'label':'', 'type':'simpleform', 'fields':{
+			'info':{'label':'', 'aside':'yes', 'type':'simpleform', 'fields':{
 				'subject':{'label':'Task', 'type':'text'},
 				'category':{'label':'Category', 'type':'text', 'livesearch':'yes', 'livesearchempty':'yes'},
 				'assigned':{'label':'Assigned', 'type':'multiselect', 'none':'yes', 'options':M.curBusiness.employees},
@@ -471,7 +471,7 @@ function ciniki_atdo_main() {
 		//		'status':{'label':'Status', 'type':'multitoggle', 'toggles':this.statuses},
 				'project_id':{'label':'Project', 'active':'no', 'type':'fkid', 'livesearch':'yes', 'livesearchempty':'yes'},
 			}},
-			'_notes':{'label':'Details', 'type':'simpleform', 'fields':{
+			'_notes':{'label':'Details', 'aside':'yes', 'type':'simpleform', 'fields':{
 				'followup':{'label':'', 'hidelabel':'yes', 'type':'textarea', 'size':'small'},
 				}},
 //			'links':{'label':'Attach', 'type':'simpleform', 'fields':{
@@ -654,7 +654,7 @@ function ciniki_atdo_main() {
 		//
 		this.atdo = new M.panel('Atdo',
 			'ciniki_atdo_main', 'atdo',
-			'mc', 'large', 'sectioned', 'ciniki.atdo.main.edit');
+			'mc', 'medium', 'sectioned', 'ciniki.atdo.main.edit');
 		this.atdo.aid = 0;
 		this.atdo.data = null;
 		this.atdo.cb = null;
@@ -669,7 +669,7 @@ function ciniki_atdo_main() {
 				'message':{'label':'Message', 'field_id':6},
 			}};
 		this.atdo.forms.appointment = {
-			'info':{'label':'', 'fields':{
+			'info':{'label':'', 'aside':'yes', 'fields':{
 				'appointment_date':{'label':'Start', 'type':'appointment', 'caloffset':0,
 					'start':'8:00',
 					'end':'20:00',
