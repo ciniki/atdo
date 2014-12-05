@@ -7,6 +7,10 @@
 #
 # Fields
 # ------
+# id:				The ID of the user assigned to the ATDO.
+# uuid:				The universal unique ID for this ATDO user.
+# business_id:		The business the user is attached to.
+#
 # atdo_id:			The atdo element the user is attached to.
 # user_id:			The user following the atdo.
 # perms:			The bits to determine how the user is attached to the atdo.
