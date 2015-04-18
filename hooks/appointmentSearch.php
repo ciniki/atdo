@@ -14,7 +14,7 @@
 // Returns
 // -------
 //
-function ciniki_atdo__appointmentSearch($ciniki, $business_id, $args) {
+function ciniki_atdo_hooks_appointmentSearch($ciniki, $business_id, $args) {
 
 	if( !isset($args['start_needle']) || $args['start_needle'] == '' ) {
 		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'553', 'msg'=>'No search specified'));
