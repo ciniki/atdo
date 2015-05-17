@@ -44,13 +44,28 @@ function ciniki_atdo_tasksSearchFull($ciniki) {
     }   
 
 	//
+	// Get timezone info
+	//
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'intlSettings');
+	$rc = ciniki_businesses_intlSettings($ciniki, $args['business_id']);
+	if( $rc['stat'] != 'ok' ) {
+		return $rc;
+	}
+	$intl_timezone = $rc['settings']['intl-default-timezone'];
+
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'dateFormat');
+	$date_format = ciniki_users_dateFormat($ciniki, 'php');
+
+	//
 	// Get the number of tasks in each status for the business, 
 	// if no rows found, then return empty array
 	//
 	$strsql = "SELECT ciniki_atdos.id, subject, ciniki_atdos.status, priority, "
 		. "IF((u1.perms&0x04)=4, 'yes', 'no') AS assigned, "
-		. "IFNULL(DATE_FORMAT(ciniki_atdos.due_date, '%b %e, %Y'), '') AS due_date, "
-		. "IF((ciniki_atdos.due_flags&0x01)=1, '', IF(ciniki_atdos.due_date=0, '', DATE_FORMAT(ciniki_atdos.due_date, '%l:%i %p'))) AS due_time, "
+//		. "IFNULL(DATE_FORMAT(ciniki_atdos.due_date, '%b %e, %Y'), '') AS due_date, "
+//		. "IF((ciniki_atdos.due_flags&0x01)=1, '', IF(ciniki_atdos.due_date=0, '', DATE_FORMAT(ciniki_atdos.due_date, '%l:%i %p'))) AS due_time, "
+		. "IFNULL(ciniki_atdos.due_date, '') AS due_date, "
+		. "IF((ciniki_atdos.due_flags&0x01)=1, '', IF(ciniki_atdos.due_date=0, '', ciniki_atdos.due_date)) AS due_time, "
 		. "IFNULL(u3.display_name, '') AS assigned_users "
 		. "FROM ciniki_atdos "
 		. "LEFT JOIN ciniki_atdo_users AS u1 ON (ciniki_atdos.id = u1.atdo_id AND u1.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
@@ -96,6 +111,8 @@ function ciniki_atdo_tasksSearchFull($ciniki) {
 	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
 		array('container'=>'tasks', 'fname'=>'id', 'name'=>'task',
 			'fields'=>array('id', 'subject', 'priority', 'assigned', 'assigned_users', 'due_date', 'due_time', 'status'), 
+			'utctotz'=>array('due_date'=>array('timezone'=>$intl_timezone, 'format'=>$date_format),
+				'due_time'=>array('timezone'=>$intl_timezone, 'format'=>'g:i A')),
 			'lists'=>array('assigned_users'),
 			'maps'=>array('status'=>array(''=>'Unknown', '1'=>'Open', '60'=>'Completed')),
 			),

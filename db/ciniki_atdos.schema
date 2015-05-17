@@ -50,7 +50,7 @@
 # location:			The location of the atdo, typically the location for an appointment.
 # content:			Any content which is not in the followup format.
 #
-# appointment_date:		When the atdo is scheduled for.  This is used in calendar display.
+# appointment_date:		The UTC date/time when the atdo is scheduled for.  This is used in calendar display.
 # appointment_duration:	How long the atdo should take, in minutes, used for displaying in the calendar.
 # appointment_flags:	0x01 - all day appointment
 # 

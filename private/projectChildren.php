@@ -16,13 +16,21 @@
 //
 function ciniki_atdo_projectChildren($ciniki, $business_id, $project_id, $status) {
     
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'timezoneOffset');
-	$utc_offset = ciniki_users_timezoneOffset($ciniki);
+	//
+	// Load timezone info
+	//
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'intlSettings');
+	$rc = ciniki_businesses_intlSettings($ciniki, $business_id);
+	if( $rc['stat'] != 'ok' ) {
+		return $rc;
+	}
+	$intl_timezone = $rc['settings']['intl-default-timezone'];
 
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbQuote');
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'datetimeFormat');
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'dateFormat');
 	$datetime_format = ciniki_users_datetimeFormat($ciniki);
+	$php_datetime_format = ciniki_users_datetimeFormat($ciniki, 'php');
 	$date_format = ciniki_users_dateFormat($ciniki);
 
 	$project = array();
@@ -39,10 +47,14 @@ function ciniki_atdo_projectChildren($ciniki, $business_id, $project_id, $status
 		. "IF((u1.perms&0x04)=4, 'yes', 'no') AS assigned, "
 	//	. "DATE_FORMAT(start_date, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS start_date, "
 	//	. "duration, "
-		. "UNIX_TIMESTAMP(ciniki_atdos.appointment_date) AS start_ts, "
-		. "DATE_FORMAT(ciniki_atdos.appointment_date, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS start_date, "
-		. "IFNULL(DATE_FORMAT(ciniki_atdos.due_date, '" . ciniki_core_dbQuote($ciniki, $date_format) . "'), '') AS due_date, "
-		. "IF((ciniki_atdos.due_flags&0x01)=1, '', IF(ciniki_atdos.due_date=0, '', DATE_FORMAT(ciniki_atdos.due_date, '%l:%i %p'))) AS due_time, "
+		. "ciniki_atdos.appointment_date AS start_ts, "
+		. "ciniki_atdos.appointment_date AS start_date, "
+		. "ciniki_atdos.due_date, "
+		. "IF((ciniki_atdos.due_flags&0x01)=1, '', IF(ciniki_atdos.due_date=0, '', ciniki_atdos.due_date)) AS due_time, "
+//		. "UNIX_TIMESTAMP(ciniki_atdos.appointment_date) AS start_ts, "
+//		. "DATE_FORMAT(ciniki_atdos.appointment_date, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS start_date, "
+//		. "IFNULL(DATE_FORMAT(ciniki_atdos.due_date, '" . ciniki_core_dbQuote($ciniki, $date_format) . "'), '') AS due_date, "
+//		. "IF((ciniki_atdos.due_flags&0x01)=1, '', IF(ciniki_atdos.due_date=0, '', DATE_FORMAT(ciniki_atdos.due_date, '%l:%i %p'))) AS due_time, "
 		. "u2.user_id AS assigned_user_ids, "
 		. "IFNULL(u3.display_name, '') AS assigned_users, "
 		. "CAST((UNIX_TIMESTAMP(UTC_TIMESTAMP())-UNIX_TIMESTAMP(ciniki_atdo_followups.date_added)) as DECIMAL(12,0)) AS age_followup, "
@@ -85,9 +97,14 @@ function ciniki_atdo_projectChildren($ciniki, $business_id, $project_id, $status
 		array('container'=>'childtypes', 'fname'=>'type', 'name'=>'tchild',
 			'fields'=>array('type')),
 		array('container'=>'children', 'fname'=>'id', 'name'=>'child',
-			'fields'=>array('id', 'subject', 'allday', 'status', 'priority', 'private', 'assigned', 'assigned_user_ids', 'assigned_users', 'due_date', 'due_time',
-				'start_ts', 'start_date', 
+			'fields'=>array('id', 'subject', 'allday', 'status', 'priority', 'private', 'assigned', 'assigned_user_ids', 'assigned_users', 
+				'start_ts', 'start_date', 'due_date', 'due_time', 
 				'last_followup_age'=>'age_followup', 'last_followup_user'=>'followup_user'), 
+			'utctotz'=>array('start_ts'=>array('timezone'=>$intl_timezone, 'format'=>'U'),
+				'start_date'=>array('timezone'=>$intl_timezone, 'format'=>$php_datetime_format),
+				'due_date'=>array('timezone'=>$intl_timezone, 'format'=>'Y-m-d'),
+				'due_time'=>array('timezone'=>$intl_timezone, 'format'=>'g:i A'),
+				),
 			'idlists'=>array('assigned_user_ids'), 'lists'=>array('assigned_users')),
 		));
 	if( $rc['stat'] != 'ok' ) {

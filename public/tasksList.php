@@ -48,9 +48,19 @@ function ciniki_atdo_tasksList($ciniki) {
     }
 	$modules = $rc['modules'];
 
+	//
+	// Get timezone info
+	//
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'intlSettings');
+	$rc = ciniki_businesses_intlSettings($ciniki, $args['business_id']);
+	if( $rc['stat'] != 'ok' ) {
+		return $rc;
+	}
+	$intl_timezone = $rc['settings']['intl-default-timezone'];
+
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbQuote');
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'dateFormat');
-	$date_format = ciniki_users_dateFormat($ciniki);
+	$date_format = ciniki_users_dateFormat($ciniki, 'php');
 
 	$strsql = "SELECT ciniki_atdos.id, "
 		. "IF(ciniki_atdos.category='', 'Uncategorized', ciniki_atdos.category) AS category, "
@@ -67,8 +77,11 @@ function ciniki_atdo_tasksList($ciniki) {
 		. "IF((u1.perms&0x04)=4, 'yes', 'no') AS assigned, "
 	//	. "DATE_FORMAT(start_date, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS start_date, "
 	//	. "duration, "
-		. "IFNULL(DATE_FORMAT(ciniki_atdos.due_date, '" . ciniki_core_dbQuote($ciniki, $date_format) . "'), '') AS due_date, "
-		. "IF((ciniki_atdos.due_flags&0x01)=1, '', IF(ciniki_atdos.due_date=0, '', DATE_FORMAT(ciniki_atdos.due_date, '%l:%i %p'))) AS due_time, "
+		. "IFNULL(ciniki_atdos.due_date, '') AS due_date, "
+//		. "IFNULL(ciniki_atdos.due_date, '') AS due_time, "
+		. "IF((ciniki_atdos.due_flags&0x01)=1, '', IF(ciniki_atdos.due_date=0, '', ciniki_atdos.due_date)) AS due_time, "
+//		. "IFNULL(DATE_FORMAT(ciniki_atdos.due_date, '" . ciniki_core_dbQuote($ciniki, $date_format) . "'), '') AS due_date, "
+//		. "IF((ciniki_atdos.due_flags&0x01)=1, '', IF(ciniki_atdos.due_date=0, '', DATE_FORMAT(ciniki_atdos.due_date, '%l:%i %p'))) AS due_time, "
 		. "u2.user_id AS assigned_user_ids, "
 		. "IFNULL(u3.display_name, '') AS assigned_users "
 		. "FROM ciniki_atdos "
@@ -116,6 +129,9 @@ function ciniki_atdo_tasksList($ciniki) {
 		array('container'=>'tasks', 'fname'=>'id', 'name'=>'task',
 			'fields'=>array('id', 'subject', 'project_name', 'allday', 'status', 'priority', 'private', 
 				'assigned', 'assigned_user_ids', 'assigned_users', 'due_date', 'due_time'), 
+			'utctotz'=>array('due_date'=>array('timezone'=>$intl_timezone, 'format'=>$date_format),
+				'due_time'=>array('timezone'=>$intl_timezone, 'format'=>'g:i A'),
+				),
 			'idlists'=>array('assigned_user_ids'), 
 			'lists'=>array('assigned_users')),
 		));

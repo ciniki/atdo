@@ -92,7 +92,7 @@ function ciniki_atdo_notesSearchFull($ciniki) {
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
 	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
 		array('container'=>'notes', 'fname'=>'id', 'name'=>'note',
-			'fields'=>array('id', 'subject', 'priority', 'assigned', 'assigned_users', 'due_date', 'due_time', 'status'), 
+			'fields'=>array('id', 'subject', 'priority', 'assigned', 'assigned_users', 'status'), 
 			'lists'=>array('assigned_users'),
 			'maps'=>array('status'=>array(''=>'Unknown', '1'=>'Open', '60'=>'Completed')),
 			),
