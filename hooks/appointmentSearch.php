@@ -31,18 +31,33 @@ function ciniki_atdo_hooks_appointmentSearch($ciniki, $business_id, $args) {
 	$settings = $rc['settings'];
 
 	//
+	// Load timezone info
+	//
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'intlSettings');
+	$rc = ciniki_businesses_intlSettings($ciniki, $business_id);
+	if( $rc['stat'] != 'ok' ) {
+		return $rc;
+	}
+	$intl_timezone = $rc['settings']['intl-default-timezone'];
+
+	//
 	// Load datetime formats
 	//
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'datetimeFormat');
-	$datetime_format = ciniki_users_datetimeFormat($ciniki);
+	$datetime_format = ciniki_users_datetimeFormat($ciniki, 'php');
 
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbQuote');
 	$strsql = "SELECT ciniki_atdos.id, type, subject, location, priority,  "
-		. "UNIX_TIMESTAMP(appointment_date) AS start_ts, "
-		. "DATE_FORMAT(appointment_date, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS start_date, "
-		. "DATE_FORMAT(appointment_date, '%Y-%m-%d') AS date, "
-		. "DATE_FORMAT(appointment_date, '%H:%i') AS time, "
-		. "DATE_FORMAT(appointment_date, '%l:%i') AS 12hour, "
+		. "appointment_date AS start_ts, "
+		. "appointment_date AS date, "
+		. "appointment_date AS start_date, "
+		. "appointment_date AS time, "
+		. "appointment_date AS 12hour, "
+//		. "UNIX_TIMESTAMP(appointment_date) AS start_ts, "
+//		. "DATE_FORMAT(appointment_date, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS start_date, "
+//		. "DATE_FORMAT(appointment_date, '%Y-%m-%d') AS date, "
+//		. "DATE_FORMAT(appointment_date, '%H:%i') AS time, "
+//		. "DATE_FORMAT(appointment_date, '%l:%i') AS 12hour, "
 		. "ciniki_atdos.status, "
 		. "appointment_duration as duration, '#ffdddd' AS colour, 'ciniki.atdo' AS 'module' "
 		. "FROM ciniki_atdos "
@@ -85,7 +100,13 @@ function ciniki_atdo_hooks_appointmentSearch($ciniki, $business_id, $args) {
 	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
 		array('container'=>'appointments', 'fname'=>'id', 'name'=>'appointment', 
 			'fields'=>array('id', 'module', 'start_ts', 'start_date', 'date', 'time', '12hour', 'duration', 'colour', 'type', 
-				'subject', 'priority', 'status')),
+				'subject', 'priority', 'status'),
+			'utctotz'=>array('start_ts'=>array('timezone'=>$intl_timezone, 'format'=>'U'),
+				'start_date'=>array('timezone'=>$intl_timezone, 'format'=>$datetime_format),
+				'date'=>array('timezone'=>$intl_timezone, 'format'=>'Y-m-d'),
+				'time'=>array('timezone'=>$intl_timezone, 'format'=>'H:i'),
+				'12hour'=>array('timezone'=>$intl_timezone, 'format'=>'g:i'),
+			)),
 		));
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;

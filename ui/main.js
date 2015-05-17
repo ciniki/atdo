@@ -684,7 +684,7 @@ function ciniki_atdo_main() {
 			}},
 			'_repeat':{'label':'Repeat', 'fields':{
 				'appointment_repeat_type':{'label':'', 'type':'multitoggle', 'none':'yes', 'toggles':this.repeatOptions},
-				'appointment_repeat_interval':{'label':'Every', 'type':'multitoggle', 'toggles':this.repeatIntervals},
+				'appointment_repeat_interval':{'label':'Every', 'type':'multitoggle', 'toggles':this.repeatIntervals, 'hint':' '},
 				'appointment_repeat_end':{'label':'End Date', 'type':'date', 'hint':'never'},
 				}},
 			'_notes':{'label':'Notes', 'fields':{
