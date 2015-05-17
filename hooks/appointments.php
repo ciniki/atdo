@@ -20,7 +20,7 @@ function ciniki_atdo_hooks_appointments($ciniki, $business_id, $args) {
 	// FIXME: Add timezone information
 	//
 	date_default_timezone_set('America/Toronto');
-	if( $args['date'] == '' || $args['date'] == 'today' ) {
+	if( isset($args['date']) && ($args['date'] == '' || $args['date'] == 'today') ) {
 		$args['date'] = strftime("%Y-%m-%d");
 	}
 
@@ -35,12 +35,31 @@ function ciniki_atdo_hooks_appointments($ciniki, $business_id, $args) {
 	$settings = $rc['settings'];
 
 	//
+	// Load timezone info
+	//
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'intlSettings');
+	$rc = ciniki_businesses_intlSettings($ciniki, $business_id);
+	if( $rc['stat'] != 'ok' ) {
+		return $rc;
+	}
+	$intl_timezone = $rc['settings']['intl-default-timezone'];
+//	$intl_currency_fmt = numfmt_create($rc['settings']['intl-default-locale'], NumberFormatter::CURRENCY);
+//	$intl_currency = $rc['settings']['intl-default-currency'];
+
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'timeFormat');
+	$time_format = ciniki_users_timeFormat($ciniki, 'php');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'dateFormat');
+	$date_format = ciniki_users_dateFormat($ciniki, 'php');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'datetimeFormat');
+	$datetime_format = ciniki_users_datetimeFormat($ciniki, 'php');
+	
+	//
 	// Load date formats
 	//
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'datetimeFormat');
-	$datetime_format = ciniki_users_datetimeFormat($ciniki);
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'dateFormat');
-	$date_format = ciniki_users_dateFormat($ciniki);
+//	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'datetimeFormat');
+//	$datetime_format = ciniki_users_datetimeFormat($ciniki);
+//	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'dateFormat');
+//	$date_format = ciniki_users_dateFormat($ciniki);
 
 	$strsql = "SELECT ciniki_atdos.id, type, ciniki_atdos.status, subject, location, priority, "
 		. "UNIX_TIMESTAMP(appointment_date) AS start_ts, "
@@ -50,7 +69,7 @@ function ciniki_atdo_hooks_appointments($ciniki, $business_id, $args) {
 		. "DATE_FORMAT(appointment_date, '%l:%i') AS 12hour, "
 		. "IF((ciniki_atdos.appointment_flags&0x01)=1, 'yes', 'no') AS allday, "
 		. "appointment_duration as duration, appointment_repeat_type as repeat_type, appointment_repeat_interval as repeat_interval, "
-		. "DATE_FORMAT(appointment_repeat_end, '" . ciniki_core_dbQuote($ciniki, $date_format) . "') AS repeat_end, "
+		. "DATE_FORMAT(appointment_repeat_end, '" . ciniki_core_dbQuote($ciniki, '%Y-%m-%d') . "') AS repeat_end, "
 		// FIXME: grab the secondary_text from followups, keep this as a placeholder for now
 		. "'#ffcccc' AS colour, 'ciniki.atdo' AS module, content AS secondary_text "
 		. "FROM ciniki_atdos "
@@ -63,9 +82,66 @@ function ciniki_atdo_hooks_appointments($ciniki, $business_id, $args) {
 	} elseif( isset($args['date']) && $args['date'] != '' ) {
 		$quoted_date = ciniki_core_dbQuote($ciniki, $args['date']);
 		$strsql = "SELECT ciniki_atdos.id, type, ciniki_atdos.status, subject, location, priority, "
+//			. "appointment_date AS start_ts, "
+			. "appointment_date AS date, "
+			. "appointment_date AS start_date, "
+			. "appointment_date AS time, "
+			. "appointment_date AS 12hour, "
+			. "FROM_UNIXTIME(UNIX_TIMESTAMP(appointment_date)+(UNIX_TIMESTAMP(DATE('$quoted_date'))-UNIX_TIMESTAMP(DATE(appointment_date)))) AS start_ts, "
+//			. "(UNIX_TIMESTAMP(appointment_date)+(UNIX_TIMESTAMP(DATE('$quoted_date'))-UNIX_TIMESTAMP(DATE(appointment_date)))) AS date, "
+//			. "DATE_FORMAT(FROM_UNIXTIME(UNIX_TIMESTAMP(appointment_date)+(UNIX_TIMESTAMP(DATE('$quoted_date'))-UNIX_TIMESTAMP(DATE(appointment_date)))), '%Y-%m-%d') AS date, "
+//			. "DATE_FORMAT(UNIX_TIMESTAMP(appointment_date)+(UNIX_TIMESTAMP(DATE('$quoted_date'))-UNIX_TIMESTAMP(DATE(appointment_date))), '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS start_date, "
+//			. "DATE_FORMAT(appointment_date, '%H:%i') AS time, "
+//			. "DATE_FORMAT(appointment_date, '%l:%i') AS 12hour, "
+			. "IF((ciniki_atdos.appointment_flags&0x01)=1, 'yes', 'no') AS allday, "
+			. "appointment_duration as duration, appointment_repeat_type as repeat_type, appointment_repeat_interval as repeat_interval, "
+			. "DATE_FORMAT(appointment_repeat_end, '" . ciniki_core_dbQuote($ciniki, '%Y-%m-%d') . "') AS repeat_end, "
+			. "'#ffcccc' AS colour, 'ciniki.atdo' AS module, content AS secondary_text "
+			. "FROM ciniki_atdos "
+			. "LEFT JOIN ciniki_atdo_users AS u1 ON (ciniki_atdos.id = u1.atdo_id AND u1.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
+			. "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+			. "AND status = 1 "
+			. "AND (type = 1 OR type = 2) "
+		. "";
+
+
+		$strsql .= "AND (DATE(ciniki_atdos.appointment_date) = '$quoted_date' "
+			. "OR ("
+				// Check for repeatable atdos
+				. "DATEDIFF(DATE(ciniki_atdos.appointment_date), DATE('$quoted_date')) < 0 AND (DATE(appointment_repeat_end) = '0000-00-00' OR DATEDIFF(DATE('$quoted_date'), DATE(appointment_repeat_end)) <= 0 ) "
+				. "AND ("
+					// Daily
+					. "(appointment_repeat_type = 10 AND MOD(TO_DAYS(DATE(ciniki_atdos.appointment_date))-TO_DAYS(DATE('$quoted_date')), appointment_repeat_interval) = 0 "
+						. ") "
+					// Weekly
+					. "OR (appointment_repeat_type = 20 AND DAYOFWEEK(ciniki_atdos.appointment_date) = DAYOFWEEK('$quoted_date') "
+						. "AND MOD(FLOOR(UNIX_TIMESTAMP(DATE(ciniki_atdos.appointment_date))/604800)-FLOOR(UNIX_TIMESTAMP(DATE('$quoted_date'))/604800), appointment_repeat_interval) = 0 "
+						. ") "
+					// Monthy by day of month
+					. "OR (appointment_repeat_type = 30 AND DAY(ciniki_atdos.appointment_date) = DAY('$quoted_date') "
+						. "AND MOD(((YEAR('$quoted_date') - YEAR(ciniki_atdos.appointment_date))*12)+(MONTH('$quoted_date')-MONTH(ciniki_atdos.appointment_date)), appointment_repeat_interval) = 0 "
+						. ") "
+					// Monthy by day of week
+					. "OR (appointment_repeat_type = 31 AND DAYOFWEEK(ciniki_atdos.appointment_date) = DAYOFWEEK('$quoted_date') "
+						// Check for Xth (day of week) of the month (first monday of the month)
+						. "AND FLOOR((DAY(ciniki_atdos.appointment_date)-1)/7) = FLOOR((DAY('$quoted_date')-1)/7) "
+						. "AND MOD(((YEAR('$quoted_date') - YEAR(ciniki_atdos.appointment_date))*12)+(MONTH('$quoted_date')-MONTH(ciniki_atdos.appointment_date)), appointment_repeat_interval) = 0 "
+						. ") "
+					// Yearly
+					. "OR (appointment_repeat_type = 40 AND DAY(ciniki_atdos.appointment_date) = DAY('$quoted_date') "
+						. "AND MONTH(ciniki_atdos.appointment_date) = MONTH('$quoted_date') "
+						. "AND MOD(YEAR('$quoted_date') - YEAR(ciniki_atdos.appointment_date), appointment_repeat_interval) = 0 "
+						. ") "
+				. ") "
+			. ")) ";
+	} elseif( isset($args['start_date']) && $args['start_date'] != '' 
+		&& isset($args['end_date']) && $args['end_date'] != '' 
+		) {
+		$quoted_date = ciniki_core_dbQuote($ciniki, $args['start_date']);
+		$strsql = "SELECT ciniki_atdos.id, type, ciniki_atdos.status, subject, location, priority, "
 			. "UNIX_TIMESTAMP(appointment_date)+(UNIX_TIMESTAMP(DATE('$quoted_date'))-UNIX_TIMESTAMP(DATE(appointment_date))) AS start_ts, "
-			. "DATE_FORMAT(UNIX_TIMESTAMP(appointment_date)+(UNIX_TIMESTAMP(DATE('$quoted_date'))-UNIX_TIMESTAMP(DATE(appointment_date))), '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS start_date, "
-			. "DATE_FORMAT(UNIX_TIMESTAMP(appointment_date)+(UNIX_TIMESTAMP(DATE('$quoted_date'))-UNIX_TIMESTAMP(DATE(appointment_date))), '%Y-%m-%d') AS date, "
+			. "DATE_FORMAT(FROM_UNIXTIME(UNIX_TIMESTAMP(appointment_date)+(UNIX_TIMESTAMP(DATE('$quoted_date'))-UNIX_TIMESTAMP(DATE(appointment_date)))), '%Y-%m-%d') AS date, "
+			. "DATE_FORMAT(FROM_UNIXTIME(UNIX_TIMESTAMP(appointment_date)+(UNIX_TIMESTAMP(DATE('$quoted_date'))-UNIX_TIMESTAMP(DATE(appointment_date)))), '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS start_date, "
 			. "DATE_FORMAT(appointment_date, '%H:%i') AS time, "
 			. "DATE_FORMAT(appointment_date, '%l:%i') AS 12hour, "
 			. "IF((ciniki_atdos.appointment_flags&0x01)=1, 'yes', 'no') AS allday, "
@@ -78,7 +154,6 @@ function ciniki_atdo_hooks_appointments($ciniki, $business_id, $args) {
 			. "AND status = 1 "
 			. "AND (type = 1 OR type = 2) "
 		. "";
-
 
 		$strsql .= "AND (DATE(ciniki_atdos.appointment_date) = '$quoted_date' "
 			. "OR ("
@@ -127,8 +202,14 @@ function ciniki_atdo_hooks_appointments($ciniki, $business_id, $args) {
 	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
 		array('container'=>'appointments', 'fname'=>'id', 'name'=>'appointment', 
 			'fields'=>array('id', 'module', 'start_ts', 'start_date', 'date', 'time', '12hour', 'allday', 'duration', 
-			'repeat_type', 'repeat_interval', 'repeat_end', 'colour', 'type', 'status', 
-			'subject', 'location', 'secondary_text', 'priority')),
+				'repeat_type', 'repeat_interval', 'repeat_end', 'colour', 'type', 'status', 
+				'subject', 'location', 'secondary_text', 'priority'),
+			'utctotz'=>array('start_ts'=>array('timezone'=>$intl_timezone, 'format'=>'U'),
+				'start_date'=>array('timezone'=>$intl_timezone, 'format'=>$datetime_format),
+				'date'=>array('timezone'=>$intl_timezone, 'format'=>'Y-m-d'),
+				'time'=>array('timezone'=>$intl_timezone, 'format'=>'H:i'),
+				'12hour'=>array('timezone'=>$intl_timezone, 'format'=>'g:i'),
+			)),
 		));
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
@@ -148,9 +229,7 @@ function ciniki_atdo_hooks_appointments($ciniki, $business_id, $args) {
 				} else {
 					$rc['appointments'][$appointment_num]['appointment']['colour'] = $settings['tasks.priority.' . $appointment['appointment']['priority']];
 				}
-				
 			}
-
 		}
 	}
 

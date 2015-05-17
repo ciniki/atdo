@@ -42,11 +42,11 @@ function ciniki_atdo_getHistory($ciniki) {
 
 	if( $args['field'] == 'appointment_date' ) {
 		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbGetModuleHistoryReformat');
-		return ciniki_core_dbGetModuleHistoryReformat($ciniki, 'ciniki.atdo', 'ciniki_atdo_history', $args['business_id'], 'ciniki_atdos', $args['atdo_id'], $args['field'], 'datetime');
+		return ciniki_core_dbGetModuleHistoryReformat($ciniki, 'ciniki.atdo', 'ciniki_atdo_history', $args['business_id'], 'ciniki_atdos', $args['atdo_id'], $args['field'], 'utcdatetime');
 	}
 	if( $args['field'] == 'due_date' ) {
 		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbGetModuleHistoryReformat');
-		return ciniki_core_dbGetModuleHistoryReformat($ciniki, 'ciniki.atdo', 'ciniki_atdo_history', $args['business_id'], 'ciniki_atdos', $args['atdo_id'], $args['field'], 'datetime');
+		return ciniki_core_dbGetModuleHistoryReformat($ciniki, 'ciniki.atdo', 'ciniki_atdo_history', $args['business_id'], 'ciniki_atdos', $args['atdo_id'], $args['field'], 'utcdatetime');
 	}
 
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbGetModuleHistory');

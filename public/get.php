@@ -41,6 +41,15 @@ function ciniki_atdo_get(&$ciniki) {
     }
 	$modules = $rc['modules'];
 
+	//
+	// Get timezone info
+	//
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'intlSettings');
+	$rc = ciniki_businesses_intlSettings($ciniki, $args['business_id']);
+	if( $rc['stat'] != 'ok' ) {
+		return $rc;
+	}
+	$intl_timezone = $rc['settings']['intl-default-timezone'];
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'timezoneOffset');
 	$utc_offset = ciniki_users_timezoneOffset($ciniki);
 
@@ -48,7 +57,8 @@ function ciniki_atdo_get(&$ciniki) {
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'datetimeFormat');
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'dateFormat');
 	$datetime_format = ciniki_users_datetimeFormat($ciniki);
-	$date_format = ciniki_users_dateFormat($ciniki);
+	$php_datetime_format = ciniki_users_datetimeFormat($ciniki, 'php');
+	$php_date_format = ciniki_users_dateFormat($ciniki, 'php');
 
 	//
 	// Update the viewed flag to specify the user has requested this atdo.
@@ -65,29 +75,39 @@ function ciniki_atdo_get(&$ciniki) {
 	$strsql = "SELECT ciniki_atdos.id, ciniki_atdos.parent_id, ";
 	if( isset($modules['ciniki.projects']) ) {
 		$strsql .= "ciniki_atdos.project_id, ciniki_projects.name AS project_name, ";
+	} else {
+		$strsql .= "0 AS project_id, '' as project_name, ";
 	}
 	$strsql .= "ciniki_atdos.type, ciniki_atdos.subject, ciniki_atdos.location, ciniki_atdos.content, ciniki_atdos.user_id, "
 		. "IF((ciniki_atdos.perm_flags&0x01)=1, 'yes', 'no') AS private, "
 		. "ciniki_atdos.status, ciniki_atdos.category, ciniki_atdos.priority, "
-		. "DATE_FORMAT(ciniki_atdos.appointment_date, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS appointment_date, "
-		. "DATE_FORMAT(ciniki_atdos.appointment_date, '%Y-%m-%d') AS appointment_date_date, "
-		. "DATE_FORMAT(ciniki_atdos.appointment_date, '%H:%i') AS appointment_time, "
-		. "DATE_FORMAT(ciniki_atdos.appointment_date, '%l:%i') AS appointment_12hour, "
+		. "ciniki_atdos.appointment_date, "
+		. "ciniki_atdos.appointment_date AS appointment_date_date, "
+		. "ciniki_atdos.appointment_date AS appointment_time, "
+		. "ciniki_atdos.appointment_date AS appointment_12hour, "
+//		. "DATE_FORMAT(ciniki_atdos.appointment_date, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS appointment_date, "
+//		. "DATE_FORMAT(ciniki_atdos.appointment_date, '%Y-%m-%d') AS appointment_date_date, "
+//		. "DATE_FORMAT(ciniki_atdos.appointment_date, '%H:%i') AS appointment_time, "
+//		. "DATE_FORMAT(ciniki_atdos.appointment_date, '%l:%i') AS appointment_12hour, "
 		. "ciniki_atdos.appointment_duration, "
 		. "IF((ciniki_atdos.appointment_flags&0x01)=1, 'yes', 'no') AS appointment_duration_allday, "
-		. "DATE_FORMAT(ciniki_atdos.due_date, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS due_date, "
-		. "DATE_FORMAT(ciniki_atdos.due_date, '%Y-%m-%d') AS due_date_date, "
-		. "DATE_FORMAT(ciniki_atdos.due_date, '%H:%i') AS due_time, "
-		. "DATE_FORMAT(ciniki_atdos.due_date, '%l:%i') AS due_12hour, "
+//		. "DATE_FORMAT(ciniki_atdos.due_date, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS due_date, "
+//		. "DATE_FORMAT(ciniki_atdos.due_date, '%Y-%m-%d') AS due_date_date, "
+//		. "DATE_FORMAT(ciniki_atdos.due_date, '%H:%i') AS due_time, "
+//		. "DATE_FORMAT(ciniki_atdos.due_date, '%l:%i') AS due_12hour, "
+		. "ciniki_atdos.due_date AS due_date, "
+		. "ciniki_atdos.due_date AS due_date_date, "
+		. "ciniki_atdos.due_date AS due_time, "
+		. "ciniki_atdos.due_date AS due_12hour, "
 		. "ciniki_atdos.due_duration, "
 		. "IF((ciniki_atdos.due_flags&0x01)=1, 'yes', 'no') AS due_duration_allday, "
 		. "ciniki_atdos.appointment_repeat_type, ciniki_atdos.appointment_repeat_interval, "
 		. "DATE_FORMAT(ciniki_atdos.appointment_date, '%D') AS appointment_repeat_dayofmonth, "
 		. "DAY(ciniki_atdos.appointment_date) AS appointment_repeat_day, "
 		. "DATE_FORMAT(ciniki_atdos.appointment_date, '%W') AS appointment_repeat_weekday, "
-		. "DATE_FORMAT(ciniki_atdos.appointment_repeat_end, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS appointment_repeat_end, "
-		. "DATE_FORMAT(CONVERT_TZ(ciniki_atdos.date_added, '+00:00', '" . ciniki_core_dbQuote($ciniki, $utc_offset) . "'), '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS date_added, "
-		. "DATE_FORMAT(CONVERT_TZ(ciniki_atdos.last_updated, '+00:00', '" . ciniki_core_dbQuote($ciniki, $utc_offset) . "'), '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS last_updated "
+		. "DATE_FORMAT(ciniki_atdos.appointment_repeat_end, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS appointment_repeat_end "
+//		. "DATE_FORMAT(CONVERT_TZ(ciniki_atdos.date_added, '+00:00', '" . ciniki_core_dbQuote($ciniki, $utc_offset) . "'), '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS date_added, "
+//		. "DATE_FORMAT(CONVERT_TZ(ciniki_atdos.last_updated, '+00:00', '" . ciniki_core_dbQuote($ciniki, $utc_offset) . "'), '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS last_updated "
 		. "FROM ciniki_atdos ";
 	if( isset($modules['ciniki.projects']) ) {
 		$strsql .= "LEFT JOIN ciniki_projects ON (ciniki_atdos.project_id = ciniki_projects.id AND ciniki_projects.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "') ";
@@ -96,15 +116,32 @@ function ciniki_atdo_get(&$ciniki) {
 		. "AND ciniki_atdos.id = '" . ciniki_core_dbQuote($ciniki, $args['atdo_id']) . "' "
 		. "";
 	
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQuery');
-	$rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.atdo', 'atdo');
+	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
+	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
+		array('container'=>'atdos', 'fname'=>'id', 'name'=>'atdo',
+			'fields'=>array('id', 'parent_id', 'project_id', 'project_name', 'type', 'subject', 'location', 'content', 'user_id',
+				'private', 'status', 'category', 'priority', 
+				'appointment_date', 'appointment_date_date', 'appointment_time', 'appointment_12hour', 'appointment_duration', 'appointment_duration_allday',
+				'due_date', 'due_date_date', 'due_time', 'due_12hour', 'due_duration', 'due_duration_allday',
+				'appointment_repeat_type', 'appointment_repeat_interval', 'appointment_repeat_dayofmonth', 'appointment_repeat_day', 'appointment_repeat_weekday', 'appointment_repeat_end', 
+				),
+			'utctotz'=>array('appointment_date'=>array('timezone'=>$intl_timezone, 'format'=>$php_datetime_format),
+				'appointment_date_date'=>array('timezone'=>$intl_timezone, 'format'=>'Y-m-d'),
+				'apointment_time'=>array('timezone'=>$intl_timezone, 'format'=>'H:i'),
+				'apointment_12hour'=>array('timezone'=>$intl_timezone, 'format'=>'g:i A'),
+				'due_date'=>array('timezone'=>$intl_timezone, 'format'=>$php_datetime_format),
+				'due_date_date'=>array('timezone'=>$intl_timezone, 'format'=>'Y-m-d'),
+				'due_time'=>array('timezone'=>$intl_timezone, 'format'=>'H:i'),
+				'due_12hour'=>array('timezone'=>$intl_timezone, 'format'=>'g:i A'),
+			)),
+		));
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;
 	}
-	if( !isset($rc['atdo']) ) {
+	if( !isset($rc['atdos'][0]['atdo']) ) {
 		return array('stat'=>'ok', 'err'=>array('pkg'=>'ciniki', 'code'=>'565', 'msg'=>'Unable to find item'));
 	}
-	$atdo = $rc['atdo'];
+	$atdo = $rc['atdos'][0]['atdo'];
 
 	//
 	// Setup the repeat string description
@@ -142,7 +179,7 @@ function ciniki_atdo_get(&$ciniki) {
 	$atdo['viewed'] = '';
 	$atdo['deleted'] = '';
 
-	$user_ids = array($rc['atdo']['user_id']);
+	$user_ids = array($atdo['user_id']);
 
     //  
     // Get the followups to the atdo
