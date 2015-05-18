@@ -87,9 +87,8 @@ function ciniki_atdo_hooks_appointments($ciniki, $business_id, $args) {
 	} elseif( isset($args['date']) && $args['date'] != '' ) {
 		$quoted_date = ciniki_core_dbQuote($ciniki, $args['date']);
 		$strsql = "SELECT ciniki_atdos.id, type, ciniki_atdos.status, subject, location, priority, "
-//			. "appointment_date AS start_ts, "
-			. "FROM_UNIXTIME(UNIX_TIMESTAMP(appointment_date)+(UNIX_TIMESTAMP(DATE('$quoted_date'))-UNIX_TIMESTAMP(DATE(appointment_date)))) AS start_ts, "
-			. "appointment_date AS date, "
+//			. "FROM_UNIXTIME(UNIX_TIMESTAMP(appointment_date)+(UNIX_TIMESTAMP(DATE('$quoted_date'))-UNIX_TIMESTAMP(DATE(appointment_date)))) AS start_ts, "
+			. "FROM_UNIXTIME(UNIX_TIMESTAMP('$quoted_date') + (UNIX_TIMESTAMP(appointment_date)-UNIX_TIMESTAMP(DATE(appointment_date)))) AS date, "
 			. "appointment_date AS start_date, "
 			. "appointment_date AS time, "
 			. "appointment_date AS 12hour, "
@@ -144,7 +143,7 @@ function ciniki_atdo_hooks_appointments($ciniki, $business_id, $args) {
 		) {
 		$quoted_date = ciniki_core_dbQuote($ciniki, $args['start_date']);
 		$strsql = "SELECT ciniki_atdos.id, type, ciniki_atdos.status, subject, location, priority, "
-			. "FROM_UNIXTIME(UNIX_TIMESTAMP(appointment_date)+(UNIX_TIMESTAMP(DATE('$quoted_date'))-UNIX_TIMESTAMP(DATE(appointment_date)))) AS start_ts, "
+//			. "FROM_UNIXTIME(UNIX_TIMESTAMP(appointment_date)+(UNIX_TIMESTAMP(DATE('$quoted_date'))-UNIX_TIMESTAMP(DATE(appointment_date)))) AS start_ts, "
 			. "appointment_date AS date, "
 			. "appointment_date AS start_date, "
 			. "appointment_date AS time, "
@@ -201,16 +200,15 @@ function ciniki_atdo_hooks_appointments($ciniki, $business_id, $args) {
 			. ") "
 		. "";
 	$strsql .= ""
-		. "ORDER BY start_ts, subject "
+		. "ORDER BY time ASC, subject "
 		. "";
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
 	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
 		array('container'=>'appointments', 'fname'=>'id', 'name'=>'appointment', 
-			'fields'=>array('id', 'module', 'start_ts', 'start_date', 'date', 'time', '12hour', 'allday', 'duration', 
+			'fields'=>array('id', 'module', 'start_date', 'date', 'time', '12hour', 'allday', 'duration', 
 				'repeat_type', 'repeat_interval', 'repeat_end', 'colour', 'type', 'status', 
 				'subject', 'location', 'secondary_text', 'priority'),
-			'utctotz'=>array('start_ts'=>array('timezone'=>$intl_timezone, 'format'=>'U'),
-				'start_date'=>array('timezone'=>$intl_timezone, 'format'=>$datetime_format),
+			'utctotz'=>array('start_date'=>array('timezone'=>$intl_timezone, 'format'=>$datetime_format),
 				'date'=>array('timezone'=>$intl_timezone, 'format'=>'Y-m-d'),
 				'time'=>array('timezone'=>$intl_timezone, 'format'=>'H:i'),
 				'12hour'=>array('timezone'=>$intl_timezone, 'format'=>'g:i'),
@@ -224,15 +222,17 @@ function ciniki_atdo_hooks_appointments($ciniki, $business_id, $args) {
 	// Apply colours if they have been configured
 	//
 	if( isset($rc['appointments']) && isset($settings['tasks.status.60']) ) {
-		foreach($rc['appointments'] as $appointment_num => $appointment) {
+		foreach($rc['appointments'] as $aid => $appointment) {
+			$dt = new DateTime($appointment['appointment']['date'] . ' ' . $appointment['appointment']['time'], new DateTimeZone($intl_timezone));
+			$rc['appointments'][$aid]['appointment']['start_ts'] = $dt->format('U');
 			if( $appointment['appointment']['type'] == 1 ) {
-				$rc['appointments'][$appointment_num]['appointment']['colour'] = $settings['appointments.status.1'];
+				$rc['appointments'][$aid]['appointment']['colour'] = $settings['appointments.status.1'];
 			}
 			elseif( $appointment['appointment']['type'] == 2 ) {
 				if( isset($appointment['appointment']['status']) && $appointment['appointment']['status'] == 60 ) {
-					$rc['appointments'][$appointment_num]['appointment']['colour'] = $settings['tasks.status.60'];
+					$rc['appointments'][$aid]['appointment']['colour'] = $settings['tasks.status.60'];
 				} else {
-					$rc['appointments'][$appointment_num]['appointment']['colour'] = $settings['tasks.priority.' . $appointment['appointment']['priority']];
+					$rc['appointments'][$aid]['appointment']['colour'] = $settings['tasks.priority.' . $appointment['appointment']['priority']];
 				}
 			}
 		}
