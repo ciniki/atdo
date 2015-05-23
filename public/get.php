@@ -59,6 +59,7 @@ function ciniki_atdo_get(&$ciniki) {
 	$datetime_format = ciniki_users_datetimeFormat($ciniki);
 	$php_datetime_format = ciniki_users_datetimeFormat($ciniki, 'php');
 	$php_date_format = ciniki_users_dateFormat($ciniki, 'php');
+	$mysql_date_format = ciniki_users_dateFormat($ciniki, 'mysql');
 
 	//
 	// Update the viewed flag to specify the user has requested this atdo.
@@ -105,7 +106,7 @@ function ciniki_atdo_get(&$ciniki) {
 		. "DATE_FORMAT(ciniki_atdos.appointment_date, '%D') AS appointment_repeat_dayofmonth, "
 		. "DAY(ciniki_atdos.appointment_date) AS appointment_repeat_day, "
 		. "DATE_FORMAT(ciniki_atdos.appointment_date, '%W') AS appointment_repeat_weekday, "
-		. "DATE_FORMAT(ciniki_atdos.appointment_repeat_end, '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS appointment_repeat_end "
+		. "DATE_FORMAT(ciniki_atdos.appointment_repeat_end, '" . ciniki_core_dbQuote($ciniki, $mysql_date_format) . "') AS appointment_repeat_end "
 //		. "DATE_FORMAT(CONVERT_TZ(ciniki_atdos.date_added, '+00:00', '" . ciniki_core_dbQuote($ciniki, $utc_offset) . "'), '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS date_added, "
 //		. "DATE_FORMAT(CONVERT_TZ(ciniki_atdos.last_updated, '+00:00', '" . ciniki_core_dbQuote($ciniki, $utc_offset) . "'), '" . ciniki_core_dbQuote($ciniki, $datetime_format) . "') AS last_updated "
 		. "FROM ciniki_atdos ";
