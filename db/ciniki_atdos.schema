@@ -55,8 +55,8 @@
 # appointment_flags:	0x01 - all day appointment
 # 
 # appointment_repeat_type:      0 - no repeat		(future)
-#            			       10 - daily
-#			                   20 - weekly
+#            			       10 - daily, repeat every x days
+#			                   20 - weekly, same day every x weeks
 #          			           30 - monthly, day of month
 #                 			   31 - monthly, day of week (first sunday)
 #			                   50 - yearly
