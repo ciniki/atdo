@@ -136,107 +136,109 @@ function ciniki_atdo_hooks_appointments($ciniki, $business_id, $args) {
 		if( $rc['stat'] != 'ok' ) {
 			return $rc;
 		}
-	
-		$repeats = $rc['appointments'];
-		foreach($repeats as $aid => $appointment) {
-			$dt = new DateTime($appointment['appointment']['date'] . ' 00:00:00', new DateTimeZone($intl_timezone));
-			$repeats[$aid]['appointment']['start_ts'] = $dt->format('U');
-			if( $appointment['appointment']['repeat_end'] != '' && $appointment['appointment']['repeat_end'] != '0000-00-00' ) {
-				$dt = new DateTime($appointment['appointment']['repeat_end'] . ' 00:00:00', new DateTimeZone($intl_timezone));
-				$dt->add(new DateInterval('P1D'));
-				$repeats[$aid]['appointment']['end_ts'] = $dt->format('U');
-			} else {
-				$repeats[$aid]['appointment']['end_ts'] = '';
-			}
-		}
 
-		//
-		// Setup the UTC start and end dates, then convert to business timezone. 
-		// cdt is used as the current date
-		//
-		$sdt = new DateTime($args['start_date'], new DateTimeZone('UTC')); 
-		$sdt->setTimezone(new DateTimeZone($intl_timezone));
-		$cdt = clone $sdt;
-		$edt = new DateTime($args['end_date'], new DateTimeZone('UTC'));
-		$edt->setTimezone(new DateTimeZone($intl_timezone));
-
-		//
-		// Go through all the dates requested and check for any repeating appointments
-		//
-		$increment = new DateInterval('P1D');
-		while($cdt <= $edt) {
-			$cts = $cdt->format('U');
-			$cts_days = floor($cts/86400);
+		if( isset($rc['appointments']) ) {
+			$repeats = $rc['appointments'];
 			foreach($repeats as $aid => $appointment) {
-				$appointment = $appointment['appointment'];
-				//
-				// Check if repeat is not active or is finished
-				//
-				if( $cts < $appointment['start_ts'] || ($appointment['end_ts'] != '' && $cts >= $appointment['end_ts']) ) {
-					continue;
+				$dt = new DateTime($appointment['appointment']['date'] . ' 00:00:00', new DateTimeZone($intl_timezone));
+				$repeats[$aid]['appointment']['start_ts'] = $dt->format('U');
+				if( $appointment['appointment']['repeat_end'] != '' && $appointment['appointment']['repeat_end'] != '0000-00-00' ) {
+					$dt = new DateTime($appointment['appointment']['repeat_end'] . ' 00:00:00', new DateTimeZone($intl_timezone));
+					$dt->add(new DateInterval('P1D'));
+					$repeats[$aid]['appointment']['end_ts'] = $dt->format('U');
+				} else {
+					$repeats[$aid]['appointment']['end_ts'] = '';
+				}
+			}
+
+			//
+			// Setup the UTC start and end dates, then convert to business timezone. 
+			// cdt is used as the current date
+			//
+			$sdt = new DateTime($args['start_date'], new DateTimeZone('UTC')); 
+			$sdt->setTimezone(new DateTimeZone($intl_timezone));
+			$cdt = clone $sdt;
+			$edt = new DateTime($args['end_date'], new DateTimeZone('UTC'));
+			$edt->setTimezone(new DateTimeZone($intl_timezone));
+
+			//
+			// Go through all the dates requested and check for any repeating appointments
+			//
+			$increment = new DateInterval('P1D');
+			while($cdt <= $edt) {
+				$cts = $cdt->format('U');
+				$cts_days = floor($cts/86400);
+				foreach($repeats as $aid => $appointment) {
+					$appointment = $appointment['appointment'];
+					//
+					// Check if repeat is not active or is finished
+					//
+					if( $cts < $appointment['start_ts'] || ($appointment['end_ts'] != '' && $cts >= $appointment['end_ts']) ) {
+						continue;
+					}
+
+					//
+					// Check to see if the current date has any repeat appointments
+					//
+					if(
+						//
+						// Daily appointments
+						//
+							(
+							$appointment['repeat_type'] == '10' 
+							// occurs on current date
+							&& ($cts_days-floor($appointment['start_ts']/86400))%$appointment['repeat_interval'] == 0
+							)
+						//
+						// Weekly appointments
+						//
+						|| (
+							$appointment['repeat_type'] == '20' 			// Weekly
+							&& $cdt->format('w') == $appointment['weekday']		// Same day of the week
+							// occurs on current date
+							&& (floor($cts/604800)-floor($appointment['start_ts']/604800))%$appointment['repeat_interval'] == 0
+							)
+						//
+						// Monthly by day of month
+						//
+						|| (
+							$appointment['repeat_type'] == '30' 				// Monthly
+							&& $cdt->format('j') == $appointment['day']		// Same day of the month
+							// Number of months between now and start_date
+							&& ((($cdt->format('Y')-$appointment['year'])*12)+($cdt->format('n')+$appointment['month']))%$appointment['repeat_interval'] == 0
+							)
+						//
+						// Monthly by day of week
+						//
+						|| (
+							$appointment['repeat_type'] == '31' 				// Monthly
+							&& $cdt->format('w') == $appointment['weekday']			// Same day of the week
+							// Check for Xth (day of week) of the month (first monday of the month)
+							&& floor(($cdt->format('j')-1)/7) == floor(($appointment['day']-1)/7)
+							// Check if right repeat (Number of months between now and start_date)
+							&& ((($cdt->format('Y')-$appointment['year'])*12)+($cdt->format('n')+$appointment['month']))%$appointment['repeat_interval'] == 0
+							) 
+						//
+						// Yearly
+						//
+						|| (
+							$appointment['repeat_type'] == '40'
+							&& $cts->format('j') == $appointment['day']
+							&& $cts->format('n') == $appointment['month']
+							&& ($cts->format('Y') - $appointment['year'])%$appointment['repeat_interval'] == 0
+							)
+						) {
+						$appointment['date'] = $cdt->format('Y-m-d');
+						unset($appointment['weekday']);
+						unset($appointment['year']);
+						unset($appointment['month']);
+						unset($appointment['day']);
+						$appointments[] = array('appointment'=>$appointment);
+					} 
 				}
 
-				//
-				// Check to see if the current date has any repeat appointments
-				//
-				if(
-					//
-					// Daily appointments
-					//
-						(
-						$appointment['repeat_type'] == '10' 
-						// occurs on current date
-						&& ($cts_days-floor($appointment['start_ts']/86400))%$appointment['repeat_interval'] == 0
-						)
-					//
-					// Weekly appointments
-					//
-					|| (
-						$appointment['repeat_type'] == '20' 			// Weekly
-						&& $cdt->format('w') == $appointment['weekday']		// Same day of the week
-						// occurs on current date
-						&& (floor($cts/604800)-floor($appointment['start_ts']/604800))%$appointment['repeat_interval'] == 0
-						)
-					//
-					// Monthly by day of month
-					//
-					|| (
-						$appointment['repeat_type'] == '30' 				// Monthly
-						&& $cdt->format('j') == $appointment['day']		// Same day of the month
-						// Number of months between now and start_date
-						&& ((($cdt->format('Y')-$appointment['year'])*12)+($cdt->format('n')+$appointment['month']))%$appointment['repeat_interval'] == 0
-						)
-					//
-					// Monthly by day of week
-					//
-					|| (
-						$appointment['repeat_type'] == '31' 				// Monthly
-						&& $cdt->format('w') == $appointment['weekday']			// Same day of the week
-						// Check for Xth (day of week) of the month (first monday of the month)
-						&& floor(($cdt->format('j')-1)/7) == floor(($appointment['day']-1)/7)
-						// Check if right repeat (Number of months between now and start_date)
-						&& ((($cdt->format('Y')-$appointment['year'])*12)+($cdt->format('n')+$appointment['month']))%$appointment['repeat_interval'] == 0
-						) 
-					//
-					// Yearly
-					//
-					|| (
-						$appointment['repeat_type'] == '40'
-						&& $cts->format('j') == $appointment['day']
-						&& $cts->format('n') == $appointment['month']
-						&& ($cts->format('Y') - $appointment['year'])%$appointment['repeat_interval'] == 0
-						)
-					) {
-					$appointment['date'] = $cdt->format('Y-m-d');
-					unset($appointment['weekday']);
-					unset($appointment['year']);
-					unset($appointment['month']);
-					unset($appointment['day']);
-					$appointments[] = array('appointment'=>$appointment);
-				} 
+				$cdt->add($increment);
 			}
-
-			$cdt->add($increment);
 		}
 
 
