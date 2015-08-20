@@ -407,7 +407,7 @@ function ciniki_atdo_main() {
 		//
 		// The form panel to add a new production order
 		//
-		this.add = new M.panel('Add Task',
+		this.add = new M.panel('Add Appointment',
 			'ciniki_atdo_main', 'add',
 			'mc', 'medium', 'sectioned', 'ciniki.atdo.main.edit');
 		this.add.default_data = {
@@ -428,11 +428,12 @@ function ciniki_atdo_main() {
 		this.add.forms = {};
 		this.add.formtab = null;
 		this.add.formtabs = {'label':'', 'field':'type', 'tabs':{
-				'appointment':{'label':'Appointment', 'field_id':1},
-				'task':{'label':'Task', 'field_id':2},
-				'faq':{'label':'FAQ', 'field_id':4},
-				'note':{'label':'Note', 'field_id':5},
-				'message':{'label':'Message', 'field_id':6},
+				'offering':{'label':'Class', 'visible':'no', 'field_id':0, 'fn':''},
+				'appointment':{'label':'Appointment', 'visible':'no', 'field_id':1},
+				'task':{'label':'Task', 'visible':'no', 'field_id':2},
+				'faq':{'label':'FAQ', 'visible':'no', 'field_id':4},
+				'note':{'label':'Note', 'visible':'no', 'field_id':5},
+				'message':{'label':'Message', 'visible':'no', 'field_id':6},
 			}};
 		this.add.forms.appointment = {
 			'info':{'label':'', 'aside':'yes', 'type':'simpleform', 'fields':{
@@ -690,12 +691,12 @@ function ciniki_atdo_main() {
 			'_notes':{'label':'Notes', 'fields':{
 				'content':{'label':'', 'hidelabel':'yes', 'type':'textarea', 'size':'medium'},
 				}},
-			'_save':{'label':'', 'buttons':{
+			'_buttons':{'label':'', 'buttons':{
 				'save':{'label':'Save appointment', 'fn':'M.ciniki_atdo_main.saveAtdo();'},
-				}},
-			'_delete':{'label':'', 'buttons':{
 				'delete':{'label':'Delete appointment', 'fn':'M.ciniki_atdo_main.deleteAppointment();'},
 				}},
+//			'_delete':{'label':'', 'buttons':{
+//				}},
 			};
 		this.atdo.forms.task = {
 			'thread':{'label':'', 'type':'simplethread'},
@@ -936,6 +937,9 @@ function ciniki_atdo_main() {
 	// aG - The arguments to be parsed into args
 	//
 	this.start = function(cb, appPrefix, aG) {
+		args = {};
+		if( aG != null ) { args = eval(aG); }
+
 		//
 		// Reset all employee lists, must be done when switching businesses
 		//
@@ -966,10 +970,19 @@ function ciniki_atdo_main() {
 			this.atdo.forms.message.info.fields.project_id.active = 'no';
 		}
 
-		args = {};
-		if( aG != null ) {
-			args = eval(aG);
-		}
+		//
+		// Determine which parts of atdo are visible
+		//
+		this.add.formtabs.tabs.appointment.visible = (M.curBusiness.modules['ciniki.atdo'].flags&0x01)==0x01?'yes':'no';
+		this.add.formtabs.tabs.task.visible = (M.curBusiness.modules['ciniki.atdo'].flags&0x02)==0x02?'yes':'no';
+		this.add.formtabs.tabs.faq.visible = (M.curBusiness.modules['ciniki.atdo'].flags&0x08)==0x08?'yes':'no';
+		this.add.formtabs.tabs.note.visible = (M.curBusiness.modules['ciniki.atdo'].flags&0x10)==0x10?'yes':'no';
+		this.add.formtabs.tabs.message.visible = (M.curBusiness.modules['ciniki.atdo'].flags&0x20)==0x20?'yes':'no';
+		this.atdo.formtabs.tabs.appointment.visible = (M.curBusiness.modules['ciniki.atdo'].flags&0x01)==0x01?'yes':'no';
+		this.atdo.formtabs.tabs.task.visible = (M.curBusiness.modules['ciniki.atdo'].flags&0x02)==0x02?'yes':'no';
+		this.atdo.formtabs.tabs.faq.visible = (M.curBusiness.modules['ciniki.atdo'].flags&0x08)==0x08?'yes':'no';
+		this.atdo.formtabs.tabs.note.visible = (M.curBusiness.modules['ciniki.atdo'].flags&0x10)==0x10?'yes':'no';
+		this.atdo.formtabs.tabs.message.visible = (M.curBusiness.modules['ciniki.atdo'].flags&0x20)==0x20?'yes':'no';
 
 		//
 		// Create the app container if it doesn't exist, and clear it out
@@ -1155,6 +1168,11 @@ function ciniki_atdo_main() {
 	//
 	this.showAdd = function(cb, type, d, t, ad) {
 		this.setupAdd(type, d, t, ad);
+		this.add.formtabs.tabs.offering.visible = 'no';
+		if( M.curBusiness.modules['ciniki.fatt'] != null ) {
+			this.add.formtabs.tabs.offering.visible = 'yes';
+			this.add.formtabs.tabs.offering.fn = 'M.startApp(\'ciniki.fatt.offerings\',null,\'' + cb + '\',\'mc\',{\'add\':\'courses\',\'date\':\'' + d + '\',\'time\':\'' + t + '\',\'allday\':\'' + ad + '\'});';
+		}
 		this.add.refresh();
 		this.add.show(cb);
 	};
@@ -1168,9 +1186,11 @@ function ciniki_atdo_main() {
 			if( ad == 1 ) {
 				this.add.data.appointment_date = M.dateFormat(d);
 				this.add.data.appointment_allday = 'yes';
+				this.add.data.appointment_duration_allday = 'yes';
 			} else {
 				this.add.data.appointment_date = M.dateFormat(d) + ' ' + t;
 				this.add.data.appointment_allday = 'no';
+				this.add.data.appointment_duration_allday = 'no';
 			}
 		}
 		this.add.formtab = type;
@@ -1282,7 +1302,7 @@ function ciniki_atdo_main() {
 
 	this.deleteAppointment = function() {
 		if( confirm("Are you sure you want to delete this appointment?") ) {        
-			var rsp = M.api.postJSONCb('ciniki.atdo.update', 
+			var rsp = M.api.getJSONCb('ciniki.atdo.update', 
 				{'business_id':M.curBusinessID, 'atdo_id':this.atdo.atdo_id, 'status':'60'}, function(rsp) {
 					if( rsp.stat != 'ok' ) {
 						M.api.err(rsp);
