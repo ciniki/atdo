@@ -11,14 +11,14 @@
 // -------
 //
 function ciniki_atdo_flags($ciniki, $modules) {
-	$flags = array(
-		array('flag'=>array('bit'=>'1', 'name'=>'Appointments')),
-		array('flag'=>array('bit'=>'2', 'name'=>'Tasks')),
-		array('flag'=>array('bit'=>'4', 'name'=>'FAQ')),
-		array('flag'=>array('bit'=>'5', 'name'=>'Notes')),
-		array('flag'=>array('bit'=>'6', 'name'=>'Messages')),
-		);
+    $flags = array(
+        array('flag'=>array('bit'=>'1', 'name'=>'Appointments')),
+        array('flag'=>array('bit'=>'2', 'name'=>'Tasks')),
+        array('flag'=>array('bit'=>'4', 'name'=>'FAQ')),
+        array('flag'=>array('bit'=>'5', 'name'=>'Notes')),
+        array('flag'=>array('bit'=>'6', 'name'=>'Messages')),
+        );
 
-	return array('stat'=>'ok', 'flags'=>$flags);
+    return array('stat'=>'ok', 'flags'=>$flags);
 }
 ?>

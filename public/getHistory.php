@@ -10,46 +10,46 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:			The ID of the business to get the details for.
-// key:					The detail key to get the history for.
+// business_id:         The ID of the business to get the details for.
+// key:                 The detail key to get the history for.
 //
 // Returns
 // -------
 //
 function ciniki_atdo_getHistory($ciniki) {
-	//
-	// Find all the required and optional arguments
-	//
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
-	$rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-		'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
-		'atdo_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Atdo'), 
-		'field'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Field'), 
-		));
-	if( $rc['stat'] != 'ok' ) {
-		return $rc;
-	}
-	$args = $rc['args'];
-	
-	//
-	// Check access to business_id as owner, or sys admin
-	//
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'atdo', 'private', 'checkAccess');
-	$rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.getHistory');
-	if( $rc['stat'] != 'ok' ) {
-		return $rc;
-	}
+    //
+    // Find all the required and optional arguments
+    //
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
+    $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
+        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'atdo_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Atdo'), 
+        'field'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Field'), 
+        ));
+    if( $rc['stat'] != 'ok' ) {
+        return $rc;
+    }
+    $args = $rc['args'];
+    
+    //
+    // Check access to business_id as owner, or sys admin
+    //
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'atdo', 'private', 'checkAccess');
+    $rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.getHistory');
+    if( $rc['stat'] != 'ok' ) {
+        return $rc;
+    }
 
-	if( $args['field'] == 'appointment_date' ) {
-		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbGetModuleHistoryReformat');
-		return ciniki_core_dbGetModuleHistoryReformat($ciniki, 'ciniki.atdo', 'ciniki_atdo_history', $args['business_id'], 'ciniki_atdos', $args['atdo_id'], $args['field'], 'utcdatetime');
-	}
-	if( $args['field'] == 'due_date' ) {
-		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbGetModuleHistoryReformat');
-		return ciniki_core_dbGetModuleHistoryReformat($ciniki, 'ciniki.atdo', 'ciniki_atdo_history', $args['business_id'], 'ciniki_atdos', $args['atdo_id'], $args['field'], 'utcdatetime');
-	}
+    if( $args['field'] == 'appointment_date' ) {
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbGetModuleHistoryReformat');
+        return ciniki_core_dbGetModuleHistoryReformat($ciniki, 'ciniki.atdo', 'ciniki_atdo_history', $args['business_id'], 'ciniki_atdos', $args['atdo_id'], $args['field'], 'utcdatetime');
+    }
+    if( $args['field'] == 'due_date' ) {
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbGetModuleHistoryReformat');
+        return ciniki_core_dbGetModuleHistoryReformat($ciniki, 'ciniki.atdo', 'ciniki_atdo_history', $args['business_id'], 'ciniki_atdos', $args['atdo_id'], $args['field'], 'utcdatetime');
+    }
 
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbGetModuleHistory');
-	return ciniki_core_dbGetModuleHistory($ciniki, 'ciniki.atdo', 'ciniki_atdo_history', $args['business_id'], 'ciniki_atdos', $args['atdo_id'], $args['field']);
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbGetModuleHistory');
+    return ciniki_core_dbGetModuleHistory($ciniki, 'ciniki.atdo', 'ciniki_atdo_history', $args['business_id'], 'ciniki_atdos', $args['atdo_id'], $args['field']);
 }
 ?>
