@@ -103,6 +103,11 @@ function ciniki_atdo_hooks_uiSettings($ciniki, $business_id, $args) {
                     '2'=>'\'<span class="maintext">\' + d.task.subject + \'</span><span class="subtext">\' + d.task.assigned_users + \'&nbsp;</span>\'',
                     '3'=>'\'<span class="maintext">\' + d.task.due_date + \'</span><span class="subtext">\' + d.task.due_time + \'</span>\'',
                     ),
+                'rowStyle'=>'if( d.task.status != \'closed\' ) { '
+                        . '\'background: \' + M.curBusiness.atdo.settings[\'tasks.priority.\' + d.task.priority]; '
+                    . '} else { '
+                        . '\'background: \' + M.curBusiness.atdo.settings[\'tasks.status.60\']; '
+                    . '}',
                 'noData'=>'No tasks found',
                 'edit'=>array('method'=>'ciniki.atdo.main', 'args'=>array('atdo_id'=>'d.task.id;')),
                 'submit'=>array('method'=>'ciniki.atdo.main', 'args'=>array('tasksearch'=>'search_str')),
