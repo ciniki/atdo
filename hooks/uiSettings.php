@@ -14,18 +14,15 @@
 //
 function ciniki_atdo_hooks_uiSettings($ciniki, $business_id, $args) {
 
-    $settings = array();
+    $rsp = array('stat'=>'ok', 'settings'=>array(), 'menu_items'=>array(), 'settings_menu_items'=>array());  
 
     //
     // Get the settings
     //
-    $rc = ciniki_core_dbDetailsQueryDash($ciniki, 'ciniki_atdo_settings', 'business_id', 
-        $business_id, 'ciniki.atdo', 'settings', '');
+    $rc = ciniki_core_dbDetailsQueryDash($ciniki, 'ciniki_atdo_settings', 'business_id', $business_id, 'ciniki.atdo', 'settings', '');
     if( $rc['stat'] == 'ok' && isset($rc['settings']) ) {
-        $settings = $rc['settings'];
+        $rsp['settings'] = $rc['settings'];
     }
-
-    $rsp = array('stat'=>'ok', 'settings'=>$settings, 'menu_items'=>array());  
 
     $task_count = 0;
     $message_count = 0;
@@ -171,7 +168,16 @@ function ciniki_atdo_hooks_uiSettings($ciniki, $business_id, $args) {
             );
         $rsp['menu_items'][] = $menu_item;
     } 
-     
+    
+    if( isset($ciniki['business']['modules']['ciniki.atdo'])
+        && (isset($args['permissions']['owners'])
+            || isset($args['permissions']['employees'])
+            || isset($args['permissions']['resellers'])
+            || ($ciniki['session']['user']['perms']&0x01) == 0x01
+            )
+        ) {
+        $rsp['settings_menu_items'][] = array('priority'=>3300, 'label'=>'Appointments', 'edit'=>array('app'=>'ciniki.atdo.settings'));
+    }
 
     return $rsp;
 }
