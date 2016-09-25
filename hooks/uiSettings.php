@@ -171,7 +171,6 @@ function ciniki_atdo_hooks_uiSettings($ciniki, $business_id, $args) {
     
     if( isset($ciniki['business']['modules']['ciniki.atdo'])
         && (isset($args['permissions']['owners'])
-            || isset($args['permissions']['employees'])
             || isset($args['permissions']['resellers'])
             || ($ciniki['session']['user']['perms']&0x01) == 0x01
             )
