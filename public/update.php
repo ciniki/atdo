@@ -141,7 +141,7 @@ function ciniki_atdo_update(&$ciniki) {
     }
     if( !isset($rc['num_affected_rows']) || $rc['num_affected_rows'] != 1 ) {
         ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'556', 'msg'=>'Unable to update task'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.17', 'msg'=>'Unable to update task'));
     }
 
     //
@@ -160,7 +160,7 @@ function ciniki_atdo_update(&$ciniki) {
             'ciniki_atdo_users', 'ciniki_atdo_history', 'atdo', $args['atdo_id'], 
             $ciniki['session']['user']['id'], 0x10);
         if( $rc['stat'] != 'ok' ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'589', 'msg'=>'Unable to remove message', 'err'=>$rc['err']));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.18', 'msg'=>'Unable to remove message', 'err'=>$rc['err']));
         }
     }
 
@@ -182,7 +182,7 @@ function ciniki_atdo_update(&$ciniki) {
             . "";
         $rc = ciniki_core_dbQueryList($ciniki, $strsql, 'ciniki.atdo', 'users', 'user_id');
         if( $rc['stat'] != 'ok' ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'562', 'msg'=>'Unable to load task information', 'err'=>$rc['err']));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.19', 'msg'=>'Unable to load task information', 'err'=>$rc['err']));
         }
         $task_users = $rc['users'];
         // 
@@ -195,7 +195,7 @@ function ciniki_atdo_update(&$ciniki) {
                 $args['business_id'], 'ciniki_atdo_users', 'ciniki_atdo_history', 
                 'atdo', $args['atdo_id'], $user_id, 0x04);
                 if( $rc['stat'] != 'ok' ) {
-                    return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'560', 'msg'=>'Unable to update task information', 'err'=>$rc['err']));
+                    return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.20', 'msg'=>'Unable to update task information', 'err'=>$rc['err']));
                 }
             }
         }
@@ -206,7 +206,7 @@ function ciniki_atdo_update(&$ciniki) {
                     $args['business_id'], 'ciniki_atdo_users', 'ciniki_atdo_history', 
                     'atdo', $args['atdo_id'], $user_id, (0x04));
                 if( $rc['stat'] != 'ok' ) {
-                    return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'561', 'msg'=>'Unable to update task information', 'err'=>$rc['err']));
+                    return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.21', 'msg'=>'Unable to update task information', 'err'=>$rc['err']));
                 }
             }
         }
@@ -248,7 +248,7 @@ function ciniki_atdo_update(&$ciniki) {
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbQueryList');
         $rc = ciniki_core_dbQueryList($ciniki, $strsql, 'ciniki.atdo', 'users', 'user_id');
         if( $rc['stat'] != 'ok' ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'132', 'msg'=>'Unable to load task information', 'err'=>$rc['err']));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.22', 'msg'=>'Unable to load task information', 'err'=>$rc['err']));
         }
         $task_users = $rc['users'];
         // 
@@ -260,7 +260,7 @@ function ciniki_atdo_update(&$ciniki) {
             $args['business_id'], 'ciniki_atdo_users', 'ciniki_atdo_history', 
             'atdo', $args['atdo_id'], $user_id, 0x18);
             if( $rc['stat'] != 'ok' ) {
-                return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'136', 'msg'=>'Unable to update task information', 'err'=>$rc['err']));
+                return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.23', 'msg'=>'Unable to update task information', 'err'=>$rc['err']));
             }
         }
     }

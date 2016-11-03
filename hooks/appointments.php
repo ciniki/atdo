@@ -392,7 +392,7 @@ function ciniki_atdo_hooks_appointments($ciniki, $business_id, $args) {
                     . ") "
                 . ")) ";
         } else {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'554', 'msg'=>'No constraints provided'));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.2', 'msg'=>'No constraints provided'));
         }
         // Check for public/private atdos, and if private make sure user created or is assigned
         $strsql .= "AND ((ciniki_atdos.perm_flags&0x01) = 0 "  // Public to business

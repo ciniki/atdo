@@ -67,7 +67,7 @@ function ciniki_atdo_get(&$ciniki) {
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddUserPerms');
     $rc = ciniki_core_threadAddUserPerms($ciniki, 'ciniki.atdo', 'user', $args['business_id'], 'ciniki_atdo_users', 'ciniki_atdo_history', 'atdo', $args['atdo_id'], $ciniki['session']['user']['id'], 0x08);
     if( $rc['stat'] != 'ok' ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'587', 'msg'=>'Unable to update task information', 'err'=>$rc['err']));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.7', 'msg'=>'Unable to update task information', 'err'=>$rc['err']));
     }
 
     //
@@ -140,7 +140,7 @@ function ciniki_atdo_get(&$ciniki) {
         return $rc;
     }
     if( !isset($rc['atdos'][0]['atdo']) ) {
-        return array('stat'=>'ok', 'err'=>array('pkg'=>'ciniki', 'code'=>'565', 'msg'=>'Unable to find item'));
+        return array('stat'=>'ok', 'err'=>array('code'=>'ciniki.atdo.8', 'msg'=>'Unable to find item'));
     }
     $atdo = $rc['atdos'][0]['atdo'];
 
@@ -196,7 +196,7 @@ function ciniki_atdo_get(&$ciniki) {
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbRspQueryPlusUserIDs');
     $rc = ciniki_core_dbRspQueryPlusUserIDs($ciniki, $strsql, 'ciniki.atdo', 'followups', 'followup', array('stat'=>'ok', 'followups'=>array(), 'user_ids'=>array()));
     if( $rc['stat'] != 'ok' ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'558', 'msg'=>'Unable to load item information', 'err'=>$rc['err']));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.9', 'msg'=>'Unable to load item information', 'err'=>$rc['err']));
     }
     $atdo['followups'] = $rc['followups'];
     $user_ids = array_merge($user_ids, $rc['user_ids']);
@@ -209,7 +209,7 @@ function ciniki_atdo_get(&$ciniki) {
         . "WHERE atdo_id = '" . ciniki_core_dbQuote($ciniki, $args['atdo_id']) . "' ";
     $rc = ciniki_core_dbRspQueryPlusUserIDs($ciniki, $strsql, 'ciniki.atdo', 'users', 'user', array('stat'=>'ok', 'users'=>array(), 'user_ids'=>array()));
     if( $rc['stat'] != 'ok' ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'566', 'msg'=>'Unable to load item information', 'err'=>$rc['err']));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.10', 'msg'=>'Unable to load item information', 'err'=>$rc['err']));
     }
     $atdo_users = $rc['users'];
     $user_ids = array_merge($user_ids, $rc['user_ids']);
@@ -220,10 +220,10 @@ function ciniki_atdo_get(&$ciniki) {
     ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'userListByID');
     $rc = ciniki_users_userListByID($ciniki, 'users', $user_ids, 'display_name');
     if( $rc['stat'] != 'ok' ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'563', 'msg'=>'Unable to load item information', 'err'=>$rc['err']));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.11', 'msg'=>'Unable to load item information', 'err'=>$rc['err']));
     }
     if( !isset($rc['users']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'564', 'msg'=>'Unable to load item information', 'err'=>$rc['err']));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.12', 'msg'=>'Unable to load item information', 'err'=>$rc['err']));
     }
     $users = $rc['users'];
 
@@ -347,7 +347,7 @@ function ciniki_atdo_get(&$ciniki) {
                 'idlists'=>array('assigned_user_ids'), 'lists'=>array('assigned_users')),
             ));
         if( $rc['stat'] != 'ok' ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'575', 'msg'=>'Unable to get child items', 'err'=>$rc['err']));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.13', 'msg'=>'Unable to get child items', 'err'=>$rc['err']));
         }
         if( isset($rc['childtypes']) ) {
             foreach($rc['childtypes'] as $tcid => $tchild) {

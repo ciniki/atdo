@@ -25,7 +25,7 @@ function ciniki_atdo_checkAccess($ciniki, $business_id, $method) {
     }
 
     if( !isset($rc['ruleset']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'551', 'msg'=>'No permissions granted'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.3', 'msg'=>'No permissions granted'));
     }
     $modules = $rc['modules'];
 
@@ -63,6 +63,6 @@ function ciniki_atdo_checkAccess($ciniki, $business_id, $method) {
     //
     // By default, fail
     //
-    return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'552', 'msg'=>'Access denied.'));
+    return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.4', 'msg'=>'Access denied.'));
 }
 ?>

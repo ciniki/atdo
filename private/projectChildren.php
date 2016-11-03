@@ -108,7 +108,7 @@ function ciniki_atdo_projectChildren($ciniki, $business_id, $project_id, $status
             'idlists'=>array('assigned_user_ids'), 'lists'=>array('assigned_users')),
         ));
     if( $rc['stat'] != 'ok' ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'831', 'msg'=>'Unable to get child items', 'err'=>$rc['err']));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.5', 'msg'=>'Unable to get child items', 'err'=>$rc['err']));
     }
     if( isset($rc['childtypes']) ) {
         foreach($rc['childtypes'] as $tcid => $tchild) {

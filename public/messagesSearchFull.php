@@ -30,7 +30,7 @@ function ciniki_atdo_messagesSearchFull($ciniki) {
 
     if( (!isset($args['completed']) || $args['completed'] != 'yes') 
         && (!isset($args['start_needle']) || $args['start_needle'] == '') ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'588', 'msg'=>'No search specified'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.14', 'msg'=>'No search specified'));
     }
     
     //  
