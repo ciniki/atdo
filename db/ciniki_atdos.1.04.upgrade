@@ -1,5 +1,5 @@
 #
-# This file will upgrade the database table businesses to version 1.04.
+# This file will upgrade the database table tenants to version 1.04.
 #
-CREATE INDEX business_id ON ciniki_atdos (business_id, uuid, last_updated);
+CREATE INDEX tnid ON ciniki_atdos (tnid, uuid, last_updated);
 ALTER TABLE ciniki_atdos COMMENT='v1.04';

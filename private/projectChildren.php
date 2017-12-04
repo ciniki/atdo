@@ -7,20 +7,20 @@
 // Arguments
 // ---------
 // ciniki:
-// business_id:     The ID of the business to get the ATDO's for.
+// tnid:     The ID of the tenant to get the ATDO's for.
 // project_id:      The ID of the project to get the ATDO's for.
 // status:          Get the project children of a certain status.
 // 
 // Returns
 // -------
 //
-function ciniki_atdo_projectChildren($ciniki, $business_id, $project_id, $status) {
+function ciniki_atdo_projectChildren($ciniki, $tnid, $project_id, $status) {
     
     //
     // Load timezone info
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'intlSettings');
-    $rc = ciniki_businesses_intlSettings($ciniki, $business_id);
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'intlSettings');
+    $rc = ciniki_tenants_intlSettings($ciniki, $tnid);
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -66,7 +66,7 @@ function ciniki_atdo_projectChildren($ciniki, $business_id, $project_id, $status
         . "LEFT JOIN ciniki_atdo_followups ON (ciniki_atdos.id = ciniki_atdo_followups.atdo_id) "
         . "LEFT JOIN ciniki_users AS u4 ON (ciniki_atdo_followups.user_id = u4.id ) "
         . "LEFT JOIN ciniki_users AS u5 ON (ciniki_atdos.user_id = u5.id ) "
-        . "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+        . "WHERE ciniki_atdos.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
         . "AND ciniki_atdos.project_id = '" . ciniki_core_dbQuote($ciniki, $project_id) . "' "
         . "AND (ciniki_atdos.type = 1 OR ciniki_atdos.type = 2 OR ciniki_atdos.type = 3 OR ciniki_atdos.type = 5 OR (ciniki_atdos.type = 6 AND (u1.perms&0x10) = 0)) "
         . "";
@@ -81,7 +81,7 @@ function ciniki_atdo_projectChildren($ciniki, $business_id, $project_id, $status
         }
     }
     // Check for public/private tasks, and if private make sure user created or is assigned
-    $strsql .= "AND ((perm_flags&0x01) = 0 "  // Public to business
+    $strsql .= "AND ((perm_flags&0x01) = 0 "  // Public to tenant
             // created by the user requesting the list
             . "OR ((perm_flags&0x01) = 1 AND ciniki_atdos.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
             // Assigned to the user requesting the list

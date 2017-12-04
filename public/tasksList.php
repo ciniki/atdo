@@ -2,13 +2,13 @@
 //
 // Description
 // ===========
-// This method returns the lists of tasks for a user from a business.
+// This method returns the lists of tasks for a user from a tenant.
 //
 // Arguments
 // ---------
 // api_key:
 // auth_token:
-// business_id:     The ID of the business to get the task list for.
+// tnid:     The ID of the tenant to get the task list for.
 // status:          (optional) Only lists tasks that are open or closed.
 // category:        (optional) Only return tasks that are assigned to the specified category.
 // assigned:        (optional) Only return tasks assigned to the session user.
@@ -26,7 +26,7 @@ function ciniki_atdo_tasksList($ciniki) {
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'status'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Status'), 
         'category'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Category'), 
         'assigned'=>array('required'=>'no', 'blank'=>'no', 'validlist'=>array('no', 'yes'), 'name'=>'Category'), 
@@ -39,10 +39,10 @@ function ciniki_atdo_tasksList($ciniki) {
     
     //  
     // Make sure this module is activated, and
-    // check permission to run this function for this business
+    // check permission to run this function for this tenant
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'atdo', 'private', 'checkAccess');
-    $rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.tasksList'); 
+    $rc = ciniki_atdo_checkAccess($ciniki, $args['tnid'], 'ciniki.atdo.tasksList'); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }
@@ -51,8 +51,8 @@ function ciniki_atdo_tasksList($ciniki) {
     //
     // Get timezone info
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'intlSettings');
-    $rc = ciniki_businesses_intlSettings($ciniki, $args['business_id']);
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'intlSettings');
+    $rc = ciniki_tenants_intlSettings($ciniki, $args['tnid']);
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -89,9 +89,9 @@ function ciniki_atdo_tasksList($ciniki) {
         . "LEFT JOIN ciniki_atdo_users AS u2 ON (ciniki_atdos.id = u2.atdo_id && (u2.perms&0x04) = 4) "
         . "LEFT JOIN ciniki_users AS u3 ON (u2.user_id = u3.id) ";
     if( isset($modules['ciniki.projects']) ) {
-        $strsql .= "LEFT JOIN ciniki_projects ON (ciniki_atdos.project_id = ciniki_projects.id AND ciniki_projects.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "') ";
+        $strsql .= "LEFT JOIN ciniki_projects ON (ciniki_atdos.project_id = ciniki_projects.id AND ciniki_projects.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "') ";
     }
-    $strsql .= "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+    $strsql .= "WHERE ciniki_atdos.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "AND ciniki_atdos.type = 2 "
         . "";
     if( isset($args['category']) ) {
@@ -111,7 +111,7 @@ function ciniki_atdo_tasksList($ciniki) {
         }
     }
     // Check for public/private tasks, and if private make sure user created or is assigned
-    $strsql .= "AND ((ciniki_atdos.perm_flags&0x01) = 0 "  // Public to business
+    $strsql .= "AND ((ciniki_atdos.perm_flags&0x01) = 0 "  // Public to tenant
             // created by the user requesting the list
             . "OR ((ciniki_atdos.perm_flags&0x01) = 1 AND ciniki_atdos.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
             // Assigned to the user requesting the list

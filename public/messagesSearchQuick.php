@@ -18,7 +18,7 @@ function ciniki_atdo_messagesSearchQuick($ciniki) {
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'start_needle'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Search String'), 
         'limit'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Limit'), 
         )); 
@@ -29,17 +29,17 @@ function ciniki_atdo_messagesSearchQuick($ciniki) {
     
     //  
     // Make sure this module is activated, and
-    // check permission to run this function for this business
+    // check permission to run this function for this tenant
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'atdo', 'private', 'checkAccess');
-    $rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.messagesSearchQuick', 0); 
+    $rc = ciniki_atdo_checkAccess($ciniki, $args['tnid'], 'ciniki.atdo.messagesSearchQuick', 0); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }
     $modules = $rc['modules'];
 
     //
-    // Get the number of messages in each status for the business, 
+    // Get the number of messages in each status for the tenant, 
     // if no rows found, then return empty array
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbQuote');
@@ -56,9 +56,9 @@ function ciniki_atdo_messagesSearchQuick($ciniki) {
         . "LEFT JOIN ciniki_users AS u3 ON (u2.user_id = u3.id) "
         . "LEFT JOIN ciniki_atdo_followups ON (ciniki_atdos.id = ciniki_atdo_followups.atdo_id) ";
     if( isset($modules['ciniki.projects']) ) {
-        $strsql .= "LEFT JOIN ciniki_projects ON (ciniki_atdos.project_id = ciniki_projects.id AND ciniki_projects.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "') ";
+        $strsql .= "LEFT JOIN ciniki_projects ON (ciniki_atdos.project_id = ciniki_projects.id AND ciniki_projects.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "') ";
     }
-    $strsql .= "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+    $strsql .= "WHERE ciniki_atdos.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "AND ciniki_atdos.type = 6 "      // Messages
         . "AND (u1.perms&0x10) = 0 "        // Check for message which haven't been deleted by user
         . "AND ciniki_atdos.status = 1 "
@@ -69,7 +69,7 @@ function ciniki_atdo_messagesSearchQuick($ciniki) {
             . ") "
         . "";
     // Check for public/private atdos, and if private make sure user created or is assigned
-    $strsql .= "AND ((ciniki_atdos.perm_flags&0x01) = 0 "  // Public to business
+    $strsql .= "AND ((ciniki_atdos.perm_flags&0x01) = 0 "  // Public to tenant
             // created by the user requesting the list
             . "OR ((ciniki_atdos.perm_flags&0x01) = 1 AND ciniki_atdos.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
             // Assigned to the user requesting the list, and the user hasn't deleted the message

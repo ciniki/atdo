@@ -15,7 +15,7 @@ function ciniki_atdo_tasksCategories($ciniki) {
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Name'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Name'), 
         )); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
@@ -24,21 +24,21 @@ function ciniki_atdo_tasksCategories($ciniki) {
     
     //  
     // Make sure this module is activated, and
-    // check permission to run this function for this business
+    // check permission to run this function for this tenant
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'atdo', 'private', 'checkAccess');
-    $rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.tasksCategories', 0); 
+    $rc = ciniki_atdo_checkAccess($ciniki, $args['tnid'], 'ciniki.atdo.tasksCategories', 0); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }   
 
     //
-    // Get the number of faqs in each status for the business, 
+    // Get the number of faqs in each status for the tenant, 
     // if no rows found, then return empty array
     //
     $strsql = "SELECT IF(category='', 'Uncategorized', category) AS name "
         . "FROM ciniki_atdos "
-        . "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "WHERE ciniki_atdos.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "AND ciniki_atdos.status = 1 "
         . "AND ciniki_atdos.type = 2 "
         . "";

@@ -16,7 +16,7 @@ function ciniki_atdo_dbIntegrityCheck($ciniki) {
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'fix'=>array('required'=>'no', 'default'=>'no', 'name'=>'Fix Problems'),
         ));
     if( $rc['stat'] != 'ok' ) {
@@ -25,10 +25,10 @@ function ciniki_atdo_dbIntegrityCheck($ciniki) {
     $args = $rc['args'];
     
     //
-    // Check access to business_id as owner, or sys admin
+    // Check access to tnid as owner, or sys admin
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'atdo', 'private', 'checkAccess');
-    $rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.dbIntegrityCheck', 0);
+    $rc = ciniki_atdo_checkAccess($ciniki, $args['tnid'], 'ciniki.atdo.dbIntegrityCheck', 0);
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -42,7 +42,7 @@ function ciniki_atdo_dbIntegrityCheck($ciniki) {
         //
         // Update the history for ciniki_atdos
         //
-        $rc = ciniki_core_dbFixTableHistory($ciniki, 'ciniki.atdo', $args['business_id'],
+        $rc = ciniki_core_dbFixTableHistory($ciniki, 'ciniki.atdo', $args['tnid'],
             'ciniki_atdos', 'ciniki_atdo_history', 
             array('uuid', 'parent_id', 'project_id', 'type', 'category', 'status',
                 'priority', 'perm_flags', 'user_id', 'subject', 'location',
@@ -56,7 +56,7 @@ function ciniki_atdo_dbIntegrityCheck($ciniki) {
         //
         // Update the history for ciniki_atdo_followups
         //
-        $rc = ciniki_core_dbFixTableHistory($ciniki, 'ciniki.atdo', $args['business_id'],
+        $rc = ciniki_core_dbFixTableHistory($ciniki, 'ciniki.atdo', $args['tnid'],
             'ciniki_atdo_followups', 'ciniki_atdo_history', 
             array('uuid', 'parent_id', 'atdo_id', 'user_id', 'content'));
         if( $rc['stat'] != 'ok' ) {
@@ -66,7 +66,7 @@ function ciniki_atdo_dbIntegrityCheck($ciniki) {
         //
         // Update the history for ciniki_atdo_users
         //
-        $rc = ciniki_core_dbFixTableHistory($ciniki, 'ciniki.atdo', $args['business_id'],
+        $rc = ciniki_core_dbFixTableHistory($ciniki, 'ciniki.atdo', $args['tnid'],
             'ciniki_atdo_users', 'ciniki_atdo_history', 
             array('uuid', 'atdo_id', 'user_id', 'perms'));
         if( $rc['stat'] != 'ok' ) {

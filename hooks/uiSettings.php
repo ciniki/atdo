@@ -7,19 +7,19 @@
 // Arguments
 // ---------
 // ciniki:
-// business_id:     The ID of the business to get events for.
+// tnid:     The ID of the tenant to get events for.
 //
 // Returns
 // -------
 //
-function ciniki_atdo_hooks_uiSettings($ciniki, $business_id, $args) {
+function ciniki_atdo_hooks_uiSettings($ciniki, $tnid, $args) {
 
     $rsp = array('stat'=>'ok', 'settings'=>array(), 'menu_items'=>array(), 'settings_menu_items'=>array());  
 
     //
     // Get the settings
     //
-    $rc = ciniki_core_dbDetailsQueryDash($ciniki, 'ciniki_atdo_settings', 'business_id', $business_id, 'ciniki.atdo', 'settings', '');
+    $rc = ciniki_core_dbDetailsQueryDash($ciniki, 'ciniki_atdo_settings', 'tnid', $tnid, 'ciniki.atdo', 'settings', '');
     if( $rc['stat'] == 'ok' && isset($rc['settings']) ) {
         $rsp['settings'] = $rc['settings'];
     }
@@ -30,7 +30,7 @@ function ciniki_atdo_hooks_uiSettings($ciniki, $business_id, $args) {
 
     $strsql = "SELECT ciniki_atdos.type, COUNT(ciniki_atdos.id) AS num_items "
         . "FROM ciniki_atdos, ciniki_atdo_users "
-        . "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+        . "WHERE ciniki_atdos.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
         . "AND (ciniki_atdos.type = 2 OR ciniki_atdos.type = 7) "   // Tasks or Projects
         . "AND ciniki_atdos.id = ciniki_atdo_users.atdo_id "
         . "AND ciniki_atdo_users.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "' "
@@ -52,7 +52,7 @@ function ciniki_atdo_hooks_uiSettings($ciniki, $business_id, $args) {
     //
     $strsql = "SELECT type, COUNT(ciniki_atdos.id) AS num_items "
         . "FROM ciniki_atdos, ciniki_atdo_users "
-        . "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+        . "WHERE ciniki_atdos.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
         . "AND ((ciniki_atdos.type = 5 AND ciniki_atdos.parent_id = 0) OR ciniki_atdos.type = 6 )"  // Notes or Messages
         . "AND ciniki_atdos.id = ciniki_atdo_users.atdo_id "
         . "AND ciniki_atdo_users.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "' "
@@ -96,14 +96,14 @@ function ciniki_atdo_hooks_uiSettings($ciniki, $business_id, $args) {
                 'headerValues'=>array('', 'Task', 'Due'),
                 'cellClasses'=>array('multiline aligncenter', 'multiline', 'multiline'),
                 'cellValues'=>array(
-                    '0'=>'M.curBusiness.atdo.priorities[d.task.priority];',
+                    '0'=>'M.curTenant.atdo.priorities[d.task.priority];',
                     '2'=>'\'<span class="maintext">\' + d.task.subject + \'</span><span class="subtext">\' + d.task.assigned_users + \'&nbsp;</span>\'',
                     '3'=>'\'<span class="maintext">\' + d.task.due_date + \'</span><span class="subtext">\' + d.task.due_time + \'</span>\'',
                     ),
                 'rowStyle'=>'if( d.task.status != \'closed\' ) { '
-                        . '\'background: \' + M.curBusiness.atdo.settings[\'tasks.priority.\' + d.task.priority]; '
+                        . '\'background: \' + M.curTenant.atdo.settings[\'tasks.priority.\' + d.task.priority]; '
                     . '} else { '
-                        . '\'background: \' + M.curBusiness.atdo.settings[\'tasks.status.60\']; '
+                        . '\'background: \' + M.curTenant.atdo.settings[\'tasks.status.60\']; '
                     . '}',
                 'noData'=>'No tasks found',
                 'edit'=>array('method'=>'ciniki.atdo.main', 'args'=>array('atdo_id'=>'d.task.id;')),
@@ -169,7 +169,7 @@ function ciniki_atdo_hooks_uiSettings($ciniki, $business_id, $args) {
         $rsp['menu_items'][] = $menu_item;
     } 
     
-    if( isset($ciniki['business']['modules']['ciniki.atdo'])
+    if( isset($ciniki['tenant']['modules']['ciniki.atdo'])
         && (isset($args['permissions']['owners'])
             || isset($args['permissions']['resellers'])
             || ($ciniki['session']['user']['perms']&0x01) == 0x01

@@ -2,13 +2,13 @@
 //
 // Description
 // ===========
-// This function will add a new atdo to the business.
+// This function will add a new atdo to the tenant.
 //
 // Arguments
 // ---------
 // api_key:
 // auth_token:
-// business_id:     The ID of the business to add the atdo to.
+// tnid:     The ID of the tenant to add the atdo to.
 // 
 // Returns
 // -------
@@ -20,7 +20,7 @@ function ciniki_atdo_add(&$ciniki) {
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'type'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Type'),
         'parent_id'=>array('required'=>'no', 'blank'=>'yes', 'default'=>'0', 'name'=>'Parent'),
         'project_id'=>array('required'=>'no', 'blank'=>'yes', 'default'=>'0', 'name'=>'Project'),
@@ -52,10 +52,10 @@ function ciniki_atdo_add(&$ciniki) {
     
     //  
     // Make sure this module is activated, and
-    // check permission to run this function for this business
+    // check permission to run this function for this tenant
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'atdo', 'private', 'checkAccess');
-    $rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.add'); 
+    $rc = ciniki_atdo_checkAccess($ciniki, $args['tnid'], 'ciniki.atdo.add'); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }   
@@ -94,7 +94,7 @@ function ciniki_atdo_add(&$ciniki) {
     $args['user_id'] = $ciniki['session']['user']['id'];
 
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'objectAdd');
-    $rc = ciniki_core_objectAdd($ciniki, $args['business_id'], 'ciniki.atdo.atdo', $args, 0x04);
+    $rc = ciniki_core_objectAdd($ciniki, $args['tnid'], 'ciniki.atdo.atdo', $args, 0x04);
     if( $rc['stat'] != 'ok' ) {
         ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
         return $rc;
@@ -106,7 +106,7 @@ function ciniki_atdo_add(&$ciniki) {
     //
     if( isset($args['followup']) && $args['followup'] != '' ) {
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddFollowup');
-        $rc = ciniki_core_threadAddFollowup($ciniki, 'ciniki.atdo', 'followup', $args['business_id'], 
+        $rc = ciniki_core_threadAddFollowup($ciniki, 'ciniki.atdo', 'followup', $args['tnid'], 
             'ciniki_atdo_followups', 'ciniki_atdo_history', 'atdo', $atdo_id, array(
             'user_id'=>$ciniki['session']['user']['id'],
             'atdo_id'=>$atdo_id,
@@ -126,7 +126,7 @@ function ciniki_atdo_add(&$ciniki) {
     // Add the user who created the atdo, as a follower 
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddUserPerms');
-    $rc = ciniki_core_threadAddUserPerms($ciniki, 'ciniki.atdo', 'user', $args['business_id'], 
+    $rc = ciniki_core_threadAddUserPerms($ciniki, 'ciniki.atdo', 'user', $args['tnid'], 
         'ciniki_atdo_users', 'ciniki_atdo_history', 'atdo', $atdo_id, 
         $ciniki['session']['user']['id'], (0x01|0x04));
     if( $rc['stat'] != 'ok' ) {
@@ -141,7 +141,7 @@ function ciniki_atdo_add(&$ciniki) {
     //
     if( isset($args['assigned']) && is_array($args['assigned']) ) {
         foreach( $args['assigned'] as $user_id ) {
-            $rc = ciniki_core_threadAddUserPerms($ciniki, 'ciniki.atdo', 'user', $args['business_id'], 
+            $rc = ciniki_core_threadAddUserPerms($ciniki, 'ciniki.atdo', 'user', $args['tnid'], 
                 'ciniki_atdo_users', 'ciniki_atdo_history', 'atdo', $atdo_id, $user_id, (0x04));
             if( $rc['stat'] != 'ok' ) {
                 ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
@@ -159,11 +159,11 @@ function ciniki_atdo_add(&$ciniki) {
     }
 
     //
-    // Update the last_change date in the business modules
+    // Update the last_change date in the tenant modules
     // Ignore the result, as we don't want to stop user updates if this fails.
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'updateModuleChangeDate');
-    ciniki_businesses_updateModuleChangeDate($ciniki, $args['business_id'], 'ciniki', 'atdo');
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'updateModuleChangeDate');
+    ciniki_tenants_updateModuleChangeDate($ciniki, $args['tnid'], 'ciniki', 'atdo');
 
     //
     // FIXME: Notify users

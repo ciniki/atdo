@@ -1,5 +1,5 @@
 #
-# This file will upgrade the database table businesses to version 1.02.
+# This file will upgrade the database table tenants to version 1.02.
 #
 ALTER TABLE ciniki_atdos ADD COLUMN category varchar(140) not null AFTER type;
 CREATE INDEX category ON ciniki_atdos (category);

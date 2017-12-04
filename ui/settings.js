@@ -37,7 +37,7 @@ function ciniki_atdo_settings() {
         // Callback for the field history
         //  
         this.main.fieldHistoryArgs = function(s, i) {
-            return {'method':'ciniki.atdo.settingsHistory', 'args':{'business_id':M.curBusinessID, 'field':i}};
+            return {'method':'ciniki.atdo.settingsHistory', 'args':{'tnid':M.curTenantID, 'field':i}};
         };
 
         this.main.addButton('save', 'Save', 'M.ciniki_atdo_settings.saveSettings();');
@@ -65,10 +65,10 @@ function ciniki_atdo_settings() {
         } 
 
         //
-        // Get the task categories for this business
+        // Get the task categories for this tenant
         //
         var rsp = M.api.getJSONCb('ciniki.atdo.tasksCategories', 
-            {'business_id':M.curBusinessID}, function(rsp) {
+            {'tnid':M.curTenantID}, function(rsp) {
                 if( rsp.stat != 'ok' ) { 
                     M.api.err(rsp);
                     return false;
@@ -86,11 +86,11 @@ function ciniki_atdo_settings() {
     }
 
     //
-    // Grab the stats for the business from the database and present the list of orders.
+    // Grab the stats for the tenant from the database and present the list of orders.
     //
     this.showMain = function(cb) {
         var rsp = M.api.getJSONCb('ciniki.atdo.settingsGet', 
-            {'business_id':M.curBusinessID}, function(rsp) {
+            {'tnid':M.curTenantID}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -106,7 +106,7 @@ function ciniki_atdo_settings() {
         var c = this.main.serializeForm('no');
         if( c != '' ) {
             var rsp = M.api.postJSONCb('ciniki.atdo.settingsUpdate', 
-                {'business_id':M.curBusinessID}, c, function(rsp) {
+                {'tnid':M.curTenantID}, c, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;

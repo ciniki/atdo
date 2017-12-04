@@ -8,13 +8,13 @@
 // Arguments
 // ---------
 // ciniki:
-// business_id:         The ID of the business to search for appointments.
+// tnid:         The ID of the tenant to search for appointments.
 // args:                The arguments passed to the calling public method ciniki.calendars.search.
 //
 // Returns
 // -------
 //
-function ciniki_atdo_hooks_appointmentSearch($ciniki, $business_id, $args) {
+function ciniki_atdo_hooks_appointmentSearch($ciniki, $tnid, $args) {
 
     if( !isset($args['start_needle']) || $args['start_needle'] == '' ) {
         return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.1', 'msg'=>'No search specified'));
@@ -24,7 +24,7 @@ function ciniki_atdo_hooks_appointmentSearch($ciniki, $business_id, $args) {
     // Get the module settings
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbDetailsQuery');
-    $rc =  ciniki_core_dbDetailsQuery($ciniki, 'ciniki_atdo_settings', 'business_id', $args['business_id'], 'ciniki.atdo', 'settings', '');
+    $rc =  ciniki_core_dbDetailsQuery($ciniki, 'ciniki_atdo_settings', 'tnid', $args['tnid'], 'ciniki.atdo', 'settings', '');
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -33,8 +33,8 @@ function ciniki_atdo_hooks_appointmentSearch($ciniki, $business_id, $args) {
     //
     // Load timezone info
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'intlSettings');
-    $rc = ciniki_businesses_intlSettings($ciniki, $business_id);
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'intlSettings');
+    $rc = ciniki_tenants_intlSettings($ciniki, $tnid);
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -65,7 +65,7 @@ function ciniki_atdo_hooks_appointmentSearch($ciniki, $business_id, $args) {
 //      . "LEFT JOIN ciniki_atdo_followups ON (ciniki_atdos.id = ciniki_atdo_followups.atdo_id "
 //          . "AND (ciniki_atdo_followups.content LIKE '" . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "
 //          . "OR ciniki_atdo_followups.content LIKE ' %" . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' ))"
-        . "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+        . "WHERE ciniki_atdos.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
         // Search items with an appointment date or due date
         . "AND (ciniki_atdos.appointment_date != 0 OR ciniki_atdos.due_date != 0) "
         . "AND (type = 1 OR type = 2) "
@@ -81,7 +81,7 @@ function ciniki_atdo_hooks_appointmentSearch($ciniki, $business_id, $args) {
             . ") "
         . "";
     // Check for public/private atdos, and if private make sure user created or is assigned
-    $strsql .= "AND ((ciniki_atdos.perm_flags&0x01) = 0 "  // Public to business
+    $strsql .= "AND ((ciniki_atdos.perm_flags&0x01) = 0 "  // Public to tenant
             // created by the user requesting the list
             . "OR ((ciniki_atdos.perm_flags&0x01) = 1 AND ciniki_atdos.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
             // Assigned to the user requesting the list

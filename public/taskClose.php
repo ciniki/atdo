@@ -9,7 +9,7 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:         The business the task is attached to.
+// tnid:         The tenant the task is attached to.
 // atdo_id:             The ID of the task to be closed.
 // content:             (optional) Any followup content to be added during close.
 // 
@@ -23,7 +23,7 @@ function ciniki_atdo_taskClose(&$ciniki) {
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'atdo_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Atdo'),
         'content'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Followup'),
         ));
@@ -34,10 +34,10 @@ function ciniki_atdo_taskClose(&$ciniki) {
     
     //
     // Make sure this module is activated, and
-    // check permission to run this function for this business
+    // check permission to run this function for this tenant
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'atdo', 'private', 'checkAccess');
-    $rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.taskClose', $args['atdo_id'], $ciniki['session']['user']['id']);
+    $rc = ciniki_atdo_checkAccess($ciniki, $args['tnid'], 'ciniki.atdo.taskClose', $args['atdo_id'], $ciniki['session']['user']['id']);
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -67,7 +67,7 @@ function ciniki_atdo_taskClose(&$ciniki) {
     //
     if( isset($args['content']) && $args['content'] != '' ) {
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddFollowup');
-        $rc = ciniki_core_threadAddFollowup($ciniki, 'ciniki.atdo', 'followup', $args['business_id'], 
+        $rc = ciniki_core_threadAddFollowup($ciniki, 'ciniki.atdo', 'followup', $args['tnid'], 
             'ciniki_atdo_followups', 'ciniki_atdo_history', 'atdo', $args['atdo_id'], $args);
         if( $rc['stat'] != 'ok' ) {
             ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
@@ -79,11 +79,11 @@ function ciniki_atdo_taskClose(&$ciniki) {
         // will make sure the flag is set.
         // 
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddUserPerms');
-        $rc = ciniki_core_threadAddUserPerms($ciniki, 'ciniki.atdo', 'user', $args['business_id'], 
+        $rc = ciniki_core_threadAddUserPerms($ciniki, 'ciniki.atdo', 'user', $args['tnid'], 
             'ciniki_atdo_users', 'ciniki_atdo_history', 
             'atdo', $args['atdo_id'], $ciniki['session']['user']['id'], (0x01));
 //      ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddFollower');
-//      $rc = ciniki_core_threadAddFollower($ciniki, 'ciniki.atdo', 'user', $args['business_id'], 
+//      $rc = ciniki_core_threadAddFollower($ciniki, 'ciniki.atdo', 'user', $args['tnid'], 
 //          'ciniki_atdo_users', 'ciniki_atdo_history', 
 //          'atdo', $args['atdo_id'], $ciniki['session']['user']['id']);
         if( $rc['stat'] != 'ok' ) {
@@ -97,7 +97,7 @@ function ciniki_atdo_taskClose(&$ciniki) {
     //
     $strsql = "UPDATE ciniki_atdos SET status = 60, last_updated = UTC_TIMESTAMP() "
         . "WHERE id = '" . ciniki_core_dbQuote($ciniki, $args['atdo_id']) . "' "
-        . "AND business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "AND tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "";
     $rc = ciniki_core_dbUpdate($ciniki, $strsql, 'ciniki.atdo');
     if( $rc['stat'] != 'ok' ) {
@@ -105,7 +105,7 @@ function ciniki_atdo_taskClose(&$ciniki) {
         return $rc;
     }
 
-    $rc = ciniki_core_dbAddModuleHistory($ciniki, 'ciniki.atdo', 'ciniki_atdo_history', $args['business_id'],
+    $rc = ciniki_core_dbAddModuleHistory($ciniki, 'ciniki.atdo', 'ciniki_atdo_history', $args['tnid'],
         2, 'ciniki_atdos', $args['atdo_id'], 'status', 60);
     if( $rc['stat'] != 'ok' ) {
         ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
@@ -133,11 +133,11 @@ function ciniki_atdo_taskClose(&$ciniki) {
     }
 
     //
-    // Update the last_change date in the business modules
+    // Update the last_change date in the tenant modules
     // Ignore the result, as we don't want to stop user updates if this fails.
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'updateModuleChangeDate');
-    ciniki_businesses_updateModuleChangeDate($ciniki, $args['business_id'], 'ciniki', 'atdo');
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'updateModuleChangeDate');
+    ciniki_tenants_updateModuleChangeDate($ciniki, $args['tnid'], 'ciniki', 'atdo');
 
     return array('stat'=>'ok');
     

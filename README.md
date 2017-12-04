@@ -1,4 +1,4 @@
-Ciniki - Small Business Management Platform
+Ciniki - Multitenant Cloud Platform
 ===========================================
 
 The Calendar module provides a high level module to bring together appointment information from other modules.

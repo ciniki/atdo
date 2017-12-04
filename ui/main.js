@@ -35,10 +35,10 @@ function ciniki_atdo_main() {
                 'cellClasses':['multiline aligncenter', 'multiline', 'multiline'],
                 'noData':'No tasks assigned to you',
                 },
-            'business':{'label':'General Tasks', 'num_cols':3, 'type':'simplegrid', 
+            'tenant':{'label':'General Tasks', 'num_cols':3, 'type':'simplegrid', 
                 'headerValues':['', 'Task', 'Due'],
                 'cellClasses':['multiline aligncenter', 'multiline', 'multiline'],
-                'noData':'No business tasks',
+                'noData':'No tenant tasks',
                 },
             'other':{'label':'Other Tasks', 'type':'simplelist', 'list':{
                 'closed':{'label':'Recently Completed', 'fn':'M.ciniki_atdo_main.showCompleted(\'M.ciniki_atdo_main.showTasks();\')'},
@@ -54,7 +54,7 @@ function ciniki_atdo_main() {
         this.tasks.noData = function() { return 'No tasks found'; }
         // Live Search functions
         this.tasks.liveSearchCb = function(s, i, v) {
-            M.api.getJSONBgCb('ciniki.atdo.tasksSearchQuick', {'business_id':M.curBusinessID, 'start_needle':v, 'limit':'15'},
+            M.api.getJSONBgCb('ciniki.atdo.tasksSearchQuick', {'tnid':M.curTenantID, 'start_needle':v, 'limit':'15'},
                 function(rsp) {
                     M.ciniki_atdo_main.tasks.liveSearchShow(s, null, M.gE(M.ciniki_atdo_main.tasks.panelUID + '_' + s), rsp.tasks);
                 });
@@ -81,8 +81,8 @@ function ciniki_atdo_main() {
             return 'M.ciniki_atdo_main.showAtdo(\'M.ciniki_atdo_main.showTasks(null, null);\', \'' + d.task.id + '\');'; 
         };
         this.tasks.liveSearchResultRowStyle = function(s, f, i, d) {
-            if( d.task.status != 'closed' ) { return 'background: ' + M.curBusiness.atdo.settings['tasks.priority.' + d.task.priority]; }
-            else { return 'background: ' + M.curBusiness.atdo.settings['tasks.status.60']; }
+            if( d.task.status != 'closed' ) { return 'background: ' + M.curTenant.atdo.settings['tasks.priority.' + d.task.priority]; }
+            else { return 'background: ' + M.curTenant.atdo.settings['tasks.status.60']; }
             return '';
         };
         this.tasks.liveSearchSubmitFn = function(s, search_str) {
@@ -104,8 +104,8 @@ function ciniki_atdo_main() {
         };
         this.tasks.rowStyle = function(s, i, d) {
             if( d != null && d.task != null ) {
-                if( d.task.status != 'closed' ) { return 'background: ' + M.curBusiness.atdo.settings['tasks.priority.' + d.task.priority]; }
-                else { return 'background: ' + M.curBusiness.atdo.settings['tasks.status.60']; }
+                if( d.task.status != 'closed' ) { return 'background: ' + M.curTenant.atdo.settings['tasks.priority.' + d.task.priority]; }
+                else { return 'background: ' + M.curTenant.atdo.settings['tasks.status.60']; }
             }
             return '';
         };
@@ -143,17 +143,17 @@ function ciniki_atdo_main() {
                 'cellClasses':[''],
                 'noData':'No notes assigned to you',
                 },
-            'business':{'label':'General Notes', 'num_cols':1, 'type':'simplegrid', 
+            'tenant':{'label':'General Notes', 'num_cols':1, 'type':'simplegrid', 
                 'headerValues':null,
                 'cellClasses':[''],
-                'noData':'No business notes',
+                'noData':'No tenant notes',
                 },
         };
         this.faqs.data = {};
         this.faqs.noData = function() { return 'No notes found'; }
         // Live Search functions
         this.faqs.liveSearchCb = function(s, i, v) {
-            M.api.getJSONBgCb('ciniki.atdo.faqsSearchQuick', {'business_id':M.curBusinessID, 'start_needle':v, 'limit':'15'},
+            M.api.getJSONBgCb('ciniki.atdo.faqsSearchQuick', {'tnid':M.curTenantID, 'start_needle':v, 'limit':'15'},
                 function(rsp) {
                     M.ciniki_atdo_main.faqs.liveSearchShow(s, null, M.gE(M.ciniki_atdo_main.faqs.panelUID + '_' + s), rsp.faqs);
                 });
@@ -211,17 +211,17 @@ function ciniki_atdo_main() {
                 'cellClasses':[''],
                 'noData':'No notes assigned to you',
                 },
-            'business':{'label':'General Notes', 'num_cols':1, 'type':'simplegrid', 
+            'tenant':{'label':'General Notes', 'num_cols':1, 'type':'simplegrid', 
                 'headerValues':null,
                 'cellClasses':[''],
-                'noData':'No business notes',
+                'noData':'No tenant notes',
                 },
         };
         this.notes.data = {};
         this.notes.noData = function() { return 'No notes found'; }
         // Live Search functions
         this.notes.liveSearchCb = function(s, i, v) {
-            M.api.getJSONBgCb('ciniki.atdo.notesSearchQuick', {'business_id':M.curBusinessID, 'start_needle':v, 'limit':'15'},
+            M.api.getJSONBgCb('ciniki.atdo.notesSearchQuick', {'tnid':M.curTenantID, 'start_needle':v, 'limit':'15'},
                 function(rsp) {
                     M.ciniki_atdo_main.notes.liveSearchShow(s, null, M.gE(M.ciniki_atdo_main.notes.panelUID + '_' + s), rsp.notes);
                 });
@@ -291,7 +291,7 @@ function ciniki_atdo_main() {
         this.messages.data = {};
         // Live Search functions
         this.messages.liveSearchCb = function(s, i, v) {
-            M.api.getJSONBgCb('ciniki.atdo.messagesSearchQuick', {'business_id':M.curBusinessID, 'start_needle':v, 'limit':'15'},
+            M.api.getJSONBgCb('ciniki.atdo.messagesSearchQuick', {'tnid':M.curTenantID, 'start_needle':v, 'limit':'15'},
                 function(rsp) {
                     M.ciniki_atdo_main.messages.liveSearchShow(s, null, M.gE(M.ciniki_atdo_main.messages.panelUID + '_' + s), rsp.messages);
                 });
@@ -356,7 +356,7 @@ function ciniki_atdo_main() {
 //      this.projects.noData = function() { return 'No projects found'; }
         // Live Search functions
         this.projects.liveSearchCb = function(s, i, v) {
-            M.api.getJSONBgCb('ciniki.atdo.projectsSearchQuick', {'business_id':M.curBusinessID, 'start_needle':v, 'limit':'15'},
+            M.api.getJSONBgCb('ciniki.atdo.projectsSearchQuick', {'tnid':M.curTenantID, 'start_needle':v, 'limit':'15'},
                 function(rsp) {
                     M.ciniki_atdo_main.projects.liveSearchShow(s, null, M.gE(M.ciniki_atdo_main.projects.panelUID + '_' + s), rsp.projects);
                 });
@@ -466,9 +466,9 @@ function ciniki_atdo_main() {
             'info':{'label':'', 'aside':'yes', 'type':'simpleform', 'fields':{
                 'subject':{'label':'Task', 'type':'text'},
                 'category':{'label':'Category', 'type':'text', 'livesearch':'yes', 'livesearchempty':'yes'},
-                'assigned':{'label':'Assigned', 'type':'multiselect', 'none':'yes', 'options':M.curBusiness.employees},
+                'assigned':{'label':'Assigned', 'type':'multiselect', 'none':'yes', 'options':M.curTenant.employees},
                 'private':{'label':'Options', 'type':'multitoggle', 'none':'yes', 'toggles':{'no':'Public', 'yes':'Private'}},
-                'priority':{'label':'Priority', 'type':'multitoggle', 'toggles':M.curBusiness.atdo.priorityText},
+                'priority':{'label':'Priority', 'type':'multitoggle', 'toggles':M.curTenant.atdo.priorityText},
         //      'status':{'label':'Status', 'type':'multitoggle', 'toggles':this.statuses},
                 'project_id':{'label':'Project', 'active':'no', 'type':'fkid', 'livesearch':'yes', 'livesearchempty':'yes'},
             }},
@@ -519,9 +519,9 @@ function ciniki_atdo_main() {
             'info':{'label':'', 'type':'simpleform', 'fields':{
                 'subject':{'label':'Title', 'type':'text'},
                 'category':{'label':'Category', 'type':'text', 'livesearch':'yes', 'livesearchempty':'yes'},
-                'assigned':{'label':'Assigned', 'type':'multiselect', 'none':'yes', 'options':M.curBusiness.employees},
+                'assigned':{'label':'Assigned', 'type':'multiselect', 'none':'yes', 'options':M.curTenant.employees},
                 'private':{'label':'Options', 'type':'multitoggle', 'none':'yes', 'toggles':{'no':'Public', 'yes':'Private'}},
-//              'priority':{'label':'Priority', 'type':'multitoggle', 'toggles':M.curBusiness.atdo.priorities},
+//              'priority':{'label':'Priority', 'type':'multitoggle', 'toggles':M.curTenant.atdo.priorities},
         //      'status':{'label':'Status', 'type':'multitoggle', 'toggles':this.statuses},
                 'project_id':{'label':'Project', 'active':'no', 'type':'fkid', 'livesearch':'yes', 'livesearchempty':'yes'},
             }},
@@ -534,7 +534,7 @@ function ciniki_atdo_main() {
             };
         this.add.forms.message = {
             'info':{'label':'', 'type':'simpleform', 'fields':{
-                'assigned':{'label':'To', 'type':'multiselect', 'none':'yes', 'options':M.curBusiness.employees},
+                'assigned':{'label':'To', 'type':'multiselect', 'none':'yes', 'options':M.curTenant.employees},
                 'subject':{'label':'Subject', 'type':'text'},
                 'project_id':{'label':'Project', 'active':'no', 'type':'fkid', 'livesearch':'yes', 'livesearchempty':'yes'},
             }},
@@ -564,25 +564,25 @@ function ciniki_atdo_main() {
         };
         this.add.liveSearchCb = function(s, i, value) {
             if( i == 'category' ) {
-                var rsp = M.api.getJSONBgCb('ciniki.atdo.searchCategory', {'business_id':M.curBusinessID, 'start_needle':value, 'limit':35},
+                var rsp = M.api.getJSONBgCb('ciniki.atdo.searchCategory', {'tnid':M.curTenantID, 'start_needle':value, 'limit':35},
                     function(rsp) {
                         M.ciniki_atdo_main.add.liveSearchShow(s, i, M.gE(M.ciniki_atdo_main.add.panelUID + '_' + i), rsp.categories);
                     });
             }
             if( i == 'project_id' ) {
-                var rsp = M.api.getJSONBgCb('ciniki.projects.searchNames', {'business_id':M.curBusinessID, 'start_needle':value, 'limit':25},
+                var rsp = M.api.getJSONBgCb('ciniki.projects.searchNames', {'tnid':M.curTenantID, 'start_needle':value, 'limit':25},
                     function(rsp) {
                         M.ciniki_atdo_main.add.liveSearchShow(s, i, M.gE(M.ciniki_atdo_main.add.panelUID + '_' + i), rsp['projects']);
                     });
             }
     // Going to be added in the future...
     //      if( i == 'customer_ids' ) {
-    //          var rsp = M.api.getJSONBgCb('ciniki.customers.searchQuick', {'business_id':M.curBusinessID, 'start_needle':value, 'limit':25},
+    //          var rsp = M.api.getJSONBgCb('ciniki.customers.searchQuick', {'tnid':M.curTenantID, 'start_needle':value, 'limit':25},
     //              function(rsp) { 
     //                  M.ciniki_atdo_main.add.liveSearchShow(s, i, M.gE(M.ciniki_atdo_main.add.panelUID + '_' + i), rsp.customers); 
     //              });
     //      } else if( i == 'product_ids' ) {
-    //          var rsp = M.api.getJSONBgCb('ciniki.products.searchQuick', {'business_id':M.curBusinessID, 'start_needle':value, 'limit':25},
+    //          var rsp = M.api.getJSONBgCb('ciniki.products.searchQuick', {'tnid':M.curTenantID, 'start_needle':value, 'limit':25},
     //              function(rsp) { 
     //                  M.ciniki_atdo_main.add.liveSearchShow(s, i, M.gE(M.ciniki_atdo_main.add.panelUID + '_' + i), rsp.products); 
     //              });
@@ -633,7 +633,7 @@ function ciniki_atdo_main() {
             // Search for events on the specified day
             if( i == 'appointment_date' ) {
                 if( day == '--' ) { day = 'today'; }
-                M.api.getJSONCb('ciniki.calendars.appointments', {'business_id':M.curBusinessID, 'date':day}, cb);
+                M.api.getJSONCb('ciniki.calendars.appointments', {'tnid':M.curTenantID, 'date':day}, cb);
 //              if( rsp.stat == 'ok' ) {
 //                  return rsp['appointments'];
 //              }
@@ -709,9 +709,9 @@ function ciniki_atdo_main() {
             'info':{'label':'', 'type':'simpleform', 'fields':{
                 'subject':{'label':'Title', 'type':'text'},
                 'category':{'label':'Category', 'type':'text', 'livesearch':'yes', 'livesearchempty':'yes'},
-                'assigned':{'label':'Assigned', 'type':'multiselect', 'none':'yes', 'options':M.curBusiness.employees, 'history':'no', 'viewed':'viewed', 'deleted':'deleted'},
+                'assigned':{'label':'Assigned', 'type':'multiselect', 'none':'yes', 'options':M.curTenant.employees, 'history':'no', 'viewed':'viewed', 'deleted':'deleted'},
                 'private':{'label':'Options', 'type':'multitoggle', 'none':'yes', 'toggles':{'no':'Public', 'yes':'Private'}, 'history':'no'},
-                'priority':{'label':'Priority', 'type':'multitoggle', 'toggles':M.curBusiness.atdo.priorityText, 'history':'no'},
+                'priority':{'label':'Priority', 'type':'multitoggle', 'toggles':M.curTenant.atdo.priorityText, 'history':'no'},
                 'status':{'label':'Status', 'type':'multitoggle', 'toggles':this.statuses, 'history':'no'},
                 'project_id':{'label':'Project', 'active':'no', 'type':'fkid', 'livesearch':'yes', 'livesearchempty':'yes'},
             }},
@@ -776,7 +776,7 @@ function ciniki_atdo_main() {
             'info':{'label':'', 'type':'simpleform', 'fields':{
                 'subject':{'label':'Title', 'type':'text'},
                 'category':{'label':'Category', 'type':'text', 'livesearch':'yes', 'livesearchempty':'yes'},
-                'assigned':{'label':'Assigned', 'type':'multiselect', 'none':'yes', 'options':M.curBusiness.employees, 'history':'no', 'viewed':'viewed', 'deleted':'deleted'},
+                'assigned':{'label':'Assigned', 'type':'multiselect', 'none':'yes', 'options':M.curTenant.employees, 'history':'no', 'viewed':'viewed', 'deleted':'deleted'},
                 'private':{'label':'Options', 'type':'multitoggle', 'none':'yes', 'toggles':{'no':'Public', 'yes':'Private'}, 'history':'no'},
                 'project_id':{'label':'Project', 'active':'no', 'type':'fkid', 'livesearch':'yes', 'livesearchempty':'yes'},
             }},
@@ -789,7 +789,7 @@ function ciniki_atdo_main() {
             };
         this.atdo.forms.message = {
             'info':{'label':'', 'type':'simpleform', 'fields':{
-                'assigned':{'label':'To', 'type':'multiselect', 'none':'yes', 'options':M.curBusiness.employees, 'history':'no', 'viewed':'viewed', 'deleted':'deleted'},
+                'assigned':{'label':'To', 'type':'multiselect', 'none':'yes', 'options':M.curTenant.employees, 'history':'no', 'viewed':'viewed', 'deleted':'deleted'},
                 'project_id':{'label':'Project', 'active':'no', 'type':'fkid', 'livesearch':'yes', 'livesearchempty':'yes'},
             }},
             'thread':{'label':'', 'type':'simplethread'},
@@ -841,13 +841,13 @@ function ciniki_atdo_main() {
         };
         this.atdo.liveSearchCb = function(s, i, value) {
             if( i == 'category' ) {
-                var rsp = M.api.getJSONBgCb('ciniki.atdo.searchCategory', {'business_id':M.curBusinessID, 'start_needle':value, 'limit':35},
+                var rsp = M.api.getJSONBgCb('ciniki.atdo.searchCategory', {'tnid':M.curTenantID, 'start_needle':value, 'limit':35},
                     function(rsp) {
                         M.ciniki_atdo_main.atdo.liveSearchShow(s, i, M.gE(M.ciniki_atdo_main.atdo.panelUID + '_' + i), rsp.categories);
                     });
             }
             if( i == 'project_id' ) {
-                var rsp = M.api.getJSONBgCb('ciniki.projects.searchNames', {'business_id':M.curBusinessID, 'start_needle':value, 'limit':25},
+                var rsp = M.api.getJSONBgCb('ciniki.projects.searchNames', {'tnid':M.curTenantID, 'start_needle':value, 'limit':25},
                     function(rsp) {
                         M.ciniki_atdo_main.atdo.liveSearchShow(s, i, M.gE(M.ciniki_atdo_main.atdo.panelUID + '_' + i), rsp['projects']);
                     });
@@ -885,7 +885,7 @@ function ciniki_atdo_main() {
         this.atdo.appointmentColour = this.add.appointmentColour;
         this.atdo.updateInterval = this.add.updateInterval;
         this.atdo.fieldHistoryArgs = function(s, i) {
-            return {'method':'ciniki.atdo.getHistory', 'args':{'business_id':M.curBusinessID, 
+            return {'method':'ciniki.atdo.getHistory', 'args':{'tnid':M.curTenantID, 
                 'atdo_id':M.ciniki_atdo_main.atdo.atdo_id, 'field':i}};
         }
 //      this.atdo.addButton('save', 'Save', 'M.ciniki_atdo_main.saveAppointment();');
@@ -916,8 +916,8 @@ function ciniki_atdo_main() {
             return '';
         };
         this.search.rowStyle = function(s, i, d) {
-            if( d.task.status != 'Completed' ) { return 'background: ' + M.curBusiness.atdo.settings['tasks.priority.' + d.task.priority]; }
-            else { return 'background: ' + M.curBusiness.atdo.settings['tasks.status.60']; }
+            if( d.task.status != 'Completed' ) { return 'background: ' + M.curTenant.atdo.settings['tasks.priority.' + d.task.priority]; }
+            else { return 'background: ' + M.curTenant.atdo.settings['tasks.status.60']; }
         };
         this.search.rowFn = function(s, i, d) {
             if( this.last_search_completed == 'yes' ) {
@@ -941,16 +941,16 @@ function ciniki_atdo_main() {
         if( aG != null ) { args = eval(aG); }
 
         //
-        // Reset all employee lists, must be done when switching businesses
+        // Reset all employee lists, must be done when switching tenants
         //
-        this.add.forms.task.info.fields.assigned.options = M.curBusiness.employees;
-        this.add.forms.note.info.fields.assigned.options = M.curBusiness.employees;
-        this.add.forms.message.info.fields.assigned.options = M.curBusiness.employees;
-        this.atdo.forms.task.info.fields.assigned.options = M.curBusiness.employees;
-        this.atdo.forms.note.info.fields.assigned.options = M.curBusiness.employees;
-        this.atdo.forms.message.info.fields.assigned.options = M.curBusiness.employees;
+        this.add.forms.task.info.fields.assigned.options = M.curTenant.employees;
+        this.add.forms.note.info.fields.assigned.options = M.curTenant.employees;
+        this.add.forms.message.info.fields.assigned.options = M.curTenant.employees;
+        this.atdo.forms.task.info.fields.assigned.options = M.curTenant.employees;
+        this.atdo.forms.note.info.fields.assigned.options = M.curTenant.employees;
+        this.atdo.forms.message.info.fields.assigned.options = M.curTenant.employees;
 
-        if( M.curBusiness.modules['ciniki.projects'] != null ) {
+        if( M.curTenant.modules['ciniki.projects'] != null ) {
             this.add.forms.appointment.info.fields.project_id.active = 'yes';
             this.add.forms.task.info.fields.project_id.active = 'yes';
             this.add.forms.note.info.fields.project_id.active = 'yes';
@@ -973,16 +973,16 @@ function ciniki_atdo_main() {
         //
         // Determine which parts of atdo are visible
         //
-        this.add.formtabs.tabs.appointment.visible = (M.curBusiness.modules['ciniki.atdo'].flags&0x01)==0x01?'yes':'no';
-        this.add.formtabs.tabs.task.visible = (M.curBusiness.modules['ciniki.atdo'].flags&0x02)==0x02?'yes':'no';
-        this.add.formtabs.tabs.faq.visible = (M.curBusiness.modules['ciniki.atdo'].flags&0x08)==0x08?'yes':'no';
-        this.add.formtabs.tabs.note.visible = (M.curBusiness.modules['ciniki.atdo'].flags&0x10)==0x10?'yes':'no';
-        this.add.formtabs.tabs.message.visible = (M.curBusiness.modules['ciniki.atdo'].flags&0x20)==0x20?'yes':'no';
-        this.atdo.formtabs.tabs.appointment.visible = (M.curBusiness.modules['ciniki.atdo'].flags&0x01)==0x01?'yes':'no';
-        this.atdo.formtabs.tabs.task.visible = (M.curBusiness.modules['ciniki.atdo'].flags&0x02)==0x02?'yes':'no';
-        this.atdo.formtabs.tabs.faq.visible = (M.curBusiness.modules['ciniki.atdo'].flags&0x08)==0x08?'yes':'no';
-        this.atdo.formtabs.tabs.note.visible = (M.curBusiness.modules['ciniki.atdo'].flags&0x10)==0x10?'yes':'no';
-        this.atdo.formtabs.tabs.message.visible = (M.curBusiness.modules['ciniki.atdo'].flags&0x20)==0x20?'yes':'no';
+        this.add.formtabs.tabs.appointment.visible = (M.curTenant.modules['ciniki.atdo'].flags&0x01)==0x01?'yes':'no';
+        this.add.formtabs.tabs.task.visible = (M.curTenant.modules['ciniki.atdo'].flags&0x02)==0x02?'yes':'no';
+        this.add.formtabs.tabs.faq.visible = (M.curTenant.modules['ciniki.atdo'].flags&0x08)==0x08?'yes':'no';
+        this.add.formtabs.tabs.note.visible = (M.curTenant.modules['ciniki.atdo'].flags&0x10)==0x10?'yes':'no';
+        this.add.formtabs.tabs.message.visible = (M.curTenant.modules['ciniki.atdo'].flags&0x20)==0x20?'yes':'no';
+        this.atdo.formtabs.tabs.appointment.visible = (M.curTenant.modules['ciniki.atdo'].flags&0x01)==0x01?'yes':'no';
+        this.atdo.formtabs.tabs.task.visible = (M.curTenant.modules['ciniki.atdo'].flags&0x02)==0x02?'yes':'no';
+        this.atdo.formtabs.tabs.faq.visible = (M.curTenant.modules['ciniki.atdo'].flags&0x08)==0x08?'yes':'no';
+        this.atdo.formtabs.tabs.note.visible = (M.curTenant.modules['ciniki.atdo'].flags&0x10)==0x10?'yes':'no';
+        this.atdo.formtabs.tabs.message.visible = (M.curTenant.modules['ciniki.atdo'].flags&0x20)==0x20?'yes':'no';
 
         //
         // Create the app container if it doesn't exist, and clear it out
@@ -1021,11 +1021,11 @@ function ciniki_atdo_main() {
     }
 
     this.showTasks = function(cb, scheduleDate) {
-        // Get the open tasks for the user and business
+        // Get the open tasks for the user and tenant
         this.tasks.data = {};
         M.startLoad();
         var rsp = M.api.getJSONCb('ciniki.atdo.tasksList', 
-            {'business_id':M.curBusinessID, 'status':'open'}, function(rsp) {
+            {'tnid':M.curTenantID, 'status':'open'}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.stopLoad();
                     M.api.err(rsp);
@@ -1057,9 +1057,9 @@ function ciniki_atdo_main() {
                 //
                 // Grab the stats for Call to Book, if module is turned on
                 //
-                if( M.curBusiness['modules']['ciniki.wineproduction'] != null ) {
+                if( M.curTenant['modules']['ciniki.wineproduction'] != null ) {
                     p.sections.other.list.ctb.visible = 'yes';
-                    var rsp = M.api.getJSON('ciniki.wineproduction.statsCTB', {'business_id':M.curBusinessID});
+                    var rsp = M.api.getJSON('ciniki.wineproduction.statsCTB', {'tnid':M.curTenantID});
                     if( rsp.stat != 'ok' ) {
                         M.stopLoad();
                         M.api.err(rsp);
@@ -1078,10 +1078,10 @@ function ciniki_atdo_main() {
     };
 
     this.showFAQs = function(cb) {
-        // Get the faqs for the user and business
+        // Get the faqs for the user and tenant
         this.faqs.data = {};
         var rsp = M.api.getJSONCb('ciniki.atdo.faqsList', 
-            {'business_id':M.curBusinessID, 'status':'open'}, function(rsp) {
+            {'tnid':M.curTenantID, 'status':'open'}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -1111,10 +1111,10 @@ function ciniki_atdo_main() {
     }
 
     this.showNotes = function(cb) {
-        // Get the notes for the user and business
-        this.notes.data = {'assigned':[], 'business':[]};
+        // Get the notes for the user and tenant
+        this.notes.data = {'assigned':[], 'tenant':[]};
         var rsp = M.api.getJSONCb('ciniki.atdo.notesList', 
-            {'business_id':M.curBusinessID, 'status':'open'}, function(rsp) {
+            {'tnid':M.curTenantID, 'status':'open'}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -1144,10 +1144,10 @@ function ciniki_atdo_main() {
     }
 
     this.showMessages = function(cb) {
-        // Get the notes for the user and business
+        // Get the notes for the user and tenant
         this.messages.data = {};
         var rsp = M.api.getJSONCb('ciniki.atdo.messagesList', 
-            {'business_id':M.curBusinessID, 'status':'open'}, function(rsp) {
+            {'tnid':M.curTenantID, 'status':'open'}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -1169,7 +1169,7 @@ function ciniki_atdo_main() {
     this.showAdd = function(cb, type, d, t, ad) {
         this.setupAdd(type, d, t, ad);
         this.add.formtabs.tabs.offering.visible = 'no';
-        if( M.curBusiness.modules['ciniki.fatt'] != null ) {
+        if( M.curTenant.modules['ciniki.fatt'] != null ) {
             this.add.formtabs.tabs.offering.visible = 'yes';
             this.add.formtabs.tabs.offering.fn = 'M.startApp(\'ciniki.fatt.offerings\',null,\'' + cb + '\',\'mc\',{\'add\':\'courses\',\'date\':\'' + d + '\',\'time\':\'' + t + '\',\'allday\':\'' + ad + '\'});';
         }
@@ -1209,7 +1209,7 @@ function ciniki_atdo_main() {
     this.addAtdo = function() {
         var c = this.getContent(this.add, 'yes', null, null);
         var rsp = M.api.postJSONCb('ciniki.atdo.add', 
-            {'business_id':M.curBusinessID}, c, function(rsp) {
+            {'tnid':M.curTenantID}, c, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -1257,7 +1257,7 @@ function ciniki_atdo_main() {
         }
 
         var rsp = M.api.getJSONCb('ciniki.atdo.get', 
-            {'business_id':M.curBusinessID, 'atdo_id':this.atdo.atdo_id}, function(rsp) {
+            {'tnid':M.curTenantID, 'atdo_id':this.atdo.atdo_id}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -1288,7 +1288,7 @@ function ciniki_atdo_main() {
 
         if( c != '' ) {
             var rsp = M.api.postJSONCb('ciniki.atdo.update', 
-                {'business_id':M.curBusinessID, 'atdo_id':this.atdo.atdo_id}, c, function(rsp) {
+                {'tnid':M.curTenantID, 'atdo_id':this.atdo.atdo_id}, c, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
@@ -1303,7 +1303,7 @@ function ciniki_atdo_main() {
     this.deleteAppointment = function() {
         if( confirm("Are you sure you want to delete this appointment?") ) {        
             var rsp = M.api.getJSONCb('ciniki.atdo.update', 
-                {'business_id':M.curBusinessID, 'atdo_id':this.atdo.atdo_id, 'status':'60'}, function(rsp) {
+                {'tnid':M.curTenantID, 'atdo_id':this.atdo.atdo_id, 'status':'60'}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
@@ -1324,7 +1324,7 @@ function ciniki_atdo_main() {
             this.search.last_search_str = search_str;
         }
         this.search.last_search_completed = 'no';
-        var rsp = M.api.getJSONBg('ciniki.atdo.tasksSearchFull', {'business_id':M.curBusinessID, 'start_needle':search_str, 'limit':100, 'full':'yes'});
+        var rsp = M.api.getJSONBg('ciniki.atdo.tasksSearchFull', {'tnid':M.curTenantID, 'start_needle':search_str, 'limit':100, 'full':'yes'});
         if( rsp.stat != 'ok' ) {
             M.api.err(rsp);
             return false;
@@ -1336,7 +1336,7 @@ function ciniki_atdo_main() {
 
     this.showCompleted = function(cb) {
         this.search.last_search_completed = 'yes';
-        var rsp = M.api.getJSONBg('ciniki.atdo.tasksSearchFull', {'business_id':M.curBusinessID, 'start_needle':'', 
+        var rsp = M.api.getJSONBg('ciniki.atdo.tasksSearchFull', {'tnid':M.curTenantID, 'start_needle':'', 
             'limit':100, 'full':'yes', 'completed':'yes'});
         if( rsp.stat != 'ok' ) {
             M.api.err(rsp);

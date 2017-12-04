@@ -2,7 +2,7 @@
 //
 // Description
 // ===========
-// This function will return a list of messages assigned to the user and/or the business.
+// This function will return a list of messages assigned to the user and/or the tenant.
 //
 // Arguments
 // ---------
@@ -20,7 +20,7 @@ function ciniki_atdo_messagesList($ciniki) {
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'status'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Status'), 
         'limit'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Limit'), 
         )); 
@@ -31,10 +31,10 @@ function ciniki_atdo_messagesList($ciniki) {
     
     //  
     // Make sure this module is activated, and
-    // check permission to run this function for this business
+    // check permission to run this function for this tenant
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'atdo', 'private', 'checkAccess');
-    $rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.messagesList'); 
+    $rc = ciniki_atdo_checkAccess($ciniki, $args['tnid'], 'ciniki.atdo.messagesList'); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }
@@ -67,9 +67,9 @@ function ciniki_atdo_messagesList($ciniki) {
         . "LEFT JOIN ciniki_users AS u4 ON (ciniki_atdo_followups.user_id = u4.id ) "
         . "LEFT JOIN ciniki_users AS u5 ON (ciniki_atdos.user_id = u5.id ) ";
         if( isset($modules['ciniki.projects']) ) {
-            $strsql .= "LEFT JOIN ciniki_projects ON (ciniki_atdos.project_id = ciniki_projects.id AND ciniki_projects.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "') ";
+            $strsql .= "LEFT JOIN ciniki_projects ON (ciniki_atdos.project_id = ciniki_projects.id AND ciniki_projects.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "') ";
         }
-        $strsql .= "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        $strsql .= "WHERE ciniki_atdos.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "AND ciniki_atdos.type = 6 "
         . "AND (u1.perms&0x10) = 0 "
         . "";
@@ -84,7 +84,7 @@ function ciniki_atdo_messagesList($ciniki) {
         }
     }
     // Check for public/private messages, and if private make sure user created or is assigned
-    $strsql .= "AND ((ciniki_atdos.perm_flags&0x01) = 0 "  // Public to business
+    $strsql .= "AND ((ciniki_atdos.perm_flags&0x01) = 0 "  // Public to tenant
             // created by the user requesting the list
             . "OR ((ciniki_atdos.perm_flags&0x01) = 1 AND ciniki_atdos.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
             // Assigned to the user requesting the list

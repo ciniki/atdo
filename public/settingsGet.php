@@ -2,13 +2,13 @@
 //
 // Description
 // -----------
-// This method will turn the settings for a ATDO module for a business.
+// This method will turn the settings for a ATDO module for a tenant.
 //
 // Arguments
 // ---------
 // api_key:
 // auth_token:
-// business_id:     The ID of the business to get the ATDO settings for.
+// tnid:     The ID of the tenant to get the ATDO settings for.
 // 
 // Returns
 // -------
@@ -19,7 +19,7 @@ function ciniki_atdo_settingsGet($ciniki) {
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         )); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
@@ -28,10 +28,10 @@ function ciniki_atdo_settingsGet($ciniki) {
     
     //  
     // Make sure this module is activated, and
-    // check permission to run this function for this business
+    // check permission to run this function for this tenant
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'atdo', 'private', 'checkAccess');
-    $rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.settingsGet'); 
+    $rc = ciniki_atdo_checkAccess($ciniki, $args['tnid'], 'ciniki.atdo.settingsGet'); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }   
@@ -56,10 +56,10 @@ function ciniki_atdo_settingsGet($ciniki) {
     }
 
     //
-    // Grab the settings for the business from the database
+    // Grab the settings for the tenant from the database
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbDetailsQuery');
-    $rc = ciniki_core_dbDetailsQuery($ciniki, 'ciniki_atdo_settings', 'business_id', $args['business_id'], 'ciniki.atdo', 'settings', '');
+    $rc = ciniki_core_dbDetailsQuery($ciniki, 'ciniki_atdo_settings', 'tnid', $args['tnid'], 'ciniki.atdo', 'settings', '');
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }

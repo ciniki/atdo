@@ -8,7 +8,7 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:     The ID of the business to get the projects for.
+// tnid:     The ID of the tenant to get the projects for.
 // 
 // 
 // Returns
@@ -23,7 +23,7 @@ function ciniki_atdo_projectsList($ciniki) {
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'status'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Status'), 
         'limit'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Limit'), 
         )); 
@@ -34,10 +34,10 @@ function ciniki_atdo_projectsList($ciniki) {
     
     //  
     // Make sure this module is activated, and
-    // check permission to run this function for this business
+    // check permission to run this function for this tenant
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'atdo', 'private', 'checkAccess');
-    $rc = ciniki_atdo_checkAccess($ciniki, $args['business_id'], 'ciniki.atdo.projectsList'); 
+    $rc = ciniki_atdo_checkAccess($ciniki, $args['tnid'], 'ciniki.atdo.projectsList'); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }   
@@ -65,7 +65,7 @@ function ciniki_atdo_projectsList($ciniki) {
         . "LEFT JOIN ciniki_atdo_users AS u1 ON (ciniki_atdos.id = u1.atdo_id AND u1.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
         . "LEFT JOIN ciniki_atdo_users AS u2 ON (ciniki_atdos.id = u2.atdo_id && (u2.perms&0x04) = 4) "
         . "LEFT JOIN ciniki_users AS u3 ON (u2.user_id = u3.id) "
-        . "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "WHERE ciniki_atdos.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "AND type = 7 "
         . "";
     if( isset($args['status']) ) {
@@ -79,7 +79,7 @@ function ciniki_atdo_projectsList($ciniki) {
         }
     }
     // Check for public/private notes, and if private make sure user created or is assigned
-    $strsql .= "AND ((perm_flags&0x01) = 0 "  // Public to business
+    $strsql .= "AND ((perm_flags&0x01) = 0 "  // Public to tenant
             // created by the user requesting the list
             . "OR ((perm_flags&0x01) = 1 AND ciniki_atdos.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
             // Assigned to the user requesting the list

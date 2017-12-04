@@ -8,13 +8,13 @@
 // Arguments
 // ---------
 // ciniki:
-// business_id:         The ID of the business to get the appointments for.
+// tnid:         The ID of the tenant to get the appointments for.
 // args:                The arguments passed to the calling public method ciniki.calendars.appointments.
 //
 // Returns
 // -------
 //
-function ciniki_atdo_hooks_appointments($ciniki, $business_id, $args) {
+function ciniki_atdo_hooks_appointments($ciniki, $tnid, $args) {
 
     //
     // FIXME: Add timezone information
@@ -28,7 +28,7 @@ function ciniki_atdo_hooks_appointments($ciniki, $business_id, $args) {
     // Get the module settings
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbDetailsQuery');
-    $rc =  ciniki_core_dbDetailsQuery($ciniki, 'ciniki_atdo_settings', 'business_id', $args['business_id'], 'ciniki.atdo', 'settings', '');
+    $rc =  ciniki_core_dbDetailsQuery($ciniki, 'ciniki_atdo_settings', 'tnid', $args['tnid'], 'ciniki.atdo', 'settings', '');
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -37,8 +37,8 @@ function ciniki_atdo_hooks_appointments($ciniki, $business_id, $args) {
     //
     // Load timezone info
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'intlSettings');
-    $rc = ciniki_businesses_intlSettings($ciniki, $business_id);
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'intlSettings');
+    $rc = ciniki_tenants_intlSettings($ciniki, $tnid);
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -99,14 +99,14 @@ function ciniki_atdo_hooks_appointments($ciniki, $business_id, $args) {
                 . "ciniki_atdos.id = u1.atdo_id "
                 . "AND u1.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "' "
                 . ") "
-            . "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+            . "WHERE ciniki_atdos.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
             . "AND ciniki_atdos.appointment_repeat_type > 0 "
             . "AND ciniki_atdos.status = 1 "                                // Active status
             . "AND (ciniki_atdos.type = 1 OR ciniki_atdos.type = 2) "       // Appointment or task
             . "AND ciniki_atdos.appointment_date <= '" . ciniki_core_dbQuote($ciniki, $end_date_quoted) . "' "      // Start of repeat is before end date
             . "AND (ciniki_atdos.appointment_repeat_end = '0000-00-00' OR DATEDIFF('$start_date_quoted', ciniki_atdos.appointment_repeat_end) <= 0 ) " // end of repeat is after start date
             // Check for public/private atdos, and if private make sure user created or is assigned
-            . "AND ((ciniki_atdos.perm_flags&0x01) = 0 "  // Public to business
+            . "AND ((ciniki_atdos.perm_flags&0x01) = 0 "  // Public to tenant
                 // created by the user requesting the list
                 . "OR ((ciniki_atdos.perm_flags&0x01) = 1 AND ciniki_atdos.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
                 // Assigned to the user requesting the list
@@ -152,7 +152,7 @@ function ciniki_atdo_hooks_appointments($ciniki, $business_id, $args) {
             }
 
             //
-            // Setup the UTC start and end dates, then convert to business timezone. 
+            // Setup the UTC start and end dates, then convert to tenant timezone. 
             // cdt is used as the current date
             //
             $sdt = new DateTime($args['start_date'], new DateTimeZone('UTC')); 
@@ -263,14 +263,14 @@ function ciniki_atdo_hooks_appointments($ciniki, $business_id, $args) {
                 . "ciniki_atdos.id = u1.atdo_id "
                 . "AND u1.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "' "
                 . ") "
-            . "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+            . "WHERE ciniki_atdos.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
             . "AND ciniki_atdos.appointment_repeat_type = 0 "
             . "AND ciniki_atdos.appointment_date >= '" . ciniki_core_dbQuote($ciniki, $start_date_quoted) . "' "
             . "AND ciniki_atdos.appointment_date <= '" . ciniki_core_dbQuote($ciniki, $end_date_quoted) . "' "
             . "AND ciniki_atdos.status = 1 "                                // Active status
             . "AND (ciniki_atdos.type = 1 OR ciniki_atdos.type = 2) "       // Appointment or task
             // Check for public/private atdos, and if private make sure user created or is assigned
-            . "AND ((ciniki_atdos.perm_flags&0x01) = 0 "  // Public to business
+            . "AND ((ciniki_atdos.perm_flags&0x01) = 0 "  // Public to tenant
                 // created by the user requesting the list
                 . "OR ((ciniki_atdos.perm_flags&0x01) = 1 AND ciniki_atdos.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
                 // Assigned to the user requesting the list
@@ -329,7 +329,7 @@ function ciniki_atdo_hooks_appointments($ciniki, $business_id, $args) {
                 . "ciniki_atdos.id = u1.atdo_id "
                 . "AND u1.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "' "
                 . ") "
-            . "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+            . "WHERE ciniki_atdos.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
             . "AND (ciniki_atdos.type = 1 OR ciniki_atdos.type = 2) "
             . "";
         if( isset($args['atdo_id']) && $args['atdo_id'] > 0 ) {
@@ -356,7 +356,7 @@ function ciniki_atdo_hooks_appointments($ciniki, $business_id, $args) {
                     . "ciniki_atdos.id = u1.atdo_id "
                     . "AND u1.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "' "
                     . ") "
-                . "WHERE ciniki_atdos.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+                . "WHERE ciniki_atdos.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
                 . "AND ciniki_atdos.status = 1 "
                 . "AND (ciniki_atdos.type = 1 OR ciniki_atdos.type = 2) "
                 . "";
@@ -395,7 +395,7 @@ function ciniki_atdo_hooks_appointments($ciniki, $business_id, $args) {
             return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.2', 'msg'=>'No constraints provided'));
         }
         // Check for public/private atdos, and if private make sure user created or is assigned
-        $strsql .= "AND ((ciniki_atdos.perm_flags&0x01) = 0 "  // Public to business
+        $strsql .= "AND ((ciniki_atdos.perm_flags&0x01) = 0 "  // Public to tenant
                 // created by the user requesting the list
                 . "OR ((ciniki_atdos.perm_flags&0x01) = 1 AND ciniki_atdos.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "') "
                 // Assigned to the user requesting the list
@@ -432,7 +432,7 @@ function ciniki_atdo_hooks_appointments($ciniki, $business_id, $args) {
         // Set the default colour and module for each appointment
         $appointments[$aid]['appointment']['colour'] = '#ffcccc';
         $appointments[$aid]['appointment']['module'] = 'ciniki.atdo';
-        // Set the start_ts for each appointment, adjusted for the business timezone
+        // Set the start_ts for each appointment, adjusted for the tenant timezone
         $dt = new DateTime($appointment['appointment']['date'] . ' ' . $appointment['appointment']['time'], new DateTimeZone($intl_timezone));
         $appointments[$aid]['appointment']['start_ts'] = $dt->format('U');
         // Check for specified colours of appointments in settings
