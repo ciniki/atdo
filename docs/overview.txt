@@ -5,7 +5,7 @@ in the calendar if a due date is set.
 
 FAQ's store questions and answers, where there can be multiple answers.  
 
-Notes are similar to FAQ's but can be used for internal documentation of business procedures.
+Notes are similar to FAQ's but can be used for internal documentation of tenants procedures.
 
 Messages are used for communication between employee's and owners.  It's
 similar to an email system.
