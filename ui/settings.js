@@ -60,7 +60,7 @@ function ciniki_atdo_settings() {
         //
         var appContainer = M.createContainer(appPrefix, 'ciniki_atdo_settings', 'yes');
         if( appContainer == null ) {
-            alert('App Error');
+            M.alert('App Error');
             return false;
         } 
 

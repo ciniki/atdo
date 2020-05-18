@@ -990,7 +990,7 @@ function ciniki_atdo_main() {
         //
         var appContainer = M.createContainer(appPrefix, 'ciniki_atdo_main', 'yes');
         if( appContainer == null ) {
-            alert('App Error');
+            M.alert('App Error');
             return false;
         } 
 
@@ -1221,7 +1221,7 @@ function ciniki_atdo_main() {
     this.getContent = function(p, s, oad, odad) {
         var subject = M.gE(p.panelUID + '_subject');
         if( s == 'yes' && subject.value == '' ) {
-            alert('No subject specified');
+            M.alert('No subject specified');
             return false;
         }
         var c = p.serializeForm(s);
@@ -1301,16 +1301,16 @@ function ciniki_atdo_main() {
     };
 
     this.deleteAppointment = function() {
-        if( confirm("Are you sure you want to delete this appointment?") ) {        
+        M.confirm("Are you sure you want to delete this appointment?",null,function() {
             var rsp = M.api.getJSONCb('ciniki.atdo.update', 
-                {'tnid':M.curTenantID, 'atdo_id':this.atdo.atdo_id, 'status':'60'}, function(rsp) {
+                {'tnid':M.curTenantID, 'atdo_id':M.ciniki_atdo_main.atdo.atdo_id, 'status':'60'}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
                     }
                     M.ciniki_atdo_main.atdo.close();
                 });
-        }
+        });
     }
     
     this.searchTasks = function(cb, search_str) {
