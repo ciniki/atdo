@@ -114,8 +114,8 @@ function ciniki_atdo_hooks_appointments($ciniki, $tnid, $args) {
                 . ") "
             . "ORDER BY appointment_date "
             . "";
-        ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
-        $rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
+        $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.atdo', array(
             array('container'=>'appointments', 'fname'=>'id', 'name'=>'appointment', 
                 'fields'=>array('id', 'start_ts', 'start_date', 'date', 'time', '12hour', 'allday', 'duration', 
                     'repeat_type', 'repeat_interval', 'repeat_end', 'weekday', 'year', 'month', 'day', 'type', 'status', 
@@ -140,14 +140,14 @@ function ciniki_atdo_hooks_appointments($ciniki, $tnid, $args) {
         if( isset($rc['appointments']) ) {
             $repeats = $rc['appointments'];
             foreach($repeats as $aid => $appointment) {
-                $dt = new DateTime($appointment['appointment']['date'] . ' 00:00:00', new DateTimeZone($intl_timezone));
-                $repeats[$aid]['appointment']['start_ts'] = $dt->format('U');
-                if( $appointment['appointment']['repeat_end'] != '' && $appointment['appointment']['repeat_end'] != '0000-00-00' ) {
-                    $dt = new DateTime($appointment['appointment']['repeat_end'] . ' 00:00:00', new DateTimeZone($intl_timezone));
+                $dt = new DateTime($appointment['date'] . ' 00:00:00', new DateTimeZone($intl_timezone));
+                $repeats[$aid]['start_ts'] = $dt->format('U');
+                if( $appointment['repeat_end'] != '' && $appointment['repeat_end'] != '0000-00-00' ) {
+                    $dt = new DateTime($appointment['repeat_end'] . ' 00:00:00', new DateTimeZone($intl_timezone));
                     $dt->add(new DateInterval('P1D'));
-                    $repeats[$aid]['appointment']['end_ts'] = $dt->format('U');
+                    $repeats[$aid]['end_ts'] = $dt->format('U');
                 } else {
-                    $repeats[$aid]['appointment']['end_ts'] = '';
+                    $repeats[$aid]['end_ts'] = '';
                 }
             }
 
@@ -169,7 +169,6 @@ function ciniki_atdo_hooks_appointments($ciniki, $tnid, $args) {
                 $cts = $cdt->format('U');
                 $cts_days = floor($cts/86400);
                 foreach($repeats as $aid => $appointment) {
-                    $appointment = $appointment['appointment'];
                     //
                     // Check if repeat is not active or is finished
                     //
@@ -233,7 +232,7 @@ function ciniki_atdo_hooks_appointments($ciniki, $tnid, $args) {
                         unset($appointment['year']);
                         unset($appointment['month']);
                         unset($appointment['day']);
-                        $appointments[] = array('appointment'=>$appointment);
+                        $appointments[] = $appointment;
                     } 
                 }
 
@@ -278,8 +277,8 @@ function ciniki_atdo_hooks_appointments($ciniki, $tnid, $args) {
                 . ") "
             . "ORDER BY appointment_date, time ASC, subject "
             . "";
-        ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
-        $rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
+        $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.atdo', array(
             array('container'=>'appointments', 'fname'=>'id', 'name'=>'appointment', 
                 'fields'=>array('id', 'start_date', 'date', 'time', '12hour', 'allday', 'duration', 
                     'type', 'status', 'subject', 'location', 'secondary_text', 'priority'),
@@ -405,8 +404,8 @@ function ciniki_atdo_hooks_appointments($ciniki, $tnid, $args) {
         $strsql .= ""
             . "ORDER BY time ASC, subject "
             . "";
-        ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
-        $rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
+        $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.atdo', array(
             array('container'=>'appointments', 'fname'=>'id', 'name'=>'appointment', 
                 'fields'=>array('id', 'start_date', 'date', 'time', '12hour', 'allday', 'duration', 
                     'repeat_type', 'repeat_interval', 'repeat_end', 'type', 'status', 
@@ -430,20 +429,20 @@ function ciniki_atdo_hooks_appointments($ciniki, $tnid, $args) {
     //
     foreach($appointments as $aid => $appointment) {    
         // Set the default colour and module for each appointment
-        $appointments[$aid]['appointment']['colour'] = '#ffcccc';
-        $appointments[$aid]['appointment']['module'] = 'ciniki.atdo';
+        $appointments[$aid]['colour'] = '#ffcccc';
+        $appointments[$aid]['module'] = 'ciniki.atdo';
         // Set the start_ts for each appointment, adjusted for the tenant timezone
-        $dt = new DateTime($appointment['appointment']['date'] . ' ' . $appointment['appointment']['time'], new DateTimeZone($intl_timezone));
-        $appointments[$aid]['appointment']['start_ts'] = $dt->format('U');
+        $dt = new DateTime($appointment['date'] . ' ' . $appointment['time'], new DateTimeZone($intl_timezone));
+        $appointments[$aid]['start_ts'] = $dt->format('U');
         // Check for specified colours of appointments in settings
-        if( $appointment['appointment']['type'] == 1 ) {
-            $appointments[$aid]['appointment']['colour'] = (isset($settings['appointments.status.1'])?$settings['appointments.status.1']:'#ffcccc');
+        if( $appointment['type'] == 1 ) {
+            $appointments[$aid]['colour'] = (isset($settings['appointments.status.1'])?$settings['appointments.status.1']:'#ffcccc');
         }
-        elseif( $appointment['appointment']['type'] == 2 ) {
-            if( isset($appointment['appointment']['status']) && $appointment['appointment']['status'] == 60 ) {
-                $appointments[$aid]['appointment']['colour'] = (isset($settings['tasks.status.60'])?$settings['tasks.status.60']:'#ffcccc');
+        elseif( $appointment['type'] == 2 ) {
+            if( isset($appointment['status']) && $appointment['status'] == 60 ) {
+                $appointments[$aid]['colour'] = (isset($settings['tasks.status.60'])?$settings['tasks.status.60']:'#ffcccc');
             } else {
-                $appointments[$aid]['appointment']['colour'] = (isset($settings['tasks.priority.' . $appointment['appointment']['priority']])?$settings['tasks.priority.' . $appointment['appointment']['priority']]:'#ffcccc');
+                $appointments[$aid]['colour'] = (isset($settings['tasks.priority.' . $appointment['priority']])?$settings['tasks.priority.' . $appointment['priority']]:'#ffcccc');
             }
         }
     }

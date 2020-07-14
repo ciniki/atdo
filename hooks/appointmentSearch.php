@@ -96,9 +96,9 @@ function ciniki_atdo_hooks_appointmentSearch($ciniki, $tnid, $args) {
     if( isset($args['limit']) && is_numeric($args['limit']) && $args['limit'] > 0 ) {
         $strsql .= "LIMIT " . ciniki_core_dbQuote($ciniki, $args['limit']) . " ";   // is_numeric verified
     }
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
-    $rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
-        array('container'=>'appointments', 'fname'=>'id', 'name'=>'appointment', 
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
+    $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.atdo', array(
+        array('container'=>'appointments', 'fname'=>'id', 
             'fields'=>array('id', 'module', 'start_ts', 'start_date', 'date', 'time', '12hour', 'duration', 'colour', 'type', 
                 'subject', 'priority', 'status'),
             'utctotz'=>array('start_ts'=>array('timezone'=>$intl_timezone, 'format'=>'U'),
@@ -117,14 +117,14 @@ function ciniki_atdo_hooks_appointmentSearch($ciniki, $tnid, $args) {
     //
     if( isset($rc['appointments']) && isset($settings['tasks.status.60']) ) {
         foreach($rc['appointments'] as $appointment_num => $appointment) {
-            if( $appointment['appointment']['type'] == 1 ) {
-                $rc['appointments'][$appointment_num]['appointment']['colour'] = $settings['appointments.status.1'];
+            if( $appointment['type'] == 1 ) {
+                $rc['appointments'][$appointment_num]['colour'] = $settings['appointments.status.1'];
             }
-            elseif( $appointment['appointment']['type'] == 2 ) {
-                if( $appointment['appointment']['status'] == 60 ) {
-                    $rc['appointments'][$appointment_num]['appointment']['colour'] = $settings['tasks.status.60'];
+            elseif( $appointment['type'] == 2 ) {
+                if( $appointment['status'] == 60 ) {
+                    $rc['appointments'][$appointment_num]['colour'] = $settings['tasks.status.60'];
                 } else {
-                    $rc['appointments'][$appointment_num]['appointment']['colour'] = $settings['tasks.priority.' . $appointment['appointment']['priority']];
+                    $rc['appointments'][$appointment_num]['colour'] = $settings['tasks.priority.' . $appointment['priority']];
                 }
                 
             }
