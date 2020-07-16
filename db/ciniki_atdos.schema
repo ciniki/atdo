@@ -59,7 +59,7 @@
 #                              20 - weekly, same day every x weeks
 #                              30 - monthly, day of month
 #                              31 - monthly, day of week (first sunday)
-#                              50 - yearly
+#                              40 - yearly
 #
 # appointment_repeat_interval:  The interval to repeat the appointment, (default 1)
 # appointment_repeat_end:       The date and time to stop the repeatable appointment on#
