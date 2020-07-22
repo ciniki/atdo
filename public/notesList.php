@@ -88,8 +88,8 @@ function ciniki_atdo_notesList($ciniki) {
     if( isset($args['limit']) && $args['limit'] != '' && $args['limit'] > 0 ) {
         $strsql .= "LIMIT " . ciniki_core_dbQuote($ciniki, $args['limit']) . " ";
     }
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
-    $rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
+    $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.atdo', array(
         array('container'=>'categories', 'fname'=>'category', 'name'=>'category',
             'fields'=>array('name'=>'category')),
         array('container'=>'notes', 'fname'=>'id', 'name'=>'note',

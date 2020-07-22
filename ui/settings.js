@@ -9,40 +9,32 @@ function ciniki_atdo_settings() {
     this.cb = null;
     this.toggleOptions = {'off':'Off', 'on':'On'};
 
-    this.init = function() {
-        //
-        // The main panel, which lists the options for production
-        //
-        this.main = new M.panel('Settings',
-            'ciniki_atdo_settings', 'main',
-            'mc', 'narrow', 'sectioned', 'ciniki.atdo.settings.main');
-        this.main.sections = {
-            '_appointments':{'label':'Appointment Colours', 'fields':{
-                'appointments.status.1':{'label':'Appointment', 'type':'colour'},
-            }},
-            '_tasks':{'label':'Task Colours', 'fields':{
-                'tasks.status.60':{'label':'Completed', 'type':'colour'},
-                'tasks.priority.10':{'label':'Low', 'type':'colour'},
-                'tasks.priority.30':{'label':'Medium', 'type':'colour'},
-                'tasks.priority.50':{'label':'High', 'type':'colour'},
-            }},
-            '_mainmenu':{'label':'Main Menu', 'fields':{}},
-        };
-
-        this.main.fieldValue = function(s, i, d) { 
-            return this.data[i];
-        };
-
-        //  
-        // Callback for the field history
-        //  
-        this.main.fieldHistoryArgs = function(s, i) {
-            return {'method':'ciniki.atdo.settingsHistory', 'args':{'tnid':M.curTenantID, 'field':i}};
-        };
-
-        this.main.addButton('save', 'Save', 'M.ciniki_atdo_settings.saveSettings();');
-        this.main.addClose('Cancel');
-    }
+    //
+    // The main panel, which lists the options for production
+    //
+    this.main = new M.panel('Settings',
+        'ciniki_atdo_settings', 'main',
+        'mc', 'narrow', 'sectioned', 'ciniki.atdo.settings.main');
+    this.main.sections = {
+        '_appointments':{'label':'Appointment Colours', 'fields':{
+            'appointments.status.1':{'label':'Appointment', 'type':'colour'},
+        }},
+        '_tasks':{'label':'Task Colours', 'fields':{
+            'tasks.status.60':{'label':'Completed', 'type':'colour'},
+            'tasks.priority.10':{'label':'Low', 'type':'colour'},
+            'tasks.priority.30':{'label':'Medium', 'type':'colour'},
+            'tasks.priority.50':{'label':'High', 'type':'colour'},
+        }},
+        '_mainmenu':{'label':'Main Menu', 'fields':{}},
+    };
+    this.main.fieldValue = function(s, i, d) { 
+        return this.data[i];
+    };
+    this.main.fieldHistoryArgs = function(s, i) {
+        return {'method':'ciniki.atdo.settingsHistory', 'args':{'tnid':M.curTenantID, 'field':i}};
+    };
+    this.main.addButton('save', 'Save', 'M.ciniki_atdo_settings.saveSettings();');
+    this.main.addClose('Cancel');
 
     //
     // Arguments:
@@ -76,7 +68,7 @@ function ciniki_atdo_settings() {
                 var p = M.ciniki_atdo_settings.main;    
                 var options = {'':'Not displayed'};
                 for(i in rsp.categories) {
-                    options[rsp.categories[i].category.name] = rsp.categories[i].category.name;
+                    options[rsp.categories[i].name] = rsp.categories[i].name;
                 }
                 p.sections._mainmenu.fields = {};
                 p.sections._mainmenu.fields['tasks.ui.mainmenu.category.'+M.userID] = 

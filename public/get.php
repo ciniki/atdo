@@ -117,8 +117,8 @@ function ciniki_atdo_get(&$ciniki) {
         . "AND ciniki_atdos.id = '" . ciniki_core_dbQuote($ciniki, $args['atdo_id']) . "' "
         . "";
     
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
-    $rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
+    $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.atdo', array(
         array('container'=>'atdos', 'fname'=>'id', 'name'=>'atdo',
             'fields'=>array('id', 'parent_id', 'project_id', 'project_name', 'type', 'subject', 'location', 'content', 'user_id',
                 'private', 'status', 'category', 'priority', 
@@ -139,10 +139,10 @@ function ciniki_atdo_get(&$ciniki) {
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
-    if( !isset($rc['atdos'][0]['atdo']) ) {
+    if( !isset($rc['atdos'][0]) ) {
         return array('stat'=>'ok', 'err'=>array('code'=>'ciniki.atdo.8', 'msg'=>'Unable to find item'));
     }
-    $atdo = $rc['atdos'][0]['atdo'];
+    $atdo = $rc['atdos'][0];
 
     //
     // Setup the repeat string description
@@ -211,7 +211,7 @@ function ciniki_atdo_get(&$ciniki) {
     if( $rc['stat'] != 'ok' ) {
         return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.10', 'msg'=>'Unable to load item information', 'err'=>$rc['err']));
     }
-    $atdo_users = $rc['users'];
+    $atdo['users'] = $rc['users'];
     $user_ids = array_merge($user_ids, $rc['user_ids']);
 
     //
@@ -230,11 +230,12 @@ function ciniki_atdo_get(&$ciniki) {
     //
     // Build the list of followers and users assigned to the atdo
     //
-    foreach($atdo_users as $unum => $user) {
+    foreach($atdo['users'] as $unum => $user) {
         $display_name = 'unknown';
         if( isset($users[$user['user']['user_id']]) ) {
             $display_name = $users[$user['user']['user_id']]['display_name'];
         }
+        $atdo['users'][$unum]['user']['display_name'] = $display_name;
         // Followers
         if( ($user['user']['perms'] & 0x01) > 0 ) {
             array_push($atdo['followers'], array('user'=>array('id'=>$user['user']['user_id'], 'display_name'=>$display_name)));
@@ -254,7 +255,7 @@ function ciniki_atdo_get(&$ciniki) {
             $atdo['deleted'] .= $user['user']['user_id'];
         }
         // Assigned to
-        if( ($user['user']['perms'] & 0x04) > 0 ) {
+        if( ($user['user']['perms'] & 0x1f) > 0 ) {
             if( $atdo['assigned'] != '' ) {
                 $atdo['assigned'] .= ',';
             }
@@ -336,8 +337,8 @@ function ciniki_atdo_get(&$ciniki) {
 //      if( isset($args['limit']) && $args['limit'] != '' && $args['limit'] > 0 ) {
 //          $strsql .= "LIMIT " . ciniki_core_dbQuote($ciniki, $args['limit']) . " ";
 //      }
-        ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
-        $rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
+        $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.atdo', array(
             array('container'=>'childtypes', 'fname'=>'type', 'name'=>'tchild',
                 'fields'=>array('type')),
             array('container'=>'children', 'fname'=>'id', 'name'=>'child',

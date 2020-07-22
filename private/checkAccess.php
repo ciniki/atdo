@@ -40,7 +40,7 @@ function ciniki_atdo_checkAccess($ciniki, $tnid, $method) {
     // Users who are an owner or employee of a tenant can see the tenant atdo
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbQuote');
-    $strsql = "SELECT ciniki_tenant_users.tnid, user_id FROM ciniki_tenant_users "
+    $strsql = "SELECT ciniki_tenant_users.tnid, user_id, permission_group FROM ciniki_tenant_users "
         . "WHERE ciniki_tenant_users.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
         . "AND user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "' "
         . "AND package = 'ciniki' "
@@ -52,12 +52,20 @@ function ciniki_atdo_checkAccess($ciniki, $tnid, $method) {
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
+
+    $permission_groups = array();
+    if( isset($rc['rows']) ) {
+        foreach($rc['rows'] as $row) {
+            $permission_groups[] = $row['permission_group'];
+        }
+    }
+
     //
     // If the user has permission, return ok
     //
     if( isset($rc['rows']) && isset($rc['rows'][0]) 
         && $rc['rows'][0]['user_id'] > 0 && $rc['rows'][0]['user_id'] == $ciniki['session']['user']['id'] ) {
-        return array('stat'=>'ok', 'modules'=>$modules);
+        return array('stat'=>'ok', 'modules'=>$modules, 'permission_groups'=>$permission_groups);
     }
 
     //

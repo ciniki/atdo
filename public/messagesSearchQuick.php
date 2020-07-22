@@ -83,17 +83,16 @@ function ciniki_atdo_messagesSearchQuick($ciniki) {
     } else {
         $strsql .= "LIMIT 25 ";
     }
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
-    $rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
+    $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.atdo', array(
         array('container'=>'messages', 'fname'=>'id', 'name'=>'message',
             'fields'=>array('id', 'subject', 'viewed', 'project_name', 'assigned', 'assigned_users'), 'lists'=>array('assigned_users')),
         ));
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
-    if( !isset($rc['messages']) ) {
-        return array('stat'=>'ok', 'messages'=>array());
-    }
-    return array('stat'=>'ok', 'messages'=>$rc['messages']);
+    $messages = isset($rc['messages']) ? $rc['messages'] : array();
+
+    return array('stat'=>'ok', 'messages'=>$messages);
 }
 ?>

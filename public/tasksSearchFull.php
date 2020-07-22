@@ -107,8 +107,8 @@ function ciniki_atdo_tasksSearchFull($ciniki) {
     } else {
         $strsql .= "LIMIT 25 ";
     }
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
-    $rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
+    $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.atdo', array(
         array('container'=>'tasks', 'fname'=>'id', 'name'=>'task',
             'fields'=>array('id', 'subject', 'priority', 'assigned', 'assigned_users', 'due_date', 'due_time', 'status'), 
             'utctotz'=>array('due_date'=>array('timezone'=>$intl_timezone, 'format'=>$date_format),

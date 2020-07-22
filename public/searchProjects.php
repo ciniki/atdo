@@ -49,7 +49,8 @@ function ciniki_atdo_searchProjects($ciniki) {
         . "WHERE ciniki_atdos.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "AND type = 7 "
         . "AND status = 1 "
-        . "AND (subject LIKE '" . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "
+        . "AND ("
+            . "subject LIKE '" . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "
             . "OR subject LIKE '% " . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "
             . ") "
         . "ORDER BY subject ";
@@ -58,8 +59,10 @@ function ciniki_atdo_searchProjects($ciniki) {
     } else {
         $strsql .= "LIMIT 25 ";
     }
-
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbRspQuery');
-    return ciniki_core_dbRspQuery($ciniki, $strsql, 'ciniki.atdo', 'projects', 'project', array('stat'=>'ok', 'projects'=>array()));
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
+    $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.atdo', array(
+        array('container'=>'', 'fname'=>'id', 'fields'=>array('id', 'subject')),
+        ));
+    return $rc;
 }
 ?>

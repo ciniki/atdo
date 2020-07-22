@@ -75,8 +75,8 @@ function ciniki_atdo_notesSearchQuick($ciniki) {
     } else {
         $strsql .= "LIMIT 25 ";
     }
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
-    $rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.atdo', array(
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
+    $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.atdo', array(
         array('container'=>'notes', 'fname'=>'id', 'name'=>'note',
             'fields'=>array('id', 'subject', 'assigned', 'viewed', 'assigned_users'), 'lists'=>array('assigned_users')),
         ));

@@ -28,10 +28,13 @@ function ciniki_atdo_hooks_uiSettings($ciniki, $tnid, $args) {
     $message_count = 0;
     $note_count = 0;
 
+    //
+    // Get the number of open tasks assigned to the user
+    //
     $strsql = "SELECT ciniki_atdos.type, COUNT(ciniki_atdos.id) AS num_items "
         . "FROM ciniki_atdos, ciniki_atdo_users "
         . "WHERE ciniki_atdos.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
-        . "AND (ciniki_atdos.type = 2 OR ciniki_atdos.type = 7) "   // Tasks or Projects
+        . "AND ciniki_atdos.type = 2 "
         . "AND ciniki_atdos.id = ciniki_atdo_users.atdo_id "
         . "AND ciniki_atdo_users.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "' "
         . "AND ciniki_atdos.status = 1 "
@@ -96,17 +99,17 @@ function ciniki_atdo_hooks_uiSettings($ciniki, $tnid, $args) {
                 'headerValues'=>array('', 'Task', 'Due'),
                 'cellClasses'=>array('multiline aligncenter', 'multiline', 'multiline'),
                 'cellValues'=>array(
-                    '0'=>'M.curTenant.atdo.priorities[d.task.priority];',
-                    '2'=>'\'<span class="maintext">\' + d.task.subject + \'</span><span class="subtext">\' + d.task.assigned_users + \'&nbsp;</span>\'',
-                    '3'=>'\'<span class="maintext">\' + d.task.due_date + \'</span><span class="subtext">\' + d.task.due_time + \'</span>\'',
+                    '0'=>'M.curTenant.atdo.priorities[d.priority];',
+                    '2'=>'\'<span class="maintext">\' + d.subject + \'</span><span class="subtext">\' + d.assigned_users + \'&nbsp;</span>\'',
+                    '3'=>'\'<span class="maintext">\' + d.due_date + \'</span><span class="subtext">\' + d.due_time + \'</span>\'',
                     ),
-                'rowStyle'=>'if( d.task.status != \'closed\' ) { '
-                        . '\'background: \' + M.curTenant.atdo.settings[\'tasks.priority.\' + d.task.priority]; '
+                'rowStyle'=>'if( d.status != \'closed\' ) { '
+                        . '\'background: \' + M.curTenant.atdo.settings[\'tasks.priority.\' + d.priority]; '
                     . '} else { '
                         . '\'background: \' + M.curTenant.atdo.settings[\'tasks.status.60\']; '
                     . '}',
                 'noData'=>'No tasks found',
-                'edit'=>array('method'=>'ciniki.atdo.main', 'args'=>array('atdo_id'=>'d.task.id;')),
+                'edit'=>array('method'=>'ciniki.atdo.main', 'args'=>array('atdo_id'=>'d.id;')),
                 'submit'=>array('method'=>'ciniki.atdo.main', 'args'=>array('tasksearch'=>'search_str')),
                 ),
             );

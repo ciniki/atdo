@@ -172,34 +172,32 @@ function ciniki_atdo_update(&$ciniki) {
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbQueryList');
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadRemoveUserPerms');
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'threadAddUserPerms');
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'objectDelete');
         //
         // Get the list of currently assigned users
         //
-        $strsql = "SELECT user_id "
+        $strsql = "SELECT id, uuid, user_id "
             . "FROM ciniki_atdo_users "
             . "WHERE atdo_id = '" . ciniki_core_dbQuote($ciniki, $args['atdo_id']) . "' "
-            . "AND (perms&0x04) = 4 "
+//            . "AND (perms&0x04) = 4 "
             . "";
-        $rc = ciniki_core_dbQueryList($ciniki, $strsql, 'ciniki.atdo', 'users', 'user_id');
+        $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.atdo', 'item');
         if( $rc['stat'] != 'ok' ) {
-            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.19', 'msg'=>'Unable to load task information', 'err'=>$rc['err']));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.30', 'msg'=>'Unable to load item', 'err'=>$rc['err']));
         }
-        $task_users = $rc['users'];
-        // 
-        // Remove users no longer assigned
-        //
-        $to_be_removed = array_diff($task_users, $args['assigned']);
-        if( is_array($to_be_removed) ) {
-            foreach($to_be_removed as $user_id) {
-                $rc = ciniki_core_threadRemoveUserPerms($ciniki, 'ciniki.atdo', 'user', 
-                $args['tnid'], 'ciniki_atdo_users', 'ciniki_atdo_history', 
-                'atdo', $args['atdo_id'], $user_id, 0x04);
+        $atdo_users = isset($rc['rows']) ? $rc['rows'] : array();
+        $atdo_user_ids = array();
+        foreach($atdo_users as $user) {
+            if( !in_array($user['user_id'], $args['assigned']) ) {
+                $rc = ciniki_core_objectDelete($ciniki, $args['tnid'], 'ciniki.atdo.user', $user['id'], $user['uuid'], 0x04);
                 if( $rc['stat'] != 'ok' ) {
-                    return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.20', 'msg'=>'Unable to update task information', 'err'=>$rc['err']));
+                    return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.31', 'msg'=>'Unable to remove user', 'err'=>$rc['err']));
                 }
+            } else {
+                $atdo_user_ids[] = $user['user_id'];
             }
         }
-        $to_be_added = array_diff($args['assigned'], $task_users);
+        $to_be_added = array_diff($args['assigned'], $atdo_user_ids);
         if( is_array($to_be_added) ) {
             foreach($to_be_added as $user_id) {
                 $rc = ciniki_core_threadAddUserPerms($ciniki, 'ciniki.atdo', 'user', 
@@ -251,6 +249,7 @@ function ciniki_atdo_update(&$ciniki) {
             return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.22', 'msg'=>'Unable to load task information', 'err'=>$rc['err']));
         }
         $task_users = $rc['users'];
+
         // 
         // Remove the delete flag if set, add unread flag
         //
