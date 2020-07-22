@@ -89,16 +89,16 @@ function ciniki_atdo_main() {
     }
     this.tasks.cellValue = function(s, i, j, d) {
         if( s == 'statuslist' ) {
-            return d.label + (d.num_messages != null && d.num_messages > 0 ? ' <span class="count">' + d.num_messages + '</span>': '');
+            return d.label + (d.num_tasks != null && d.num_tasks > 0 ? ' <span class="count">' + d.num_tasks + '</span>': '');
         }
         if( s == 'prioritylist' ) {
-            return d.label + (d.num_messages != null && d.num_messages > 0 ? ' <span class="count">' + d.num_messages + '</span>': '');
+            return d.label + (d.num_tasks != null && d.num_tasks > 0 ? ' <span class="count">' + d.num_tasks + '</span>': '');
         }
         if( s == 'categorylist' ) {
-            return d.category + (d.num_messages != null && d.num_messages > 0 ? ' <span class="count">' + d.num_messages + '</span>': '');
+            return d.category + (d.num_tasks != null && d.num_tasks > 0 ? ' <span class="count">' + d.num_tasks + '</span>': '');
         }
         if( s == 'employeelist' ) {
-            return d.display_name + (d.num_messages != null && d.num_messages > 0 ? ' <span class="count">' + d.num_messages + '</span>': '');
+            return d.display_name + (d.num_tasks != null && d.num_tasks > 0 ? ' <span class="count">' + d.num_tasks + '</span>': '');
         }
         if( s == 'tasks' || s == 'search' ) {
             switch(j) {

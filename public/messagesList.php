@@ -22,6 +22,7 @@ function ciniki_atdo_messagesList($ciniki) {
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
         'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'status'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Status'), 
+        'assigned'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Assigned'), 
         'user_id'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'User'), 
         'limit'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Limit'), 
         'stats'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Stats'), 
@@ -99,7 +100,14 @@ function ciniki_atdo_messagesList($ciniki) {
                 . "AND u1.user_id = '" . ciniki_core_dbQuote($ciniki, $args['user_id']) . "' "
                 . "AND u1.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                 . ") ";
-        } else {
+/*        } elseif( isset($args['assigned']) && $args['assigned'] == 'yes' ) {
+            $assigned_join_sql = "LEFT JOIN ciniki_atdo_users AS u1 ON ("
+                . "ciniki_atdos.id = u1.atdo_id "
+                . "AND u1.user_id = '" . ciniki_core_dbQuote($ciniki, $ciniki['session']['user']['id']) . "' "
+                . "AND (u1.perms&0x10) = 0 "
+                . "AND u1.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
+                . ") "; */
+        } elseif( !isset($args['assigned']) || $args['assigned'] != 'yes' ) {
             $assigned_join_sql = "LEFT JOIN ciniki_atdo_users AS u1 ON ("
                 . "ciniki_atdos.id = u1.atdo_id "
                 . "AND u1.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
@@ -114,6 +122,7 @@ function ciniki_atdo_messagesList($ciniki) {
             . "AND u1.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
             . ") ";
     }
+    error_log($assigned_join_sql);
     $limit_sql = '';
     if( isset($args['limit']) && $args['limit'] != '' && $args['limit'] > 0 ) {
         $limit_sql .= "LIMIT " . ciniki_core_dbQuote($ciniki, $args['limit']) . " ";
@@ -154,7 +163,7 @@ function ciniki_atdo_messagesList($ciniki) {
         . $status_sql
         . $assigned_sql
         . $user_sql
-        . "ORDER BY ciniki_atdos.last_updated, ciniki_atdos.priority DESC, ciniki_atdos.due_date DESC, ciniki_atdos.id, u3.display_name, ciniki_atdo_followups.date_added DESC "
+        . "ORDER BY ciniki_atdos.last_updated DESC, ciniki_atdos.priority DESC, ciniki_atdos.due_date DESC, ciniki_atdos.id, u3.display_name, ciniki_atdo_followups.date_added DESC "
         . $limit_sql
         . "";
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
