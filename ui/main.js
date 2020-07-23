@@ -424,7 +424,7 @@ function ciniki_atdo_main() {
             return d.display_name + (d.num_messages != null && d.num_messages > 0 ? ' <span class="count">' + d.num_messages + '</span>': '');
         }
         if( s == 'messages' ) {
-            return M.multiline(d.subject + (d.project_name != null && d.project_name != '' ? ' <span class="subdue">[' + d.project_name + ']</span>' : ''), d.last_followup_user + ' - ' + d.last_followup_age);
+            return M.multiline((d.viewed == 'no' ? '<b>'+d.subject+'</b>' : d.subject) + (d.project_name != null && d.project_name != '' ? ' <span class="subdue">[' + d.project_name + ']</span>' : ''), d.last_followup_user + ' - ' + d.last_followup_age);
         }
     };
     this.messages.rowFn = function(s, i, d) {
