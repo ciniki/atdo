@@ -94,7 +94,6 @@ function ciniki_atdo_faqsList($ciniki) {
         array('container'=>'faqs', 'fname'=>'id', 'name'=>'faq',
             'fields'=>array('id', 'subject')),
         ));
-    // error_log($strsql);
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }

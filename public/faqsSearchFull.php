@@ -96,7 +96,6 @@ function ciniki_atdo_faqsSearchFull($ciniki) {
             'fields'=>array('id', 'category', 'subject'), 
             ),
         ));
-    // error_log($strsql);
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }

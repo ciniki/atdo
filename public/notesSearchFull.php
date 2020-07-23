@@ -97,7 +97,6 @@ function ciniki_atdo_notesSearchFull($ciniki) {
             'maps'=>array('status'=>array(''=>'Unknown', '1'=>'Open', '60'=>'Completed')),
             ),
         ));
-    // error_log($strsql);
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }

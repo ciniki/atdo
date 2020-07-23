@@ -122,7 +122,6 @@ function ciniki_atdo_messagesList($ciniki) {
             . "AND u1.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
             . ") ";
     }
-    error_log($assigned_join_sql);
     $limit_sql = '';
     if( isset($args['limit']) && $args['limit'] != '' && $args['limit'] > 0 ) {
         $limit_sql .= "LIMIT " . ciniki_core_dbQuote($ciniki, $args['limit']) . " ";
