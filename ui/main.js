@@ -74,9 +74,18 @@ function ciniki_atdo_main() {
     this.tasks.liveSearchResultRowFn = function(s, f, i, j, d) {
         return this.rowFn(s, i, d);
     };
-    this.tasks.liveSearchResultRowStyle = function(s, f, i, d) {
-        if( d.status != 'closed' ) { return 'background: ' + M.curTenant.atdo.settings['tasks.priority.' + d.priority]; }
-        else { return 'background: ' + M.curTenant.atdo.settings['tasks.status.60']; }
+    this.tasks.liveSearchResultRowClass = function(s, f, i, d) {
+        if( d.status == 'closed' ) {
+            return 'statusgreen';
+        } else {
+            switch (d.priority) {
+                case '10': return 'statusyellow';
+                case '30': return 'statusorange';
+                case '50': return 'statusred';
+            }
+        }
+//        if( d.status != 'closed' ) { return 'background: ' + M.curTenant.atdo.settings['tasks.priority.' + d.priority]; }
+//        else { return 'background: ' + M.curTenant.atdo.settings['tasks.status.60']; }
         return '';
     };
     this.tasks.liveSearchSubmitFn = function(s, search_str) {
@@ -123,14 +132,25 @@ function ciniki_atdo_main() {
         if( s == 'employeelist' && this.user_id == d.id ) {
             return 'highlight';
         }
+        if( s == 'tasks' ) {
+            if( d.status == 'closed' ) {
+                return 'statusgreen';
+            } else {
+                switch (d.priority) {
+                    case '10': return 'statusyellow';
+                    case '30': return 'statusorange';
+                    case '50': return 'statusred';
+                }
+            }
+        }
     }
-    this.tasks.rowStyle = function(s, i, d) {
+/*    this.tasks.rowStyle = function(s, i, d) {
         if( d != null ) {
             if( d.status != 'closed' ) { return 'background: ' + M.curTenant.atdo.settings['tasks.priority.' + d.priority]; }
             else { return 'background: ' + M.curTenant.atdo.settings['tasks.status.60']; }
         }
         return '';
-    };
+    }; */
     this.tasks.rowFn = function(s, i, d) {
         if( s == 'statuslist' ) {
             return 'M.ciniki_atdo_main.tasks.filter(\'status\',\'' + d.id + '\');';
@@ -424,7 +444,7 @@ function ciniki_atdo_main() {
             return d.display_name + (d.num_messages != null && d.num_messages > 0 ? ' <span class="count">' + d.num_messages + '</span>': '');
         }
         if( s == 'messages' ) {
-            return M.multiline((d.viewed == 'no' ? '<b>'+d.subject+'</b>' : d.subject) + (d.project_name != null && d.project_name != '' ? ' <span class="subdue">[' + d.project_name + ']</span>' : ''), d.last_followup_user + ' - ' + d.last_followup_age);
+            return M.multiline((d.viewed == 'no' ? ('<b>'+d.subject+'</b>') : d.subject) + (d.project_name != null && d.project_name != '' ? ' <span class="subdue">[' + d.project_name + ']</span>' : ''), d.last_followup_user + ' - ' + d.last_followup_age);
         }
     };
     this.messages.rowFn = function(s, i, d) {

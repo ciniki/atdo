@@ -103,11 +103,20 @@ function ciniki_atdo_hooks_uiSettings($ciniki, $tnid, $args) {
                     '2'=>'\'<span class="maintext">\' + d.subject + \'</span><span class="subtext">\' + d.assigned_users + \'&nbsp;</span>\'',
                     '3'=>'\'<span class="maintext">\' + d.due_date + \'</span><span class="subtext">\' + d.due_time + \'</span>\'',
                     ),
-                'rowStyle'=>'if( d.status != \'closed\' ) { '
-                        . '\'background: \' + M.curTenant.atdo.settings[\'tasks.priority.\' + d.priority]; '
-                    . '} else { '
-                        . '\'background: \' + M.curTenant.atdo.settings[\'tasks.status.60\']; '
-                    . '}',
+                'rowClass'=>'if( d.status == \'closed\' ) {'
+                        . '\'statusgreen\''
+                    . '} else if(d.priority == \'10\' ) {'
+                        . '\'statusyellow\''
+                    . '} else if(d.priority == \'30\' ) {'
+                        . '\'statusorange\''
+                    . '} else if(d.priority == \'50\' ) {'
+                        . '\'statusred\''
+                    . '} ',
+//                'rowStyle'=>'if( d.status != \'closed\' ) { '
+//                        . '\'background: \' + M.curTenant.atdo.settings[\'tasks.priority.\' + d.priority]; '
+//                    . '} else { '
+//                        . '\'background: \' + M.curTenant.atdo.settings[\'tasks.status.60\']; '
+//                    . '}',
                 'noData'=>'No tasks found',
                 'edit'=>array('method'=>'ciniki.atdo.main', 'args'=>array('atdo_id'=>'d.id;')),
                 'submit'=>array('method'=>'ciniki.atdo.main', 'args'=>array('tasksearch'=>'search_str')),
