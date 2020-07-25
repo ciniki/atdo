@@ -189,13 +189,15 @@ function ciniki_atdo_main() {
     this.tasks.renameCategory = function(c) {
         var n = prompt("New category name", unescape(c));
         if( n != c ) {
-            M.api.getJSONCb('ciniki.atdo.categoryRename', {'tnid':M.curTenantID, 'type':2, 'old':c, 'new':escape(n)}, function(rsp) {
-                if( rsp.stat != 'ok' ) {
-                    M.api.err(rsp);
-                    return false;
-                }
-                M.ciniki_atdo_main.tasks.open();
-            });
+            M.api.getJSONCb('ciniki.atdo.categoryRename', {'tnid':M.curTenantID, 'type':2, 
+                'status':this.status, 'priority':this.priority, 'user_id':this.user_id,
+                'old':c, 'new':escape(n)}, function(rsp) {
+                    if( rsp.stat != 'ok' ) {
+                        M.api.err(rsp);
+                        return false;
+                    }
+                    M.ciniki_atdo_main.tasks.open();
+                });
         }
     }
     this.tasks.open = function(cb, scheduleDate) {

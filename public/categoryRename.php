@@ -20,6 +20,9 @@ function ciniki_atdo_categoryRename(&$ciniki) {
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
         'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'type'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Type'),
+        'status'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Old Category'),
+        'priority'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Old Category'),
+        'user_id'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Old Category'),
         'old'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Old Category'),
         'new'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'New Category'),
         )); 
@@ -39,13 +42,44 @@ function ciniki_atdo_categoryRename(&$ciniki) {
     }   
 
     //
+    // Prepare some of the SQL snippets
+    //
+    $priority_sql = '';
+    if( isset($args['priority']) && $args['priority'] != '' ) {
+        $priority_sql = "AND ciniki_atdos.priority = '" . ciniki_core_dbQuote($ciniki, $args['priority']) . "' ";
+    }
+    $status_sql = '';
+    if( isset($args['status']) && $args['status'] != '' ) {
+        switch($args['status']) {
+            case 'Open':
+            case 'open': $status_sql = "AND ciniki_atdos.status = 1 ";
+                break;
+            case 'Closed':
+            case 'closed': $status_sql = "AND ciniki_atdos.status = 60 ";
+                break;
+        }
+    }
+    $user_sql = '';
+    if( isset($args['user_id']) && $args['user_id'] > 0 ) {
+        $user_sql = "INNER JOIN ciniki_atdo_users AS u1 ON ("
+            . "ciniki_atdos.id = u1.atdo_id "
+            . "AND u1.user_id = '" . ciniki_core_dbQuote($ciniki, $args['user_id']) . "' "
+            . "AND (u1.perms&0x04) = 0x04 "
+            . "AND u1.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
+            . ") ";
+    }
+
+    //
     // Get the list of items with that category
     //
     $strsql = "SELECT ciniki_atdos.id, "
         . "ciniki_atdos.category "
         . "FROM ciniki_atdos "
-        . "WHERE tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
-        . "AND category = '" . ciniki_core_dbQuote($ciniki, $args['old']) . "' "
+        . $user_sql
+        . "WHERE ciniki_atdos.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
+        . "AND ciniki_atdos.category = '" . ciniki_core_dbQuote($ciniki, $args['old']) . "' "
+        . $priority_sql
+        . $status_sql
         . "";
     if( isset($args['type']) && $args['type'] != '' ) {
         $strsql .= "AND type = '" . ciniki_core_dbQuote($ciniki, $args['type']) . "' ";
