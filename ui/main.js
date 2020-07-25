@@ -42,6 +42,12 @@ function ciniki_atdo_main() {
             },
         'categorylist':{'label':'Categories', 'aside':'yes', 'type':'simplegrid', 'num_cols':1,
             'flexcolumn':1,
+            'editFn':function(s, i, d) {
+                if( d.category != 'All' && M.curTenant.permissions.owners != null ) {
+                    return 'M.ciniki_atdo_main.tasks.renameCategory(\'' + escape(d.category) + '\');';
+                }
+                return '';
+                },
             },
         'search':{'label':'', 'type':'livesearchgrid', 'livesearchcols':5, 'hint':'search', 
             'flexcolumn':2,
@@ -179,6 +185,18 @@ function ciniki_atdo_main() {
             this.category = 'All';
         }
         this.open();
+    }
+    this.tasks.renameCategory = function(c) {
+        var n = prompt("New category name", unescape(c));
+        if( n != c ) {
+            M.api.getJSONCb('ciniki.atdo.categoryRename', {'tnid':M.curTenantID, 'type':2, 'old':c, 'new':escape(n)}, function(rsp) {
+                if( rsp.stat != 'ok' ) {
+                    M.api.err(rsp);
+                    return false;
+                }
+                M.ciniki_atdo_main.tasks.open();
+            });
+        }
     }
     this.tasks.open = function(cb, scheduleDate) {
         // Get the open tasks for the user and tenant
@@ -486,7 +504,6 @@ function ciniki_atdo_main() {
                 M.api.err(rsp);
                 return false;
             }
-            console.log(rsp);
             var p = M.ciniki_atdo_main.messages;
             p.data = rsp;
             p.refresh();
@@ -1291,7 +1308,6 @@ function ciniki_atdo_main() {
         this.add.data = this.add.default_data;
         this.add.data.project_id = 0;
         this.add.data.project_name = '';
-        console.log(type);
         if( type == 'task' ) {  
             this.add.data['private'] = 'yes';
         }
