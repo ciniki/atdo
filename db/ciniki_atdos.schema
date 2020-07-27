@@ -69,7 +69,9 @@
 #                   the atdo without interfering with the date it's due.
 #
 # due_duration:     How long the appointment should be for the due_date.
-# due_flags:        0x01 - all date due date
+# due_flags:            0x01 - all date due date
+#
+# closed_dt:        The date the item was marked as closed or completed
 #
 # date_added:       The UTC date and time the thread was added.
 # last_updated:     The UTC date and time the thread was last updated.

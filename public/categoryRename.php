@@ -41,6 +41,10 @@ function ciniki_atdo_categoryRename(&$ciniki) {
         return $rc;
     }   
 
+    if( isset($args['old']) && $args['old'] == 'Uncategorized' ) {
+        $args['old'] = '';
+    }
+
     //
     // Prepare some of the SQL snippets
     //
