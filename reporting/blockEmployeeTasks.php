@@ -128,6 +128,7 @@ function ciniki_atdo_reporting_blockEmployeeTasks(&$ciniki, $tnid, $args) {
                 array('label'=>'Last Updated', 'pdfwidth'=>'15%', 'field'=>'last_updated_date'),
                 ),
             'data'=>array(),
+            'editApp'=>array('app'=>'ciniki.atdo.main', 'args'=>array('atdo_id'=>'d.id')),
             'textlist'=>'',
             );
         foreach($tasks as $tid => $task) {
