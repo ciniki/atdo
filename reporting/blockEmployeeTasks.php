@@ -85,6 +85,7 @@ function ciniki_atdo_reporting_blockEmployeeTasks(&$ciniki, $tnid, $args) {
         . "INNER JOIN ciniki_atdo_users AS u1 ON ("
             . "ciniki_atdos.id = u1.atdo_id "
             . "AND u1.user_id = '" . ciniki_core_dbQuote($ciniki, $args['user_id']) . "' "
+            . "AND (u1.perms&0x04) = 0x04 "  // assigned to user
             . "AND u1.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
             . ") "
         . $projects_sql
@@ -94,12 +95,11 @@ function ciniki_atdo_reporting_blockEmployeeTasks(&$ciniki, $tnid, $args) {
         . $status_sql
         . "ORDER BY ciniki_atdos.priority DESC, ciniki_atdos.due_date DESC, ciniki_atdos.id "
         . "";
-        error_log(print_r($strsql,true));
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
     $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.atdo', array(
         array('container'=>'tasks', 'fname'=>'id', 'name'=>'task',
             'fields'=>array('id', 'category', 'subject', 'project_name', 'allday', 'status', 'priority', 'priority_text', 'private', 
-                'assigned_users', 'due_date', 'due_time', 'last_updated_date', 'last_updated_time'), 
+                'due_date', 'due_time', 'last_updated_date', 'last_updated_time'), 
             'maps'=>array('priority_text'=>$maps['atdo']['priority']),
             'utctotz'=>array(
                 'due_date'=>array('timezone'=>$intl_timezone, 'format'=>$date_format),
