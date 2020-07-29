@@ -149,9 +149,20 @@ function ciniki_atdo_tasksList($ciniki) {
             . "IFNULL(ciniki_atdos.due_date, '') AS due_date, "
             . "IF((ciniki_atdos.due_flags&0x01)=1, '', IF(ciniki_atdos.due_date=0, '', ciniki_atdos.due_date)) AS due_time, "
             . "IFNULL(u3.display_name, '') AS assigned_users, "
-            . "ciniki_atdos.last_updated AS last_updated_date, "
-            . "ciniki_atdos.last_updated AS last_updated_time "
+            . "followups.id AS fol_las_up, "
+            . "IFNULL(followups.last_updated, ciniki_atdos.last_updated) AS last_updated_date, "
+            . "IFNULL(followups.last_updated, ciniki_atdos.last_updated) AS last_updated_time "
             . "FROM ciniki_atdos "
+            . "LEFT JOIN ciniki_atdo_followups AS followups ON ("
+                . "followups.id = ("
+                    . "SELECT id "
+                    . "FROM ciniki_atdo_followups "
+                    . "WHERE atdo_id = ciniki_atdos.id "
+                    . "AND tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
+                    . "ORDER BY date_added DESC "
+                    . "LIMIT 1 "
+                    . ") "
+                . ") "
             . $assigned_join_sql
             . "LEFT JOIN ciniki_atdo_users AS u2 ON ("
                 . "ciniki_atdos.id = u2.atdo_id "
@@ -224,7 +235,7 @@ function ciniki_atdo_tasksList($ciniki) {
     $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.atdo', array(
         array('container'=>'tasks', 'fname'=>'id', 'name'=>'task',
             'fields'=>array('id', 'category', 'subject', 'project_name', 'allday', 'status', 'priority', 'private', 
-                'assigned_users', 'due_date', 'due_time', 'last_updated_date', 'last_updated_time'), 
+                'assigned_users', 'due_date', 'due_time', 'last_updated_date', 'last_updated_time', 'fol_las_up'), 
             'utctotz'=>array(
                 'due_date'=>array('timezone'=>$intl_timezone, 'format'=>$date_format),
                 'due_time'=>array('timezone'=>$intl_timezone, 'format'=>'g:i A'),
@@ -237,6 +248,7 @@ function ciniki_atdo_tasksList($ciniki) {
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
+        error_log(print_r($rc,true));
     $rsp = array('stat'=>'ok', 'tasks' => isset($rc['tasks']) ? $rc['tasks'] : array());
 
     //

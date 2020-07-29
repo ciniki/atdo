@@ -40,6 +40,9 @@ function ciniki_atdo_reporting_block(&$ciniki, $tnid, $args) {
     if( $args['block_ref'] == 'ciniki.atdo.employeetasks' ) {
         ciniki_core_loadMethod($ciniki, 'ciniki', 'atdo', 'reporting', 'blockEmployeeTasks');
         return ciniki_atdo_reporting_blockEmployeeTasks($ciniki, $tnid, $args['options']);
+    } elseif( $args['block_ref'] == 'ciniki.atdo.completedtasks' ) {
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'atdo', 'reporting', 'blockCompletedTasks');
+        return ciniki_atdo_reporting_blockCompletedTasks($ciniki, $tnid, $args['options']);
     }
 
     return array('stat'=>'ok');

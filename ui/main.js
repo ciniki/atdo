@@ -579,7 +579,7 @@ function ciniki_atdo_main() {
     //
     this.add = new M.panel('Add Appointment',
         'ciniki_atdo_main', 'add',
-        'mc', 'medium', 'sectioned', 'ciniki.atdo.main.edit');
+        'mc', 'medium mediumaside', 'sectioned', 'ciniki.atdo.main.edit');
     this.add.default_data = {
         'status':'1',
         'priority':'10',
@@ -606,7 +606,7 @@ function ciniki_atdo_main() {
             'message':{'label':'Message', 'visible':'no', 'field_id':6},
         }};
     this.add.forms.appointment = {
-        'info':{'label':'', 'aside':'yes', 'type':'simpleform', 'fields':{
+        'info':{'label':'', 'aside':'yes', 'type':'simpleform', 'aside':'yes', 'fields':{
             'appointment_date':{'label':'Start', 'type':'appointment', 'caloffset':0,
                 'start':'8:00',
                 'end':'20:00',
@@ -619,7 +619,7 @@ function ciniki_atdo_main() {
             'location':{'label':'Location', 'type':'text'},
             'project_id':{'label':'Project', 'active':'no', 'type':'fkid', 'livesearch':'yes', 'livesearchempty':'yes'},
         }},
-        '_repeat':{'label':'Repeat', 'aside':'yes', 'type':'simpleform', 'fields':{
+        '_repeat':{'label':'Repeat', 'aside':'yes', 'type':'simpleform', 'aside':'yes', 'fields':{
             'appointment_repeat_type':{'label':'Type', 'type':'multitoggle', 'none':'yes', 'toggles':this.repeatOptions, 
                 'fn':'M.ciniki_atdo_main.add.updateInterval'},
             'appointment_repeat_interval':{'label':'Every', 'type':'multitoggle', 'toggles':this.repeatIntervals, 'hint':' '},
@@ -822,7 +822,7 @@ function ciniki_atdo_main() {
     //
     this.atdo = new M.panel('Atdo',
         'ciniki_atdo_main', 'atdo',
-        'mc', 'medium', 'sectioned', 'ciniki.atdo.main.edit');
+        'mc', 'medium mediumaside', 'sectioned', 'ciniki.atdo.main.edit');
     this.atdo.aid = 0;
     this.atdo.data = null;
     this.atdo.cb = null;
@@ -867,14 +867,7 @@ function ciniki_atdo_main() {
 //              }},
         };
     this.atdo.forms.task = {
-        'thread':{'label':'', 'type':'simplethread'},
-        '_followup':{'label':'Add your response', 'fields':{
-            'followup':{'label':'Details', 'hidelabel':'yes', 'type':'textarea', 'history':'no'},
-            }},
-        '_addfollowup':{'label':'', 'type':'simplebuttons', 'buttons':{
-            'add':{'label':'Save', 'fn':'M.ciniki_atdo_main.atdo.save();'},
-            }},
-        'info':{'label':'', 'type':'simpleform', 'fields':{
+        'info':{'label':'', 'type':'simpleform', 'aside':'yes', 'fields':{
             'subject':{'label':'Title', 'type':'text'},
             'category':{'label':'Category', 'type':'text', 'livesearch':'yes', 'livesearchempty':'yes'},
             'assigned':{'label':'Assigned', 'type':'multiselect', 'none':'yes', 'options':M.curTenant.employees, 'history':'no'},
@@ -889,7 +882,16 @@ function ciniki_atdo_main() {
 //              'customer_ids':{'label':'Customer', 'type':'fkid', 'livesearch':'yes'},
 //              'product_ids':{'label':'Product', 'type':'fkid', 'livesearch':'yes'},
 //          }},
-        '_appointment':{'label':'Scheduling', 'collapsable':'yes', 'collapse':'compact', 'type':'simpleform', 'fields':{
+        '_due':{'label':'Due Date', 'collapsable':'yes', 'aside':'yes', 'collapse':'compact', 'type':'simpleform', 'fields':{
+            'due_date':{'label':'Due', 'type':'appointment', 'caloffset':0, 'history':'no',
+                'start':'8:00',
+                'end':'20:00',
+                'notimelabel':'All day',
+                'duration':'due_duration',      // Specify the duration field to update when selecting allday
+                },
+            'due_duration':{'label':'Duration', 'type':'timeduration', 'min':15, 'history':'no', 'allday':'yes', 'date':'due_date', 'buttons':this.durationButtons},
+            }},
+        '_appointment':{'label':'Scheduling', 'collapsable':'yes', 'aside':'yes', 'collapse':'compact', 'type':'simpleform', 'fields':{
             'appointment_date':{'label':'Start', 'type':'appointment', 'caloffset':0, 'history':'no',
                 'start':'8:00',
                 'end':'20:00',
@@ -901,13 +903,6 @@ function ciniki_atdo_main() {
             'appointment_repeat_type':{'label':'Repeat', 'type':'multitoggle', 'none':'yes', 'history':'no', 'toggles':this.repeatOptions, 'fn':'M.ciniki_atdo_main.atdo.updateInterval'},
             'appointment_repeat_interval':{'label':'Every', 'type':'multitoggle', 'toggles':this.repeatIntervals, 'history':'no', 'hint':' '},
             'appointment_repeat_end':{'label':'End Date', 'type':'date', 'hint':'never', 'history':'no'},
-            'due_date':{'label':'Due', 'type':'appointment', 'caloffset':0, 'history':'no',
-                'start':'8:00',
-                'end':'20:00',
-                'notimelabel':'All day',
-                'duration':'due_duration',      // Specify the duration field to update when selecting allday
-                },
-            'due_duration':{'label':'Duration', 'type':'timeduration', 'min':15, 'history':'no', 'allday':'yes', 'date':'due_date', 'buttons':this.durationButtons},
             }},
 //          'links':{'label':'Additional Information', 'type':'simplelist', 'list':{
 //              'customer_ids':{'label':'Customer', 'value':''},
@@ -915,12 +910,19 @@ function ciniki_atdo_main() {
 //              'customer_ids':{'label':'Customer', 'type':'fkid', 'livesearch':'yes'},
 //              'product_ids':{'label':'Product', 'type':'fkid', 'livesearch':'yes'},
 //              }},
-        '_update':{'label':'', 'type':'simplebuttons', 'buttons':{
+        '_update':{'label':'', 'type':'simplebuttons', 'aside':'yes', 'buttons':{
             'update':{'label':'Save', 'fn':'M.ciniki_atdo_main.atdo.save();'},
             'delete':{'label':'Delete', 
                 'visible':function() { return M.curTenant.permissions.owners != null ? 'yes' : 'no'; },
                 'fn':'M.ciniki_atdo_main.atdo.remove();',
                 },
+            }},
+        'thread':{'label':'', 'type':'simplethread'},
+        '_followup':{'label':'Add your response', 'fields':{
+            'followup':{'label':'Details', 'hidelabel':'yes', 'type':'textarea', 'history':'no'},
+            }},
+        '_addfollowup':{'label':'', 'type':'simplebuttons', 'buttons':{
+            'add':{'label':'Save', 'fn':'M.ciniki_atdo_main.atdo.save();'},
             }},
         };
     this.atdo.forms.faq = {

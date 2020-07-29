@@ -51,6 +51,13 @@ function ciniki_atdo_reporting_blocks(&$ciniki, $tnid, $args) {
                     )),
                 ),
             );
+        $blocks['ciniki.atdo.completedtasks'] = array(
+            'name'=>'Completed Tasks',
+            'module' => 'Tasks',
+            'options'=>array(
+                'days'=>array('label'=>'Previous Number of Days', 'type'=>'text', 'size'=>'small'),
+                ),
+            );
     }
 
     return array('stat'=>'ok', 'blocks'=>$blocks);
