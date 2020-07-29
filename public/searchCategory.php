@@ -41,13 +41,12 @@ function ciniki_atdo_searchCategory($ciniki) {
     // Get the number of faqs in each status for the tenant, 
     // if no rows found, then return empty array
     //
-    $strsql = "SELECT category AS name "
+    $strsql = "SELECT DISTINCT category AS name "
         . "FROM ciniki_atdos "
         . "WHERE ciniki_atdos.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "AND ciniki_atdos.status  "
-        . "AND (category LIKE '" . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "
-            . "AND category <> '' "
-            . ") "
+        . "AND category LIKE '" . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "
+        . "AND category <> '' "
         . "";
     $strsql .= "ORDER BY category "
         . "";
