@@ -97,7 +97,6 @@ function ciniki_atdo_projectsList($ciniki) {
         array('container'=>'projects', 'fname'=>'id', 'name'=>'project',
             'fields'=>array('id', 'subject', 'status', 'private', 'assigned', 'viewed', 'assigned_user_ids', 'assigned_users'), 'idlists'=>array('assigned_user_ids'), 'lists'=>array('assigned_users')),
         ));
-    // error_log($strsql);
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }

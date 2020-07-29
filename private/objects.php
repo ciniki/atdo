@@ -38,6 +38,7 @@ function ciniki_atdo_objects($ciniki) {
             'due_date' => array('name'=>'Due Date'),
             'due_duration' => array('name'=>'Due Date Duration'),
             'due_flags' => array('name'=>'Due Date Flags'),
+            'date_closed' => array('name'=>'Date Closed', 'default'=>''),
             ),
         'history_table' => 'ciniki_atdo_history',
         );

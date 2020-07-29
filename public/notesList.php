@@ -95,7 +95,6 @@ function ciniki_atdo_notesList($ciniki) {
         array('container'=>'notes', 'fname'=>'id', 'name'=>'note',
             'fields'=>array('id', 'subject', 'status', 'private', 'assigned', 'viewed', 'assigned_user_ids', 'assigned_users'), 'idlists'=>array('assigned_user_ids'), 'lists'=>array('assigned_users')),
         ));
-    // error_log($strsql);
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }

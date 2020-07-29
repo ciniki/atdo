@@ -41,7 +41,7 @@ function ciniki_atdo_add(&$ciniki) {
         'appointment_repeat_type'=>array('required'=>'no', 'default'=>'0', 'blank'=>'yes', 'name'=>'Repeat flag'), 
         'appointment_repeat_interval'=>array('required'=>'no', 'default'=>'0', 'blank'=>'yes', 'name'=>'Repeat Interval'), 
         'appointment_repeat_end'=>array('required'=>'no', 'type'=>'date', 'default'=>'', 'blank'=>'yes', 'name'=>'Repeat End Date'), 
-        'due_date'=>array('required'=>'no', 'blank'=>'yes', 'type'=>'datetimetoutc', 'default'=>'', 'name'=>'Due Date'), 
+        'due_date'=>array('required'=>'no', 'blank'=>'yes', 'type'=>'date', 'default'=>'', 'name'=>'Due Date'), 
         'due_duration'=>array('required'=>'no', 'blank'=>'no', 'default'=>'0', 'name'=>'Due Date Duration'), 
         'due_allday'=>array('required'=>'no', 'default'=>'no', 'blank'=>'no', 'name'=>'Due Allday Flag'), 
         )); 

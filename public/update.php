@@ -40,7 +40,7 @@ function ciniki_atdo_update(&$ciniki) {
         'appointment_repeat_type'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Appointment Repeat'), 
         'appointment_repeat_interval'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Appointment Repeat Interval'), 
         'appointment_repeat_end'=>array('required'=>'no', 'type'=>'date', 'blank'=>'yes', 'name'=>'Appointment Repeat End'), 
-        'due_date'=>array('required'=>'no', 'blank'=>'yes', 'type'=>'datetimetoutc', 'name'=>'Due Date'), 
+        'due_date'=>array('required'=>'no', 'blank'=>'yes', 'type'=>'date', 'name'=>'Due Date'), 
         'due_duration'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Due Date Duration'), 
         'due_allday'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Due All Day Flag'), 
         'userdelete'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'User Delete Flag'),
@@ -60,6 +60,35 @@ function ciniki_atdo_update(&$ciniki) {
         return $rc;
     }   
 
+    //
+    // Get the current atdo
+    //
+    $strsql = "SELECT ciniki_atdos.id, "
+        . "ciniki_atdos.parent_id, "
+        . "ciniki_atdos.type, "
+        . "ciniki_atdos.subject, "
+        . "ciniki_atdos.location, "
+        . "ciniki_atdos.content, "
+        . "ciniki_atdos.user_id, "
+        . "ciniki_atdos.perm_flags, "
+        . "ciniki_atdos.status, "
+        . "ciniki_atdos.category, "
+        . "ciniki_atdos.priority, "
+        . "ciniki_atdos.appointment_flags "
+        . "FROM ciniki_atdos "
+        . "WHERE ciniki_atdos.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
+        . "AND ciniki_atdos.id = '" . ciniki_core_dbQuote($ciniki, $args['atdo_id']) . "' "
+        . "";
+    $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.atdo', 'atdo');
+    if( $rc['stat'] != 'ok' ) {
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.34', 'msg'=>'Unable to load atdo', 'err'=>$rc['err']));
+    }
+    if( !isset($rc['atdo']) ) {
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.35', 'msg'=>'Unable to find requested item'));
+    }
+    $atdo = $rc['atdo'];
+    
+    
     //  
     // Turn off autocommit
     //  
@@ -74,40 +103,68 @@ function ciniki_atdo_update(&$ciniki) {
         return $rc;
     }   
 
-    //
+/*    //
     // Add the order to the database
     //
     $strsql = "UPDATE ciniki_atdos SET last_updated = UTC_TIMESTAMP()";
-
+*/
     //
     // Turn allday flag on or off
     //
-
+//    $update_args = array();
     if( isset($args['appointment_allday']) ) {
-        if( $args['appointment_allday'] == 'yes' ) {
-            $strsql .= ', appointment_flags=(appointment_flags|0x01)';
-        } else {
-            $strsql .= ', appointment_flags=(appointment_flags&~0x01)';
+        if( $args['appointment_allday'] == 'yes' && ($atdo['appointment_flags']&0x01) == 0 ) {
+            $args['appointment_flags'] = ($atdo['appointment_flags'] | 0x01);
+//            $strsql .= ', appointment_flags=(appointment_flags|0x01)';
+        } elseif( $args['appointment_allday'] == 'no' && ($atdo['appointment_flags']&0x01) == 0x01 ) {
+            $args['appointment_flags'] = ($atdo['appointment_flags']&~0x01);
+//        } else {
+//            $strsql .= ', appointment_flags=(appointment_flags&~0x01)';
         }
     }
-    if( isset($args['due_allday']) ) {
+/*    if( isset($args['due_allday']) ) {
         if( $args['due_allday'] == 'yes' ) {
             $strsql .= ', due_flags=(due_flags|0x01)';
         } else {
             $strsql .= ', due_flags=(due_flags&~0x01)';
         }
+    } */
+    // Make sure the message is private
+    if( isset($args['type']) && $args['type'] == 6 ) {
+        if( ($atdo['perm_flags']&0x01) == 0 ) {
+            $args['perm_flags'] = ($atdo['perm_flags']|0x01);
+//            $strsql .= ', perm_flags=' . ($atdo['perm_flags']|0x01) . ' ';
+//            $rc = ciniki_core_dbAddModuleHistory($ciniki, 'ciniki.atdo', 'ciniki_atdo_history', $args['tnid'], 
+//                2, 'ciniki_atdos', $args['atdo_id'], 'perm_flags', ($atdo['perm_flags']|0x01));
+        }
+    } 
+    elseif( isset($args['private']) && $args['private'] == 'yes' && ($atdo['perm_flags']&0x01) == 0 ) {
+        $args['perm_flags'] = ($atdo['perm_flags']&~0x01);
+//        $strsql .= ', perm_flags=' . ($atdo['perm_flags'] &= ~0x01) . ' ';
+//        $rc = ciniki_core_dbAddModuleHistory($ciniki, 'ciniki.atdo', 'ciniki_atdo_history', $args['tnid'], 
+//            2, 'ciniki_atdos', $args['atdo_id'], 'perm_flags', ($atdo['perm_flags']&~0x01));
+    } 
+    elseif( isset($args['private']) && $args['private'] == 'no' && ($atdo['perm_flags']&0x01) == 0x01 ) {
+        $args['perm_flags'] = ($atdo['perm_flags']|0x01);
+//        $strsql .= ', perm_flags=' . ($atdo['perm_flags']|0x01) . ' ';
+//        $rc = ciniki_core_dbAddModuleHistory($ciniki, 'ciniki.atdo', 'ciniki_atdo_history', $args['tnid'], 
+//            2, 'ciniki_atdos', $args['atdo_id'], 'perm_flags', ($atdo['perm_flags']|0x01));
     }
-    // Make sure the message is private, or if other type is set as private
-    if( (isset($args['type']) && $args['type'] == 6) || (isset($args['private']) && $args['private'] == 'yes') ) {
-        $strsql .= ', perm_flags=(perm_flags|0x01)';
-    } elseif( isset($args['private']) ) {
-        $strsql .= ', perm_flags=(perm_flags&~0x01)';
+
+    //
+    // Check if status changes, update date_closed field
+    //
+    if( isset($args['status']) && $args['status'] == 1 && $atdo['status'] > 1 ) {
+        $args['date_closed'] = '';
+    } elseif( isset($args['status']) && $args['status'] == 60 && $atdo['status'] < 60 ) {
+        $dt = new DateTime('now', new DateTimezone('UTC'));
+        $args['date_closed'] = $dt->format('Y-m-d H:i:s');
     }
 
     //
     // Add all the fields to the change log
     //
-    $changelog_fields = array(
+/*    $changelog_fields = array(
         'parent_id',
         'project_id',
         'type',
@@ -143,6 +200,16 @@ function ciniki_atdo_update(&$ciniki) {
         ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
         return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.17', 'msg'=>'Unable to update task'));
     }
+*/
+    //
+    // Update the object
+    //
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'objectUpdate');
+    $rc = ciniki_core_objectUpdate($ciniki, $args['tnid'], 'ciniki.atdo.atdo', $args['atdo_id'], $args, 0x04);
+    if( $rc['stat'] != 'ok' ) {
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.36', 'msg'=>'Unable to update the item'));
+    }
+    
 
     //
     // Push the change to the other servers

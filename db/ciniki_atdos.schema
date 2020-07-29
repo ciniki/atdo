@@ -64,14 +64,14 @@
 # appointment_repeat_interval:  The interval to repeat the appointment, (default 1)
 # appointment_repeat_end:       The date and time to stop the repeatable appointment on#
 #
-# due_date:         The UTC date and time the atdo is due to be finished.  The due date may be after,
+# due_date:         The local timezone date the atdo is due to be finished.  The due date may be after,
 #                   the start_date + duration.  It allows the user to alter when they want to schedule
 #                   the atdo without interfering with the date it's due.
 #
 # due_duration:     How long the appointment should be for the due_date.
 # due_flags:            0x01 - all date due date
 #
-# closed_dt:        The date the item was marked as closed or completed
+# date_closed:      The UTC date and time the item was marked as closed or completed.
 #
 # date_added:       The UTC date and time the thread was added.
 # last_updated:     The UTC date and time the thread was last updated.
@@ -97,9 +97,10 @@ create table ciniki_atdos (
     appointment_repeat_type tinyint unsigned not null,
     appointment_repeat_interval int not null,
     appointment_repeat_end datetime not null,
-    due_date datetime not null,
+    due_date date not null,
     due_duration int not null,
     due_flags tinyint unsigned not null,
+    date_closed datetime not null,
     date_added datetime not null,
     last_updated datetime not null,
     primary key (id),
@@ -107,4 +108,4 @@ create table ciniki_atdos (
     index (category),
     index (parent_id, tnid, status, priority, date_added),
     index (tnid, uuid, last_updated)
-) ENGINE='InnoDB', COMMENT='v1.04';
+) ENGINE='InnoDB', COMMENT='v1.05';

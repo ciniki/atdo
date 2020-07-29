@@ -98,10 +98,10 @@ function ciniki_atdo_get(&$ciniki) {
 //      . "DATE_FORMAT(ciniki_atdos.due_date, '%l:%i') AS due_12hour, "
         . "ciniki_atdos.due_date AS due_date, "
         . "ciniki_atdos.due_date AS due_date_date, "
-        . "ciniki_atdos.due_date AS due_time, "
-        . "ciniki_atdos.due_date AS due_12hour, "
-        . "ciniki_atdos.due_duration, "
-        . "IF((ciniki_atdos.due_flags&0x01)=1, 'yes', 'no') AS due_duration_allday, "
+//        . "ciniki_atdos.due_date AS due_time, "
+//        . "ciniki_atdos.due_date AS due_12hour, "
+//        . "ciniki_atdos.due_duration, "
+//        . "IF((ciniki_atdos.due_flags&0x01)=1, 'yes', 'no') AS due_duration_allday, "
         . "ciniki_atdos.appointment_repeat_type, ciniki_atdos.appointment_repeat_interval, "
         . "DATE_FORMAT(ciniki_atdos.appointment_date, '%D') AS appointment_repeat_dayofmonth, "
         . "DAY(ciniki_atdos.appointment_date) AS appointment_repeat_day, "
@@ -123,17 +123,17 @@ function ciniki_atdo_get(&$ciniki) {
             'fields'=>array('id', 'parent_id', 'project_id', 'project_name', 'type', 'subject', 'location', 'content', 'user_id',
                 'private', 'status', 'category', 'priority', 
                 'appointment_date', 'appointment_date_date', 'appointment_time', 'appointment_12hour', 'appointment_duration', 'appointment_duration_allday',
-                'due_date', 'due_date_date', 'due_time', 'due_12hour', 'due_duration', 'due_duration_allday',
+                'due_date', 'due_date_date',
                 'appointment_repeat_type', 'appointment_repeat_interval', 'appointment_repeat_dayofmonth', 'appointment_repeat_day', 'appointment_repeat_weekday', 'appointment_repeat_end', 
                 ),
             'utctotz'=>array('appointment_date'=>array('timezone'=>$intl_timezone, 'format'=>$php_datetime_format),
                 'appointment_date_date'=>array('timezone'=>$intl_timezone, 'format'=>'Y-m-d'),
                 'apointment_time'=>array('timezone'=>$intl_timezone, 'format'=>'H:i'),
                 'apointment_12hour'=>array('timezone'=>$intl_timezone, 'format'=>'g:i A'),
-                'due_date'=>array('timezone'=>$intl_timezone, 'format'=>$php_datetime_format),
-                'due_date_date'=>array('timezone'=>$intl_timezone, 'format'=>'Y-m-d'),
-                'due_time'=>array('timezone'=>$intl_timezone, 'format'=>'H:i'),
-                'due_12hour'=>array('timezone'=>$intl_timezone, 'format'=>'g:i A'),
+                'due_date'=>array('timezone'=>'UTC', 'format'=>$php_date_format),
+                'due_date_date'=>array('timezone'=>'UTC', 'format'=>'Y-m-d'),
+//                'due_time'=>array('timezone'=>$intl_timezone, 'format'=>'H:i'),
+//                'due_12hour'=>array('timezone'=>$intl_timezone, 'format'=>'g:i A'),
             )),
         ));
     if( $rc['stat'] != 'ok' ) {

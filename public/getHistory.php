@@ -46,8 +46,14 @@ function ciniki_atdo_getHistory($ciniki) {
     }
     if( $args['field'] == 'due_date' ) {
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbGetModuleHistoryReformat');
-        return ciniki_core_dbGetModuleHistoryReformat($ciniki, 'ciniki.atdo', 'ciniki_atdo_history', $args['tnid'], 'ciniki_atdos', $args['atdo_id'], $args['field'], 'utcdatetime');
+        return ciniki_core_dbGetModuleHistoryReformat($ciniki, 'ciniki.atdo', 'ciniki_atdo_history', $args['tnid'], 'ciniki_atdos', $args['atdo_id'], $args['field'], 'date');
     }
+    if( $args['field'] == 'private' ) {
+        error_log('flag');
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbGetModuleHistoryFlagBit');
+        return ciniki_core_dbGetModuleHistoryFlagBit($ciniki, 'ciniki.atdo', 'ciniki_atdo_history', $args['tnid'], 'ciniki_atdos', $args['atdo_id'], 'perm_flags', 0x01, 'no', 'yes');
+    }
+
 
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbGetModuleHistory');
     return ciniki_core_dbGetModuleHistory($ciniki, 'ciniki.atdo', 'ciniki_atdo_history', $args['tnid'], 'ciniki_atdos', $args['atdo_id'], $args['field']);

@@ -1,0 +1,6 @@
+#
+# This file will upgrade the database table tenants to version 1.05.
+#
+ALTER TABLE ciniki_atdos MODIFY COLUMN due_date date not null;
+ALTER TABLE ciniki_atdos ADD COLUMN date_closed datetime not null AFTER due_flags;
+ALTER TABLE ciniki_atdos COMMENT='v1.05';
