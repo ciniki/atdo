@@ -891,7 +891,7 @@ function ciniki_atdo_main() {
             'appointment_duration':{'label':'Duration', 'type':'timeduration', 'min':15, 'allday':'yes', 
                 'date':'appointment_date', 'buttons':this.durationButtons},
             'appointment_repeat_type':{'label':'Repeat', 'type':'select', 'none':'yes', 'options':this.repeatOptions, 'fn':'M.ciniki_atdo_main.atdo.updateInterval'},
-            'appointment_repeat_interval':{'label':'Every', 'type':'multitoggle', 'toggles':this.repeatIntervals, 'hint':' '},
+            'appointment_repeat_interval':{'label':'Every', 'type':'toggle', 'toggles':this.repeatIntervals, 'hint':' '},
             'appointment_repeat_end':{'label':'End Date', 'type':'date', 'hint':'never'},
             }},
 //          'links':{'label':'Additional Information', 'type':'simplelist', 'list':{
@@ -1074,6 +1074,7 @@ function ciniki_atdo_main() {
                 return false;
             }
             var p = M.ciniki_atdo_main.atdo;
+            console.log(rsp);
             p.data = rsp.atdo;
             p.org_data = rsp.atdo;  // Store original data, to use in comparison when saving to know what changed
             // Need to set the followup to blank, incase they add one it will get sent to the update

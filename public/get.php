@@ -149,27 +149,27 @@ function ciniki_atdo_get(&$ciniki) {
     //
     $atdo['appointment_repeat'] = '';
     $nth = array('1st', '2nd', '3rd', '4th', '5th');
-    if( $atdo['appointment_repeat_type'] == 10 && $atdo['appointment_repeat_interval'] = 1 ) {
+    if( $atdo['appointment_repeat_type'] == 10 && $atdo['appointment_repeat_interval'] == 1 ) {
         $atdo['appointment_repeat'] = 'every day';
     } elseif( $atdo['appointment_repeat_type'] == 10 && $atdo['appointment_repeat_interval'] > 1 ) {
         $atdo['appointment_repeat'] = 'every ' . $atdo['appointment_repeat_interval'] . " days";
 
-    } elseif( $atdo['appointment_repeat_type'] == 20 && $atdo['appointment_repeat_interval'] = 1 ) {
+    } elseif( $atdo['appointment_repeat_type'] == 20 && $atdo['appointment_repeat_interval'] == 1 ) {
         $atdo['appointment_repeat'] = 'every week';
     } elseif( $atdo['appointment_repeat_type'] == 20 && $atdo['appointment_repeat_interval'] > 1 ) {
         $atdo['appointment_repeat'] = 'every ' . $atdo['appointment_repeat_interval'] . " weeks";
 
-    } elseif( $atdo['appointment_repeat_type'] == 30 && $atdo['appointment_repeat_interval'] = 1 ) {
+    } elseif( $atdo['appointment_repeat_type'] == 30 && $atdo['appointment_repeat_interval'] == 1 ) {
         $atdo['appointment_repeat'] = 'every month on the ' . $atdo['appointment_repeat_dayofmonth'];
     } elseif( $atdo['appointment_repeat_type'] == 30 && $atdo['appointment_repeat_interval'] > 1 ) {
         $atdo['appointment_repeat'] = 'every ' . $atdo['appointment_repeat_interval'] . " months on the " . $atdo['appointment_repeat_dayofmonth'];
         
-    } elseif( $atdo['appointment_repeat_type'] == 31 && $atdo['appointment_repeat_interval'] = 1 ) {
+    } elseif( $atdo['appointment_repeat_type'] == 31 && $atdo['appointment_repeat_interval'] == 1 ) {
         $atdo['appointment_repeat'] = 'every month on the ' . $nth[floor($atdo['appointment_repeat_day']/7)] . ' ' . $atdo['appointment_repeat_weekday'];
     } elseif( $atdo['appointment_repeat_type'] == 31 && $atdo['appointment_repeat_interval'] > 1 ) {
         $atdo['appointment_repeat'] = 'every ' . $atdo['appointment_repeat_interval'] . ' months on the '. $nth[floor($atdo['appointment_repeat_day']/7)] . ' ' . $atdo['appointment_repeat_weekday'];
 
-    } elseif( $atdo['appointment_repeat_type'] == 40 && $atdo['appointment_repeat_interval'] = 1 ) {
+    } elseif( $atdo['appointment_repeat_type'] == 40 && $atdo['appointment_repeat_interval'] == 1 ) {
         $atdo['appointment_repeat'] = 'every year';
     } elseif( $atdo['appointment_repeat_type'] == 40 && $atdo['appointment_repeat_interval'] > 1 ) {
         $atdo['appointment_repeat'] = 'every ' . $atdo['appointment_repeat_interval'] . " years";
