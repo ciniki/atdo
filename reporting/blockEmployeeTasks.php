@@ -124,7 +124,7 @@ function ciniki_atdo_reporting_blockEmployeeTasks(&$ciniki, $tnid, $args) {
             'columns'=>array(
                 array('label'=>'Priority', 'pdfwidth'=>'10%', 'field'=>'priority_text'),
                 array('label'=>'Category', 'pdfwidth'=>'25%', 'field'=>'category'),
-                array('label'=>'Tasks', 'pdfwidth'=>'50%', 'field'=>'subject'),
+                array('label'=>'Tasks', 'pdfwidth'=>'65%', 'field'=>'subject'),
                 array('label'=>'Last Updated', 'pdfwidth'=>'15%', 'field'=>'last_updated_date'),
                 ),
             'data'=>array(),

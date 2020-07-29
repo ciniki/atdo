@@ -206,7 +206,9 @@ function ciniki_atdo_get(&$ciniki) {
     //
     $strsql = "SELECT atdo_id, user_id, perms "
         . "FROM ciniki_atdo_users "
-        . "WHERE atdo_id = '" . ciniki_core_dbQuote($ciniki, $args['atdo_id']) . "' ";
+        . "WHERE atdo_id = '" . ciniki_core_dbQuote($ciniki, $args['atdo_id']) . "' "
+        . "AND (perms&0x04) = 0x04 "
+        . "";
     $rc = ciniki_core_dbRspQueryPlusUserIDs($ciniki, $strsql, 'ciniki.atdo', 'users', 'user', array('stat'=>'ok', 'users'=>array(), 'user_ids'=>array()));
     if( $rc['stat'] != 'ok' ) {
         return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.10', 'msg'=>'Unable to load item information', 'err'=>$rc['err']));
