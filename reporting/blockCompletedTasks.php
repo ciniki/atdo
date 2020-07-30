@@ -107,7 +107,6 @@ function ciniki_atdo_reporting_blockCompletedTasks(&$ciniki, $tnid, $args) {
         . $status_sql
         . "ORDER BY ciniki_atdos.priority DESC, ciniki_atdos.due_date DESC, ciniki_atdos.id "
         . "";
-        error_log($strsql);
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
     $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.atdo', array(
         array('container'=>'tasks', 'fname'=>'id', 'name'=>'task',
@@ -139,7 +138,7 @@ function ciniki_atdo_reporting_blockCompletedTasks(&$ciniki, $tnid, $args) {
             'columns'=>array(
                 array('label'=>'Priority', 'pdfwidth'=>'10%', 'field'=>'priority_text'),
                 array('label'=>'Category', 'pdfwidth'=>'25%', 'field'=>'category'),
-                array('label'=>'Tasks', 'pdfwidth'=>'65%', 'field'=>'subject'),
+                array('label'=>'Tasks', 'pdfwidth'=>'50%', 'field'=>'subject'),
                 array('label'=>'Date Closed', 'pdfwidth'=>'15%', 'field'=>'date_closed'),
                 ),
             'data'=>array(),

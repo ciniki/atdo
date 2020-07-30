@@ -125,7 +125,7 @@ function ciniki_atdo_reporting_blockEmployeeTasks(&$ciniki, $tnid, $args) {
                 array('label'=>'Priority', 'pdfwidth'=>'10%', 'field'=>'priority_text'),
                 array('label'=>'Category', 'pdfwidth'=>'25%', 'field'=>'category'),
                 array('label'=>'Tasks', 'pdfwidth'=>'65%', 'field'=>'subject'),
-                array('label'=>'Last Updated', 'pdfwidth'=>'15%', 'field'=>'last_updated_date'),
+//                array('label'=>'Last Updated', 'pdfwidth'=>'15%', 'field'=>'last_updated_date'),
                 ),
             'data'=>array(),
             'editApp'=>array('app'=>'ciniki.atdo.main', 'args'=>array('atdo_id'=>'d.id')),
@@ -136,9 +136,9 @@ function ciniki_atdo_reporting_blockEmployeeTasks(&$ciniki, $tnid, $args) {
             // Add emails to customer
             //
             $chunk['textlist'] .= $task['priority_text'] . " - ";
-            $chunk['textlist'] .= $task['subject'] . "\n";
-            $chunk['textlist'] .= $task['category'] . "\n";
-            $chunk['textlist'] .= $task['last_updated_date'] . "\n";
+            $chunk['textlist'] .= $task['subject'] . "";
+            $chunk['textlist'] .= ' [' . $task['category'] . "]\n";
+//            $chunk['textlist'] .= $task['last_updated_date'] . "\n";
 
             $chunk['textlist'] .= "\n";
             $chunk['data'][] = $task;
