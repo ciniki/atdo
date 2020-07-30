@@ -32,6 +32,8 @@ function ciniki_atdo_reporting_blockCompletedTasks(&$ciniki, $tnid, $args) {
 
     ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'dateFormat');
     $date_format = ciniki_users_dateFormat($ciniki, 'php');
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'datetimeFormat');
+    $datetime_format = ciniki_users_datetimeFormat($ciniki, 'php');
 
     //
     // Load maps
@@ -46,7 +48,7 @@ function ciniki_atdo_reporting_blockCompletedTasks(&$ciniki, $tnid, $args) {
     //
     // Get the list of tasks for the employee
     //
-    $status_sql = "AND ciniki_atdos.status = 1 ";
+    $status_sql = "AND ciniki_atdos.status = 60 ";
     $priority_sql = '';
     if( isset($args['priority']) && $args['priority'] != '' && $args['priority'] != '0' && $args['priority'] > 0 ) {
         $priority_sql = "AND ciniki_atdos.priority = '" . ciniki_core_dbQuote($ciniki, $args['priority']) . "' ";
@@ -60,6 +62,17 @@ function ciniki_atdo_reporting_blockCompletedTasks(&$ciniki, $tnid, $args) {
             . "AND ciniki_projects.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
             . ") ";
     }
+
+    $start_dt = new DateTime('now', new DateTimezone($intl_timezone));
+    $start_dt->setTime(23,59,59);
+    $end_dt = clone $start_dt;
+    if( isset($args['days']) && $args['days'] > 0 ) {
+        $start_dt->sub(new DateInterval('P' . $args['days'] . 'D'));
+    } else {
+        $start_dt->sub(new DateInterval('P1D'));
+    }
+    $start_dt->setTimezone(new DateTimezone('UTC'));
+    $end_dt->setTimezone(new DateTimezone('UTC'));
 
     //
     // Get the list of tasks
@@ -76,32 +89,38 @@ function ciniki_atdo_reporting_blockCompletedTasks(&$ciniki, $tnid, $args) {
         . "IFNULL(ciniki_atdos.due_date, '') AS due_date, "
         . "IF((ciniki_atdos.due_flags&0x01)=1, '', IF(ciniki_atdos.due_date=0, '', ciniki_atdos.due_date)) AS due_time, "
         . "ciniki_atdos.last_updated AS last_updated_date, "
-        . "ciniki_atdos.last_updated AS last_updated_time "
+        . "ciniki_atdos.last_updated AS last_updated_time, "
+        . "ciniki_atdos.date_closed "
         . "FROM ciniki_atdos "
-        . "INNER JOIN ciniki_atdo_users AS u1 ON ("
-            . "ciniki_atdos.id = u1.atdo_id "
-            . "AND u1.user_id = '" . ciniki_core_dbQuote($ciniki, $args['user_id']) . "' "
-            . "AND (u1.perms&0x04) = 0x04 "  // assigned to user
-            . "AND u1.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
-            . ") "
+//        . "INNER JOIN ciniki_atdo_users AS u1 ON ("
+//            . "ciniki_atdos.id = u1.atdo_id "
+//            . "AND u1.user_id = '" . ciniki_core_dbQuote($ciniki, $args['user_id']) . "' "
+//            . "AND (u1.perms&0x04) = 0x04 "  // assigned to user
+//            . "AND u1.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
+//            . ") "
         . $projects_sql
         . "WHERE ciniki_atdos.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
         . "AND ciniki_atdos.type = 2 "
+        . "AND ciniki_atdos.date_closed <= '" . ciniki_core_dbQuote($ciniki, $end_dt->format('Y-m-d H:i:s')) . "' "
+        . "AND ciniki_atdos.date_closed > '" . ciniki_core_dbQuote($ciniki, $start_dt->format('Y-m-d H:i:s')) . "' "
         . $priority_sql
         . $status_sql
         . "ORDER BY ciniki_atdos.priority DESC, ciniki_atdos.due_date DESC, ciniki_atdos.id "
         . "";
+        error_log($strsql);
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
     $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.atdo', array(
         array('container'=>'tasks', 'fname'=>'id', 'name'=>'task',
             'fields'=>array('id', 'category', 'subject', 'project_name', 'allday', 'status', 'priority', 'priority_text', 'private', 
-                'due_date', 'due_time', 'last_updated_date', 'last_updated_time'), 
+                'due_date', 'due_time', 'last_updated_date', 'last_updated_time','date_closed',
+                ), 
             'maps'=>array('priority_text'=>$maps['atdo']['priority']),
             'utctotz'=>array(
                 'due_date'=>array('timezone'=>$intl_timezone, 'format'=>$date_format),
                 'due_time'=>array('timezone'=>$intl_timezone, 'format'=>'g:i A'),
                 'last_updated_date'=>array('timezone'=>$intl_timezone, 'format'=>$date_format),
                 'last_updated_time'=>array('timezone'=>$intl_timezone, 'format'=>'g:i A'),
+                'date_closed'=>array('timezone'=>$intl_timezone, 'format'=>$datetime_format),
                 ),
             'lists'=>array('assigned_users'),    
             ),
@@ -121,7 +140,7 @@ function ciniki_atdo_reporting_blockCompletedTasks(&$ciniki, $tnid, $args) {
                 array('label'=>'Priority', 'pdfwidth'=>'10%', 'field'=>'priority_text'),
                 array('label'=>'Category', 'pdfwidth'=>'25%', 'field'=>'category'),
                 array('label'=>'Tasks', 'pdfwidth'=>'65%', 'field'=>'subject'),
-                array('label'=>'Last Updated', 'pdfwidth'=>'15%', 'field'=>'last_updated_date'),
+                array('label'=>'Date Closed', 'pdfwidth'=>'15%', 'field'=>'date_closed'),
                 ),
             'data'=>array(),
             'editApp'=>array('app'=>'ciniki.atdo.main', 'args'=>array('atdo_id'=>'d.id')),
@@ -143,7 +162,7 @@ function ciniki_atdo_reporting_blockCompletedTasks(&$ciniki, $tnid, $args) {
     }
     //
     else {
-        $chunks[] = array('type'=>'message', 'content'=>'No tasks!');
+        $chunks[] = array('type'=>'message', 'content'=>'No tasks were closed today');
     }
     
     return array('stat'=>'ok', 'chunks'=>$chunks);
