@@ -149,7 +149,6 @@ function ciniki_atdo_tasksList($ciniki) {
             . "IFNULL(ciniki_atdos.due_date, '') AS due_date, "
 //            . "IF((ciniki_atdos.due_flags&0x01)=1, '', IF(ciniki_atdos.due_date=0, '', ciniki_atdos.due_date)) AS due_time, "
             . "IFNULL(u3.display_name, '') AS assigned_users, "
-            . "followups.id AS fol_las_up, "
             . "IFNULL(followups.last_updated, ciniki_atdos.last_updated) AS last_updated_date, "
             . "IFNULL(followups.last_updated, ciniki_atdos.last_updated) AS last_updated_time "
             . "FROM ciniki_atdos "
@@ -235,7 +234,7 @@ function ciniki_atdo_tasksList($ciniki) {
     $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.atdo', array(
         array('container'=>'tasks', 'fname'=>'id', 'name'=>'task',
             'fields'=>array('id', 'category', 'subject', 'project_name', 'allday', 'status', 'priority', 'private', 
-                'assigned_users', 'due_date', 'last_updated_date', 'last_updated_time', 'fol_las_up'), 
+                'assigned_users', 'due_date', 'last_updated_date', 'last_updated_time'), 
             'utctotz'=>array(
                 'due_date'=>array('timezone'=>'UTC', 'format'=>$date_format),
                 'last_updated_date'=>array('timezone'=>$intl_timezone, 'format'=>$date_format),
