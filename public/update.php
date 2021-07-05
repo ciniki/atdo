@@ -258,7 +258,7 @@ function ciniki_atdo_update(&$ciniki) {
             if( !in_array($user['user_id'], $args['assigned']) ) {
                 $rc = ciniki_core_objectDelete($ciniki, $args['tnid'], 'ciniki.atdo.user', $user['id'], $user['uuid'], 0x04);
                 if( $rc['stat'] != 'ok' ) {
-                    return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.31', 'msg'=>'Unable to remove user', 'err'=>$rc['err']));
+                    return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.45', 'msg'=>'Unable to remove user', 'err'=>$rc['err']));
                 }
             } else {
                 $atdo_user_ids[] = $user['user_id'];

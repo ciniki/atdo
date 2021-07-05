@@ -57,7 +57,7 @@ function ciniki_atdo_tasksList($ciniki) {
     ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'hooks', 'tenantOwners');
     $rc = ciniki_tenants_hooks_tenantOwners($ciniki, $args['tnid'], array());
     if( $rc['stat'] != 'ok' ) {
-        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.24', 'msg'=>'', 'err'=>$rc['err']));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.38', 'msg'=>'', 'err'=>$rc['err']));
     }
     $owners = $rc['users'];
 
@@ -295,7 +295,7 @@ function ciniki_atdo_tasksList($ciniki) {
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbCount');
         $rc = ciniki_core_dbCount($ciniki, $strsql, 'ciniki.atdo', 'num');
         if( $rc['stat'] != 'ok' ) {
-            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.25', 'msg'=>'Unable to load get the number of items', 'err'=>$rc['err']));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.39', 'msg'=>'Unable to load get the number of items', 'err'=>$rc['err']));
         }
         if( isset($rc['num']['1']) ) {
             $rsp['statuslist'][0]['num_tasks'] = $rc['num']['1'];
@@ -415,7 +415,7 @@ function ciniki_atdo_tasksList($ciniki) {
             array('container'=>'categories', 'fname'=>'category', 'fields'=>array('category', 'num_tasks')),
             ));
         if( $rc['stat'] != 'ok' ) {
-            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.29', 'msg'=>'Unable to load ', 'err'=>$rc['err']));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.43', 'msg'=>'Unable to load ', 'err'=>$rc['err']));
         }
         $rsp['categorylist'] = isset($rc['categories']) ? $rc['categories'] : array();
         $num_tasks = 0;

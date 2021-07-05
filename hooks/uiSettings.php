@@ -86,11 +86,11 @@ function ciniki_atdo_hooks_uiSettings($ciniki, $tnid, $args) {
             )
         ) {
         $menu_item = array(
-            'priority'=>5000,
+            'priority'=>4500,
             'label'=>'Tasks', 
             'count'=>$task_count,
             'edit'=>array('app'=>'ciniki.atdo.main', 'args'=>array('tasks'=>'"\'yes\'"')),
-            'add'=>array('app'=>'ciniki.atdo.main', 'args'=>array('add'=>'"\'task\'"')),
+/*            'add'=>array('app'=>'ciniki.atdo.main', 'args'=>array('add'=>'"\'task\'"')),
             'search'=>array(
                 'method'=>'ciniki.atdo.tasksSearchQuick',
                 'args'=>array(),
@@ -120,7 +120,7 @@ function ciniki_atdo_hooks_uiSettings($ciniki, $tnid, $args) {
                 'noData'=>'No tasks found',
                 'edit'=>array('method'=>'ciniki.atdo.main', 'args'=>array('atdo_id'=>'d.id;')),
                 'submit'=>array('method'=>'ciniki.atdo.main', 'args'=>array('tasksearch'=>'search_str')),
-                ),
+                ), */
             );
         $rsp['menu_items'][] = $menu_item;
     } 

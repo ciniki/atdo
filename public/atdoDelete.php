@@ -46,7 +46,7 @@ function ciniki_atdo_atdoDelete(&$ciniki) {
         . ""; 
     $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.atdo', 'item');
     if( $rc['stat'] != 'ok' ) {
-        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.26', 'msg'=>'Unable to load item', 'err'=>$rc['err']));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.41', 'msg'=>'Unable to load item', 'err'=>$rc['err']));
     }
     $followups = isset($rc['rows']) ? $rc['rows'] : array();
     
@@ -95,7 +95,7 @@ function ciniki_atdo_atdoDelete(&$ciniki) {
         $rc = ciniki_core_objectDelete($ciniki, $args['tnid'], 'ciniki.atdo.user', $user['id'], $user['uuid'], 0x04);
         if( $rc['stat'] != 'ok' ) {
             ciniki_core_dbTransactionRollback($ciniki, 'ciniki.atdo');
-            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.28', 'msg'=>'Unable to remove user', 'err'=>$rc['err']));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.atdo.42', 'msg'=>'Unable to remove user', 'err'=>$rc['err']));
         }
     }
 
