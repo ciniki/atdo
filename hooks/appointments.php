@@ -175,6 +175,7 @@ function ciniki_atdo_hooks_appointments($ciniki, $tnid, $args) {
                     if( $cts < $appointment['start_ts'] || ($appointment['end_ts'] != '' && $cts >= $appointment['end_ts']) ) {
                         continue;
                     }
+                    error_log($cts);
 
                     //
                     // Check to see if the current date has any repeat appointments
@@ -222,9 +223,9 @@ function ciniki_atdo_hooks_appointments($ciniki, $tnid, $args) {
                         //
                         || (
                             $appointment['repeat_type'] == '40'
-                            && $cts->format('j') == $appointment['day']
-                            && $cts->format('n') == $appointment['month']
-                            && ($cts->format('Y') - $appointment['year'])%$appointment['repeat_interval'] == 0
+                            && $cdt->format('j') == $appointment['day']
+                            && $cdt->format('n') == $appointment['month']
+                            && ($cdt->format('Y') - $appointment['year'])%$appointment['repeat_interval'] == 0
                             )
                         ) {
                         $appointment['date'] = $cdt->format('Y-m-d');
