@@ -175,7 +175,6 @@ function ciniki_atdo_hooks_appointments($ciniki, $tnid, $args) {
                     if( $cts < $appointment['start_ts'] || ($appointment['end_ts'] != '' && $cts >= $appointment['end_ts']) ) {
                         continue;
                     }
-                    error_log($cts);
 
                     //
                     // Check to see if the current date has any repeat appointments
